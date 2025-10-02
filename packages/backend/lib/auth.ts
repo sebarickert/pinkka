@@ -11,7 +11,7 @@ export type AuthType = {
 export const auth = betterAuth({
   database,
   // Allow requests from the frontend development server
-  //   trustedOrigins: ['http://localhost:5173'],
+  trustedOrigins: ["http://localhost:4321"],
   emailAndPassword: {
     enabled: true,
   },
