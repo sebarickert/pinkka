@@ -6,6 +6,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "migrate": "node-pg-migrate -j ts",
+    "migrate:create": "npm run migrate create",
     "migrate:up": "DATABASE_URL=postgresql://admin:admin@localhost:5432/app_db npm run migrate up"
   },
   "dependencies": {
