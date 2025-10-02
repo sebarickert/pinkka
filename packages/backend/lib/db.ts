@@ -1,8 +1,11 @@
 import { Pool } from "pg";
 
+const { DATABASE_USER, DATABASE_PASSWORD, DATABASE_DB, DATABASE_PORT } =
+  process.env;
+
 export const database = new Pool({
-  user: "user",
-  password: "password",
-  database: "db",
-  port: 5432,
+  user: DATABASE_USER,
+  password: DATABASE_PASSWORD,
+  database: DATABASE_DB,
+  port: Number(DATABASE_PORT),
 });

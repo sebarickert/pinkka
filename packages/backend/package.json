@@ -4,7 +4,9 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "migrate": "node-pg-migrate -j ts",
+    "migrate:up": "DATABASE_URL=postgresql://admin:admin@localhost:5432/app_db npm run migrate up"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.5",
@@ -14,6 +16,7 @@
   "devDependencies": {
     "@types/node": "^20.11.17",
     "@types/pg": "^8.15.5",
+    "node-pg-migrate": "^8.0.3",
     "tsx": "^4.7.1",
     "typescript": "^5.8.3"
   }

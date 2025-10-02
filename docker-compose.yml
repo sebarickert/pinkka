@@ -2,13 +2,13 @@ services:
   database:
     image: postgres:latest
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: db
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_DB}
     ports:
-      - "5432:5432"
+      - "${DATABASE_PORT}:${DATABASE_PORT}"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - app_db:/var/lib/postgresql/data
 
 volumes:
-  db_data:
+  app_db:
