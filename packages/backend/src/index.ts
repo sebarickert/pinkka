@@ -1,9 +1,12 @@
+import app from "@/src/app.js";
 import { serve } from "@hono/node-server";
-import { Hono } from "hono";
-import { user } from "./routes/user.js";
 
-const app = new Hono().basePath("/api/v1");
+const port = 3000;
 
-app.route("/user", user);
+// eslint-disable-next-line no-console
+console.log(`Server is running on http://localhost:${port}`);
 
-serve(app);
+serve({
+  fetch: app.fetch,
+  port,
+});

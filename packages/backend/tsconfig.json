@@ -1,16 +1,18 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "ESNext",
     "module": "NodeNext",
     "strict": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-    "outDir": "./dist"
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["*"]
+    }
   },
   "exclude": ["node_modules"]
 }
