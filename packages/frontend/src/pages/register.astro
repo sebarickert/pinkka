@@ -1,0 +1,49 @@
+---
+
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Register</title>
+  </head>
+  <body>
+    <form id="form">
+      <input name="email" />
+      <input type="password" name="password" />
+      <button>gogogo</button>
+    </form>
+    <script>
+      import { authClient } from "../lib/auth-client.js";
+      const form = document.getElementById("form");
+
+      form?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = e.target.email.value;
+        const password = e.target.password.value;
+
+        try {
+          await authClient.signUp.email(
+            { email, password, name: "Test User" },
+            {
+              onSuccess: () => {
+                Astro.redirect("/");
+                // window.location.href = "/";
+              },
+              onError: (error) => {
+                console.log("222", error);
+                alert(error.message || "Registration failed");
+              },
+            }
+          );
+        } catch (error) {
+          console.log("111", error);
+          alert(error.message || "Registration error");
+        }
+      });
+    </script>
+  </body>
+</html>

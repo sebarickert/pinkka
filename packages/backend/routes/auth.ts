@@ -1,7 +1,7 @@
 import { auth, type AuthType } from "@/lib/auth.js";
 import { Hono } from "hono";
 
-const router = new Hono<{ Bindings: AuthType }>({
+const router = new Hono<{ Variables: AuthType["Variables"] }>({
   strict: false,
 });
 
