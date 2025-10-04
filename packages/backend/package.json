@@ -7,16 +7,19 @@
     "start": "node dist/index.js",
     "migrate": "node-pg-migrate -j ts",
     "migrate:create": "npm run migrate create",
-    "migrate:up": "DATABASE_URL=postgresql://admin:admin@localhost:5432/app_db npm run migrate up"
+    "migrate:up": "DATABASE_URL=postgresql://admin:admin@localhost:5432/app_db npm run migrate up",
+    "kysely:codegen": "DATABASE_URL=postgresql://admin:admin@localhost:5432/app_db kysely-codegen"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.5",
     "hono": "^4.9.9",
+    "kysely": "^0.28.7",
     "pg": "^8.16.3"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
     "@types/pg": "^8.15.5",
+    "kysely-codegen": "^0.19.0",
     "node-pg-migrate": "^8.0.3",
     "tsx": "^4.7.1",
     "typescript": "^5.8.3"

@@ -1,4 +1,4 @@
-import { database } from "@/lib/db.js";
+import { pool } from "@/lib/db.js";
 import { betterAuth } from "better-auth";
 
 export type AuthType = {
@@ -9,7 +9,7 @@ export type AuthType = {
 };
 
 export const auth = betterAuth({
-  database,
+  database: pool,
   // Allow requests from the frontend development server
   trustedOrigins: ["http://localhost:4321"],
   emailAndPassword: {

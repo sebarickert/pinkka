@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth.js";
 import createApp from "@/lib/create-app.js";
+import { db } from "@/lib/db.js";
 import authRoute from "@/routes/auth.js";
 import { cors } from "hono/cors";
 
@@ -35,11 +36,19 @@ app.use("*", async (c, next) => {
 });
 
 // Simple test endpoint
-app.get("/api/ping", (c) => {
+app.get("/api/ping", async (c) => {
   const session = c.get("session");
   const user = c.get("user");
 
   if (!user) return c.body(null, 401);
+
+  console.log(
+    await db
+      .selectFrom("user")
+      .where("id", "=", "X2LRbFmHDeQ99NgKU5I5eh5T9wCn5Izj")
+      .select(["name"])
+      .execute()
+  );
 
   return c.json({ message: "pong", user, session });
 });
