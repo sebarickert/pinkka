@@ -7,8 +7,8 @@
     "start": "node dist/index.js",
     "migrate": "node-pg-migrate -j ts",
     "migrate:create": "npm run migrate create",
-    "migrate:up": "DATABASE_URL=postgresql://admin:admin@localhost:5432/app_db npm run migrate up",
-    "kysely:codegen": "DATABASE_URL=postgresql://admin:admin@localhost:5432/app_db kysely-codegen"
+    "migrate:up": "DATABASE_URL=postgresql://admin:admin@localhost:5432/pinkka_db npm run migrate up",
+    "kysely:codegen": "DATABASE_URL=postgresql://admin:admin@localhost:5432/pinkka_db kysely-codegen"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.5",
