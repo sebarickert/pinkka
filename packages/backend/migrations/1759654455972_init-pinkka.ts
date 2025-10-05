@@ -19,7 +19,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       primaryKey: true,
     },
     user_id: {
-      type: "text",
+      type: "uuid",
       references: "user",
       notNull: true,
       onDelete: "CASCADE",
@@ -48,7 +48,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       primaryKey: true,
     },
     user_id: {
-      type: "text",
+      type: "uuid",
       references: "user",
       notNull: true,
       onDelete: "CASCADE",

@@ -2,14 +2,14 @@ import type { Timestamp } from "@/types/Database.js";
 import type { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 export interface SessionTable {
-  createdAt: Generated<Timestamp>;
-  expiresAt: Timestamp;
+  created_at: Generated<Timestamp>;
+  expires_at: Timestamp;
   id: Generated<string>;
-  ipAddress: string | null;
+  ip_address: string | null;
   token: string;
-  updatedAt: Generated<Timestamp>;
-  userAgent: string | null;
-  userId: string;
+  updated_at: Generated<Timestamp>;
+  user_agent: string | null;
+  user_id: string;
 }
 
 export type Session = Selectable<SessionTable>;

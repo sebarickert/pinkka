@@ -4,17 +4,17 @@ export const shorthands: ColumnDefinitions | undefined = undefined;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createTable("user", {
-    id: { type: "text", notNull: true, primaryKey: true },
+    id: { type: "uuid", primaryKey: true },
     name: { type: "text", notNull: true },
     email: { type: "text", notNull: true, unique: true },
-    emailVerified: { type: "boolean", notNull: true },
+    email_verified: { type: "boolean", notNull: true },
     image: { type: "text" },
-    createdAt: {
+    created_at: {
       type: "timestamptz",
       notNull: true,
       default: pgm.func("CURRENT_TIMESTAMP"),
     },
-    updatedAt: {
+    updated_at: {
       type: "timestamptz",
       notNull: true,
       default: pgm.func("CURRENT_TIMESTAMP"),
@@ -22,23 +22,23 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   });
 
   pgm.createTable("session", {
-    id: { type: "text", notNull: true, primaryKey: true },
-    expiresAt: { type: "timestamptz", notNull: true },
+    id: { type: "uuid", primaryKey: true },
+    expires_at: { type: "timestamptz", notNull: true },
     token: { type: "text", notNull: true, unique: true },
-    createdAt: {
+    created_at: {
       type: "timestamptz",
       notNull: true,
       default: pgm.func("CURRENT_TIMESTAMP"),
     },
-    updatedAt: {
+    updated_at: {
       type: "timestamptz",
       notNull: true,
       default: pgm.func("CURRENT_TIMESTAMP"),
     },
-    ipAddress: { type: "text" },
-    userAgent: { type: "text" },
-    userId: {
-      type: "text",
+    ip_address: { type: "text" },
+    user_agent: { type: "text" },
+    user_id: {
+      type: "uuid",
       notNull: true,
       references: "user",
       onDelete: "CASCADE",
@@ -46,28 +46,28 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   });
 
   pgm.createTable("account", {
-    id: { type: "text", notNull: true, primaryKey: true },
-    accountId: { type: "text", notNull: true },
-    providerId: { type: "text", notNull: true },
-    userId: {
-      type: "text",
+    id: { type: "uuid", primaryKey: true },
+    account_id: { type: "text", notNull: true },
+    provider_id: { type: "text", notNull: true },
+    user_id: {
+      type: "uuid",
       notNull: true,
       references: "user",
       onDelete: "CASCADE",
     },
-    accessToken: { type: "text" },
-    refreshToken: { type: "text" },
-    idToken: { type: "text" },
-    accessTokenExpiresAt: { type: "timestamptz" },
-    refreshTokenExpiresAt: { type: "timestamptz" },
+    access_token: { type: "text" },
+    refresh_token: { type: "text" },
+    id_token: { type: "text" },
+    access_token_expires_at: { type: "timestamptz" },
+    refresh_token_expires_at: { type: "timestamptz" },
     scope: { type: "text" },
     password: { type: "text" },
-    createdAt: {
+    created_at: {
       type: "timestamptz",
       notNull: true,
       default: pgm.func("CURRENT_TIMESTAMP"),
     },
-    updatedAt: {
+    updated_at: {
       type: "timestamptz",
       notNull: true,
       default: pgm.func("CURRENT_TIMESTAMP"),
@@ -75,16 +75,16 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   });
 
   pgm.createTable("verification", {
-    id: { type: "text", notNull: true, primaryKey: true },
+    id: { type: "uuid", primaryKey: true },
     identifier: { type: "text", notNull: true },
     value: { type: "text", notNull: true },
-    expiresAt: { type: "timestamptz", notNull: true },
-    createdAt: {
+    expires_at: { type: "timestamptz", notNull: true },
+    created_at: {
       type: "timestamptz",
       notNull: true,
       default: pgm.func("CURRENT_TIMESTAMP"),
     },
-    updatedAt: {
+    updated_at: {
       type: "timestamptz",
       notNull: true,
       default: pgm.func("CURRENT_TIMESTAMP"),

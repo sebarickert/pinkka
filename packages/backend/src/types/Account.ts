@@ -2,19 +2,19 @@ import type { Timestamp } from "@/types/Database.js";
 import type { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 export interface AccountTable {
-  accessToken: string | null;
-  accessTokenExpiresAt: Timestamp | null;
-  accountId: string;
-  createdAt: Generated<Timestamp>;
+  access_token: string | null;
+  access_token_expires_at: Timestamp | null;
+  account_id: string;
+  created_at: Generated<Timestamp>;
   id: Generated<string>;
-  idToken: string | null;
+  id_token: string | null;
   password: string | null;
-  providerId: string;
-  refreshToken: string | null;
-  refreshTokenExpiresAt: Timestamp | null;
+  provider_id: string;
+  refresh_token: string | null;
+  refresh_token_expires_at: Timestamp | null;
   scope: string | null;
-  updatedAt: Generated<Timestamp>;
-  userId: string;
+  updated_at: Generated<Timestamp>;
+  user_id: string;
 }
 
 export type Account = Selectable<AccountTable>;

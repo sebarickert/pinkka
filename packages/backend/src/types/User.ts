@@ -2,13 +2,13 @@ import type { Timestamp } from "@/types/Database.js";
 import type { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 export interface UserTable {
-  createdAt: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
   email: string;
-  emailVerified: boolean;
+  email_verified: boolean;
   id: Generated<string>;
   image: string | null;
   name: string;
-  updatedAt: Generated<Timestamp>;
+  updated_at: Generated<Timestamp>;
 }
 
 export type User = Selectable<UserTable>;

@@ -10,15 +10,13 @@ const DATABASE_PASSWORD = "admin";
 const DATABASE_DB = "pinkka_db";
 const DATABASE_PORT = 5432;
 
-export const pool = new Pool({
-  user: DATABASE_USER,
-  password: DATABASE_PASSWORD,
-  database: DATABASE_DB,
-  port: Number(DATABASE_PORT),
-});
-
 const dialect = new PostgresDialect({
-  pool,
+  pool: new Pool({
+    user: DATABASE_USER,
+    password: DATABASE_PASSWORD,
+    database: DATABASE_DB,
+    port: Number(DATABASE_PORT),
+  }),
 });
 
 export const db = new Kysely<Database>({

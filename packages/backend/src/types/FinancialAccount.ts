@@ -1,6 +1,7 @@
 import type { Timestamp } from "@/types/Database.js";
 import type { Generated, Insertable, Selectable, Updateable } from "kysely";
 
+// Named FinancialAccount to avoid confusion with Account from better-auth
 export interface FinancialAccountTable {
   id: Generated<string>;
   user_id: string;
