@@ -1,5 +1,5 @@
 import { db } from "@/lib/db.js";
-import { betterAuth, generateId } from "better-auth";
+import { betterAuth } from "better-auth";
 import { v4 as uuidv4 } from "uuid";
 
 export type AuthType = {
@@ -17,7 +17,7 @@ export const auth = betterAuth({
     },
   },
   // Allow requests from the frontend development server
-  trustedOrigins: ["http://localhost:4321"],
+  trustedOrigins: [process.env.FRONTEND_URL!],
   emailAndPassword: {
     enabled: true,
   },

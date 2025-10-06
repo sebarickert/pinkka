@@ -17,6 +17,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     id: {
       type: "uuid",
       primaryKey: true,
+      default: pgm.func("gen_random_uuid()"),
     },
     user_id: {
       type: "uuid",
@@ -46,6 +47,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     id: {
       type: "uuid",
       primaryKey: true,
+      default: pgm.func("gen_random_uuid()"),
     },
     user_id: {
       type: "uuid",

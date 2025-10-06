@@ -12,5 +12,19 @@ import "../styles/global.css";
   </head>
   <body>
     <h1 class="text-4xl font-bold">Astro</h1>
+    <button id="sign-up-button">Sign out</button>
   </body>
+  <script>
+    import { authClient } from "../lib/auth-client.js";
+
+    const signUpButton = document.getElementById("sign-up-button");
+    signUpButton?.addEventListener("click", async () => {
+      try {
+        await authClient.signOut();
+      } catch (error) {
+        console.log("111", error);
+        alert(error.message || "Sign out error");
+      }
+    });
+  </script>
 </html>

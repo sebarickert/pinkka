@@ -1,14 +1,14 @@
+import dotenv from "dotenv";
+dotenv.config({ path: "../../.env" });
+
 import { Pool } from "pg";
 import { Kysely, PostgresDialect } from "kysely";
 import type { Database } from "@/types/Database.js";
 
-// const { DATABASE_USER, DATABASE_PASSWORD, DATABASE_DB, DATABASE_PORT } =
-//   process.env;
+const { DATABASE_USER, DATABASE_PASSWORD, DATABASE_DB, DATABASE_PORT } =
+  process.env;
 
-const DATABASE_USER = "admin";
-const DATABASE_PASSWORD = "admin";
-const DATABASE_DB = "pinkka_db";
-const DATABASE_PORT = 5432;
+console.log(DATABASE_DB);
 
 const dialect = new PostgresDialect({
   pool: new Pool({

@@ -1,17 +1,21 @@
+import dotenv from "dotenv";
+dotenv.config({ path: "../../.env" });
+
 import { auth } from "@/lib/auth.js";
 import createApp from "@/lib/create-app.js";
-import { db } from "@/lib/db.js";
+// import { db } from "@/lib/db.js";
+import accounts from "@/routes/accounts.js";
 import authRoute from "@/routes/auth.js";
 import { cors } from "hono/cors";
 
 const app = createApp();
 
-const routes = [authRoute] as const;
+const routes = [authRoute, accounts] as const;
 
 app.use(
   "*",
   cors({
-    origin: "http://localhost:4321", // replace with your origin
+    origin: process.env.FRONTEND_URL!,
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["POST", "GET", "OPTIONS"],
     exposeHeaders: ["Content-Length"],
@@ -40,15 +44,17 @@ app.get("/api/ping", async (c) => {
   const session = c.get("session");
   const user = c.get("user");
 
+  console.log(session, user);
+
   if (!user) return c.body(null, 401);
 
-  console.log(
-    await db
-      .selectFrom("user")
-      .where("id", "=", "X2LRbFmHDeQ99NgKU5I5eh5T9wCn5Izj")
-      .select(["name"])
-      .execute()
-  );
+  // console.log(
+  //   await db
+  //     .selectFrom("user")
+  //     .where("id", "=", "83cc6094-9d89-40cc-b841-7210e30362c0")
+  //     .select(["name"])
+  //     .execute()
+  // );
 
   return c.json({ message: "pong", user, session });
 });

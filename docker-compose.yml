@@ -4,11 +4,12 @@ services:
     environment:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_DB}
+      POSTGRES_MULTIPLE_DATABASES: ${DATABASE_DB},pinkka_test_db
     ports:
       - "${DATABASE_PORT}:${DATABASE_PORT}"
     volumes:
       - pinkka_db:/var/lib/postgresql/data
+      - ./scripts/init-test-db.sh:/docker-entrypoint-initdb.d/init-test-db.sh
 
 volumes:
   pinkka_db:

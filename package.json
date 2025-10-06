@@ -8,13 +8,18 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run start:backend & npm run start:frontend",
-    "start:backend": "npm -w backend run dev",
-    "start:frontend": "npm -w frontend run dev",
-    "migrate:create": "npm -w backend run migrate:create",
-    "migrate:up": "npm -w backend run migrate:up"
+    "start:test": "npm run start:backend:test & npm run start:frontend",
+    "start:backend": "npm -w @pinkka/backend run dev",
+    "start:backend:test": "DATABASE_DB=pinkka_test_db npm -w @pinkka/backend run dev",
+    "start:frontend": "npm -w @pinkka/frontend run dev",
+    "migrate:create": "npm -w @pinkka/backend run migrate:create",
+    "migrate:up": "npm -w @pinkka/backend run migrate:up",
+    "migrate:up:test": "npm -w @pinkka/backend run migrate:up:test"
   },
   "type": "commonjs",
   "dependencies": {
-    "better-auth": "^1.3.24"
+    "better-auth": "^1.3.24",
+    "dotenv": "^17.2.3",
+    "zod": "^4.1.12"
   }
 }
