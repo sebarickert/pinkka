@@ -50,6 +50,7 @@ describe("Financial Account Integration Tests", () => {
       expect(res.status).toEqual(400);
       expect(body.status).toEqual("fail");
       expect(body.data).toHaveProperty("name");
+      expect(body.data).toHaveProperty("initial_balance");
     });
 
     test("should create financial account for authenticated user", async () => {
@@ -58,8 +59,7 @@ describe("Financial Account Integration Tests", () => {
         type: "bank",
         name: "Hola!",
         currency: "EUR",
-        current_balance: 1000,
-        pending_balance: 0,
+        initial_balance: 1000,
       };
 
       const res = await fetcher(
@@ -87,8 +87,9 @@ describe("Financial Account Integration Tests", () => {
       expect(newAccount).toMatchObject({
         ...newAccountPayload,
         id: newAccount?.id,
+        initial_balance: "1000",
         current_balance: "1000",
-        pending_balance: "0",
+        pending_balance: "1000",
       });
 
       expect(newAccount?.is_deleted).toBeDefined();

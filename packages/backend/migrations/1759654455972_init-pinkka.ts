@@ -28,6 +28,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     name: { type: "text", notNull: true },
     type: { type: "financial_account_type", notNull: true },
     currency: { type: "text", notNull: true },
+    initial_balance: { type: "numeric", notNull: true, default: 0 },
     current_balance: { type: "numeric", notNull: true, default: 0 },
     pending_balance: { type: "numeric", notNull: true, default: 0 },
     is_deleted: { type: "boolean", notNull: true, default: false },

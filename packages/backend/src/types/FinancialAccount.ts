@@ -8,6 +8,7 @@ export interface FinancialAccountTable {
   name: string;
   type: "bank" | "credit_card" | "wallet" | "investment" | "loan";
   currency: string;
+  initial_balance: number;
   current_balance: number;
   pending_balance: number;
   is_deleted: boolean;

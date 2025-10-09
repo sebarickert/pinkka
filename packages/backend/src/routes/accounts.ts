@@ -24,9 +24,11 @@ accounts.post("/accounts", requireAuth, async (c) => {
   }
 
   try {
-    const newFinancialAccount = await FinancialAccountRepo.create(
-      validation.data
-    );
+    const newFinancialAccount = await FinancialAccountRepo.create({
+      ...validation.data,
+      current_balance: validation.data.initial_balance,
+      pending_balance: validation.data.initial_balance,
+    });
 
     return success(c, newFinancialAccount, 201);
   } catch (err) {

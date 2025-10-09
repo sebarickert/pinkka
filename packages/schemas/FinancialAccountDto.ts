@@ -17,6 +17,7 @@ export const FinancialAccountDto = z.object({
   name: z.string(),
   type: financialAccountTypes,
   currency: currencyEnum,
+  initial_balance: z.number(),
   current_balance: z.number(),
   pending_balance: z.number(),
   is_deleted: z.boolean().default(false),
@@ -28,6 +29,8 @@ export const NewFinancialAccountDto = FinancialAccountDto.omit({
   id: true,
   created_at: true,
   updated_at: true,
+  current_balance: true,
+  pending_balance: true,
 });
 
 export type FinancialAccountDto = z.infer<typeof FinancialAccountDto>;
