@@ -1,48 +1,176 @@
 import { db } from "@/lib/db.js";
 import { fetcher } from "@/tests/utils/fetcher.js";
 import { createTestUser } from "@/tests/utils/createTestUser.js";
-import { beforeAll, describe, expect, test } from "vitest";
+import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 import { cleanDb } from "@/tests/utils/cleanDb.js";
 
+const createAccount = async (newAccountPayload: any, jwt: string) => {
+  const res = await fetcher(
+    "/api/accounts",
+    {
+      method: "POST",
+      body: JSON.stringify(newAccountPayload),
+    },
+    jwt
+  );
+
+  const body = await res.json();
+
+  return body.data;
+};
+
 describe("Financial Account Integration Tests", () => {
-  let user: any;
-  let jwt: string;
+  let user1: any;
+  let jwt1: string;
+  let user2: any;
+  let jwt2: string;
 
   beforeAll(async () => {
     await cleanDb();
     const auth = await createTestUser();
+    const auth2 = await createTestUser();
 
-    user = auth.user;
-    jwt = auth.jwt;
+    user1 = auth.user;
+    jwt1 = auth.jwt;
+    user2 = auth2.user;
+    jwt2 = auth2.jwt;
   });
 
-  describe("POST /accounts", () => {
-    test("should fail to create financial account for unauthenticated user", async () => {
-      const res = await fetcher("/api/accounts", {
-        method: "POST",
+  describe("Authorization", () => {
+    const protectedEndpoints = [
+      { method: "GET", path: "/api/accounts" },
+      { method: "POST", path: "/api/accounts" },
+      { method: "GET", path: "/api/accounts/some-id" },
+      { method: "PUT", path: "/api/accounts/some-id" },
+      { method: "DELETE", path: "/api/accounts/some-id" },
+    ];
+
+    protectedEndpoints.forEach(({ method, path }) => {
+      test(`returns 401 for unauthorized ${method} ${path}`, async () => {
+        const res = await fetcher(path, { method });
+        const body = await res.json();
+
+        expect(res.status).toEqual(401);
+        expect(body.status).toEqual("error");
+        expect(body.message).toBe("Unauthorized");
       });
+    });
+  });
+
+  describe("GET /accounts/:id", () => {
+    let account: any;
+
+    beforeAll(async () => {
+      const newAccountPayload = {
+        type: "bank",
+        name: "Hola!",
+        currency: "EUR",
+        initial_balance: 1000,
+      };
+
+      account = await createAccount(newAccountPayload, jwt1);
+    });
+
+    test("returns the financial account for given id", async () => {
+      const res = await fetcher(`/api/accounts/${account.id}`, {}, jwt1);
 
       const body = await res.json();
 
-      expect(res.status).toEqual(401);
-      expect(body.status).toEqual("error");
-      expect(body.message).toBe("Unauthorized");
+      expect(res.status).toEqual(200);
+      expect(body.status).toEqual("success");
+      expect(body.data).toMatchObject(account);
     });
 
-    test("should fail to create financial account for authenticated user without required fields", async () => {
+    test("returns 404 when account does not exist", async () => {
+      const id = "c2b8f3ee-c9ae-4104-8f89-173e3871ebb9";
+
+      const res = await fetcher(`/api/accounts/${id}`, {}, jwt1);
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(404);
+      expect(body.status).toEqual("error");
+      expect(body.message).toBe(`Financial account with id ${id} not found`);
+    });
+
+    test("returns validation error if id is not a valid uuid", async () => {
+      const res = await fetcher(`/api/accounts/some-non-existing-id`, {}, jwt1);
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(400);
+      expect(body.status).toEqual("error");
+      expect(body.message).toBe("Invalid id format");
+    });
+  });
+
+  describe("GET /accounts", () => {
+    test("returns empty array when user has no financial accounts", async () => {
+      const res = await fetcher("/api/accounts", {}, jwt2);
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(200);
+      expect(body.status).toEqual("success");
+      expect(body.data).toEqual([]);
+    });
+
+    test("returns all financial accounts for user", async () => {
+      const newAccounts = [
+        {
+          type: "bank",
+          name: "Hola!",
+          currency: "EUR",
+          initial_balance: 1000,
+        },
+        {
+          type: "wallet",
+          name: "Petty Cash",
+          currency: "USD",
+          initial_balance: 500,
+        },
+      ];
+
+      for (const account of newAccounts) {
+        await fetcher(
+          "/api/accounts",
+          {
+            method: "POST",
+            body: JSON.stringify(account),
+          },
+          jwt2
+        );
+      }
+
+      const res = await fetcher("/api/accounts", {}, jwt2);
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(200);
+      expect(body.status).toEqual("success");
+      expect(body.data).toHaveLength(newAccounts.length);
+
+      body.data.forEach((account: any) => {
+        expect(account.user_id).toEqual(user2.id);
+      });
+    });
+  });
+
+  describe("POST /accounts - single", () => {
+    const newAccountPayload = {
+      type: "bank",
+      name: "Hola!",
+      currency: "EUR",
+      initial_balance: 1000,
+    };
+
+    test("returns validation errors if required fields are missing", async () => {
       const res = await fetcher(
         "/api/accounts",
         {
           method: "POST",
-          body: JSON.stringify({
-            user_id: user.id,
-            type: "bank",
-            currency: "EUR",
-            current_balance: 1000,
-            pending_balance: 0,
-          }),
         },
-        jwt
+        jwt1
       );
 
       const body = await res.json();
@@ -53,22 +181,14 @@ describe("Financial Account Integration Tests", () => {
       expect(body.data).toHaveProperty("initial_balance");
     });
 
-    test("should create financial account for authenticated user", async () => {
-      const newAccountPayload = {
-        user_id: user.id,
-        type: "bank",
-        name: "Hola!",
-        currency: "EUR",
-        initial_balance: 1000,
-      };
-
+    test("creates financial account with valid data", async () => {
       const res = await fetcher(
         "/api/accounts",
         {
           method: "POST",
           body: JSON.stringify(newAccountPayload),
         },
-        jwt
+        jwt1
       );
 
       const body = await res.json();
@@ -87,14 +207,412 @@ describe("Financial Account Integration Tests", () => {
       expect(newAccount).toMatchObject({
         ...newAccountPayload,
         id: newAccount?.id,
-        initial_balance: "1000",
-        current_balance: "1000",
-        pending_balance: "1000",
+        initial_balance: newAccountPayload.initial_balance.toString(),
+        current_balance: newAccountPayload.initial_balance.toString(),
+        pending_balance: newAccountPayload.initial_balance.toString(),
       });
 
       expect(newAccount?.is_deleted).toBeDefined();
       expect(newAccount?.created_at).toBeDefined();
       expect(newAccount?.updated_at).toBeDefined();
+    });
+
+    test("creates financial account with negative initial_balance", async () => {
+      const newAccountPayloadNegative = {
+        ...newAccountPayload,
+        initial_balance: -1000,
+      };
+
+      const res = await fetcher(
+        "/api/accounts",
+        {
+          method: "POST",
+          body: JSON.stringify(newAccountPayloadNegative),
+        },
+        jwt1
+      );
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(201);
+      expect(body.status).toEqual("success");
+
+      const newAccountId = body.data.id;
+
+      const newAccount = await db
+        .selectFrom("financial_account")
+        .where("id", "=", newAccountId)
+        .selectAll()
+        .executeTakeFirst();
+
+      expect(newAccount).toMatchObject({
+        ...newAccountPayload,
+        id: newAccount?.id,
+        initial_balance: newAccountPayloadNegative.initial_balance.toString(),
+        current_balance: newAccountPayloadNegative.initial_balance.toString(),
+        pending_balance: newAccountPayloadNegative.initial_balance.toString(),
+      });
+
+      expect(newAccount?.is_deleted).toBeDefined();
+      expect(newAccount?.created_at).toBeDefined();
+      expect(newAccount?.updated_at).toBeDefined();
+    });
+  });
+
+  describe("POST /accounts - multiple", async () => {
+    const newAccountPayload1 = {
+      type: "bank",
+      name: "Hola!",
+      currency: "EUR",
+      initial_balance: 1000,
+    };
+
+    const newAccountPayload2 = {
+      type: "bank",
+      name: "Adios!",
+      currency: "USD",
+      initial_balance: 1234,
+    };
+
+    const newAccountPayload3 = {
+      type: "bank",
+      name: "Adios!",
+      currency: "USD",
+      initial_balance: 9999999,
+    };
+
+    test("returns validation errors for multiple accounts with invalid data", async () => {
+      const newAccountPayload1Invalid = {
+        ...newAccountPayload1,
+        currency: undefined,
+      };
+
+      const newAccountPayload3Invalid = {
+        ...newAccountPayload3,
+        initial_balance: "100",
+      };
+
+      const res = await fetcher(
+        "/api/accounts",
+        {
+          method: "POST",
+          body: JSON.stringify([
+            newAccountPayload1Invalid,
+            newAccountPayload2,
+            newAccountPayload3Invalid,
+          ]),
+        },
+        jwt1
+      );
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(400);
+      expect(body.status).toEqual("fail");
+      expect(body.data["0"]).toHaveProperty("currency");
+      expect(body.data["2"]).toHaveProperty("initial_balance");
+    });
+
+    test("creates multiple financial accounts with valid data", async () => {
+      const res = await fetcher(
+        "/api/accounts",
+        {
+          method: "POST",
+          body: JSON.stringify([
+            newAccountPayload1,
+            newAccountPayload2,
+            newAccountPayload3,
+          ]),
+        },
+        jwt1
+      );
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(201);
+      expect(body.status).toEqual("success");
+      expect(body.data).toHaveLength(3);
+
+      const newAccountIds = body.data.map(
+        (account: { id: string }) => account.id
+      );
+
+      const newAccounts = await db
+        .selectFrom("financial_account")
+        .where("id", "in", newAccountIds)
+        .selectAll()
+        .execute();
+
+      expect(newAccounts).toHaveLength(3);
+      [newAccountPayload1, newAccountPayload2, newAccountPayload3].forEach(
+        (payload, i) => {
+          expect(newAccounts[i]).toMatchObject({
+            ...payload,
+            id: newAccounts[i].id,
+            initial_balance: String(payload.initial_balance),
+            current_balance: String(payload.initial_balance),
+            pending_balance: String(payload.initial_balance),
+          });
+        }
+      );
+    });
+  });
+
+  describe("PUT /accounts/:id", () => {
+    let account: any;
+
+    beforeAll(async () => {
+      const newAccountPayload = {
+        type: "bank",
+        name: "Hola!",
+        currency: "EUR",
+        initial_balance: 1000,
+      };
+
+      account = await createAccount(newAccountPayload, jwt1);
+    });
+
+    test("updates financial account with valid data", async () => {
+      const accountBefore = await db
+        .selectFrom("financial_account")
+        .where("id", "=", account.id)
+        .selectAll()
+        .executeTakeFirst();
+
+      const res = await fetcher(
+        `/api/accounts/${account.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            name: "I was just updated!",
+            currency: "USD",
+            type: "wallet",
+            initial_balance: 5000,
+          }),
+        },
+        jwt1
+      );
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(200);
+      expect(body.status).toEqual("success");
+
+      const accountAfter = await db
+        .selectFrom("financial_account")
+        .where("id", "=", account.id)
+        .selectAll()
+        .executeTakeFirst();
+
+      expect(accountAfter).not.toMatchObject(accountBefore!);
+    });
+
+    test("sending empty body results in no changes", async () => {
+      const accountBefore = await db
+        .selectFrom("financial_account")
+        .where("id", "=", account.id)
+        .selectAll()
+        .executeTakeFirst();
+
+      const res = await fetcher(
+        `/api/accounts/${account.id}`,
+        {
+          method: "PUT",
+        },
+        jwt1
+      );
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(200);
+      expect(body.status).toEqual("success");
+
+      const accountAfter = await db
+        .selectFrom("financial_account")
+        .where("id", "=", account.id)
+        .selectAll()
+        .executeTakeFirst();
+
+      expect(accountAfter).toMatchObject(accountBefore!);
+    });
+
+    test("returns validation error if id is not a valid uuid", async () => {
+      const res = await fetcher(
+        `/api/accounts/some-non-existing-id`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            name: "I do not exist",
+          }),
+        },
+        jwt1
+      );
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(400);
+      expect(body.status).toEqual("error");
+      expect(body.message).toBe("Invalid id format");
+    });
+
+    test("returns validation errors if trying to update with invalid data", async () => {
+      const res = await fetcher(
+        `/api/accounts/${account.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            name: "I was just updated!",
+            currency: 123,
+            type: "wrong",
+            initial_balance: 5000,
+          }),
+        },
+        jwt1
+      );
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(400);
+      expect(body.status).toEqual("fail");
+      expect(body.data).toHaveProperty("currency");
+      expect(body.data).toHaveProperty("type");
+    });
+
+    test("returns 404 when trying to update non-existing account", async () => {
+      const id = "c2b8f3ee-c9ae-4104-8f89-173e3871ebb9";
+
+      const res = await fetcher(
+        `/api/accounts/${id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            name: "I do not exist",
+          }),
+        },
+        jwt1
+      );
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(404);
+      expect(body.status).toEqual("error");
+      expect(body.message).toBe(`Financial account with id ${id} not found`);
+    });
+
+    // TODO: Implement this test when transactions are implemented
+    test.skip("prevents updating initial_balance if account has transactions", async () => {});
+
+    test("returns 404 when trying to update deleted account", async () => {
+      await fetcher(
+        `/api/accounts/${account.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            is_deleted: true,
+          }),
+        },
+        jwt1
+      );
+
+      const res = await fetcher(
+        `/api/accounts/${account.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            name: "Trying to update deleted account",
+          }),
+        },
+        jwt1
+      );
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(404);
+      expect(body.status).toEqual("error");
+      expect(body.message).toBe(
+        `Financial account with id ${account.id} not found`
+      );
+    });
+  });
+
+  describe("DELETE /accounts/:id", () => {
+    let account: any;
+
+    beforeAll(async () => {
+      const newAccountPayload = {
+        type: "bank",
+        name: "Hola!",
+        currency: "EUR",
+        initial_balance: 1000,
+      };
+
+      account = await createAccount(newAccountPayload, jwt1);
+    });
+
+    test("soft-deletes the financial account", async () => {
+      const accountBefore = await db
+        .selectFrom("financial_account")
+        .where("id", "=", account.id)
+        .selectAll()
+        .executeTakeFirst();
+
+      expect(accountBefore?.is_deleted).toBe(false);
+
+      const res = await fetcher(
+        `/api/accounts/${account.id}`,
+        {
+          method: "DELETE",
+        },
+        jwt1
+      );
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(200);
+      expect(body.status).toEqual("success");
+      expect(body.data.is_deleted).toBe(true);
+
+      const accountAfter = await db
+        .selectFrom("financial_account")
+        .where("id", "=", account.id)
+        .selectAll()
+        .executeTakeFirst();
+
+      expect(accountAfter?.is_deleted).toBe(true);
+    });
+
+    test("returns 404 when trying to delete non-existing account", async () => {
+      const id = "c2b8f3ee-c9ae-4104-8f89-173e3871ebb9";
+
+      const res = await fetcher(
+        `/api/accounts/${id}`,
+        {
+          method: "DELETE",
+        },
+        jwt1
+      );
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(404);
+      expect(body.status).toEqual("error");
+      expect(body.message).toBe(`Financial account with id ${id} not found`);
+    });
+
+    test("returns validation error if id is not a valid uuid", async () => {
+      const res = await fetcher(
+        `/api/accounts/some-non-existing-id`,
+        {
+          method: "DELETE",
+        },
+        jwt1
+      );
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(400);
+      expect(body.status).toEqual("error");
+      expect(body.message).toBe("Invalid id format");
     });
   });
 });

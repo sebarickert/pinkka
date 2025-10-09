@@ -14,7 +14,8 @@
     "start:frontend": "npm -w @pinkka/frontend run dev",
     "migrate:create": "npm -w @pinkka/backend run migrate:create",
     "migrate:up": "npm -w @pinkka/backend run migrate:up",
-    "migrate:up:test": "npm -w @pinkka/backend run migrate:up:test"
+    "migrate:up:test": "npm -w @pinkka/backend run migrate:up:test",
+    "test:backend:integration": "npm -w @pinkka/backend run test:integration"
   },
   "type": "commonjs",
   "dependencies": {

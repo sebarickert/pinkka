@@ -27,11 +27,26 @@ export const FinancialAccountDto = z.object({
 
 export const NewFinancialAccountDto = FinancialAccountDto.omit({
   id: true,
+  user_id: true,
   created_at: true,
   updated_at: true,
   current_balance: true,
   pending_balance: true,
-});
+}).strict();
+
+export const UpdateFinancialAccountDto = FinancialAccountDto.omit({
+  id: true,
+  user_id: true,
+  created_at: true,
+  updated_at: true,
+  current_balance: true,
+  pending_balance: true,
+})
+  .strict()
+  .partial();
 
 export type FinancialAccountDto = z.infer<typeof FinancialAccountDto>;
 export type NewFinancialAccountDto = z.infer<typeof NewFinancialAccountDto>;
+export type UpdateFinancialAccountDto = z.infer<
+  typeof UpdateFinancialAccountDto
+>;
