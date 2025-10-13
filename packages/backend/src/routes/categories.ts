@@ -64,7 +64,7 @@ categories.post("/categories", requireAuth, async (c) => {
 
   try {
     const newCategory = await CategoryRepo.create({
-      data: { ...validation.data, user_id },
+      data: { ...validation.data, user_id, is_deleted: false },
     });
 
     return success(c, newCategory, 201);

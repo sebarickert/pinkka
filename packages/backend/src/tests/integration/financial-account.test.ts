@@ -1,39 +1,19 @@
 import { db } from "@/lib/db.js";
 import { fetcher } from "@/tests/utils/fetcher.js";
-import { createTestUser } from "@/tests/utils/createTestUser.js";
-import { beforeAll, beforeEach, describe, expect, test } from "vitest";
+import {
+  createTestUser,
+  type UserWithSessionToken,
+} from "@/tests/utils/createTestUser.js";
+import { beforeEach, describe, expect, test } from "vitest";
 import { cleanDb } from "@/tests/utils/cleanDb.js";
-
-const createAccount = async (newAccountPayload: any, jwt: string) => {
-  const res = await fetcher(
-    "/api/accounts",
-    {
-      method: "POST",
-      body: JSON.stringify(newAccountPayload),
-    },
-    jwt
-  );
-
-  const body = await res.json();
-
-  return body.data;
-};
+import { createAccount } from "@/tests/utils/createAccount.js";
 
 describe("Financial Account Integration Tests", () => {
-  let user1: any;
-  let jwt1: string;
-  let user2: any;
-  let jwt2: string;
+  let user: UserWithSessionToken;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     await cleanDb();
-    const auth = await createTestUser();
-    const auth2 = await createTestUser();
-
-    user1 = auth.user;
-    jwt1 = auth.jwt;
-    user2 = auth2.user;
-    jwt2 = auth2.jwt;
+    user = await createTestUser();
   });
 
   describe("Authorization", () => {
@@ -60,19 +40,23 @@ describe("Financial Account Integration Tests", () => {
   describe("GET /accounts/:id", () => {
     let account: any;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       const newAccountPayload = {
         type: "bank",
         name: "Hola!",
         currency: "EUR",
         initial_balance: 1000,
-      };
+      } as const;
 
-      account = await createAccount(newAccountPayload, jwt1);
+      account = await createAccount(newAccountPayload, user);
     });
 
     test("returns the financial account for given id", async () => {
-      const res = await fetcher(`/api/accounts/${account.id}`, {}, jwt1);
+      const res = await fetcher(
+        `/api/accounts/${account.id}`,
+        {},
+        user.session_token
+      );
 
       const body = await res.json();
 
@@ -84,7 +68,7 @@ describe("Financial Account Integration Tests", () => {
     test("returns 404 when account does not exist", async () => {
       const id = "c2b8f3ee-c9ae-4104-8f89-173e3871ebb9";
 
-      const res = await fetcher(`/api/accounts/${id}`, {}, jwt1);
+      const res = await fetcher(`/api/accounts/${id}`, {}, user.session_token);
 
       const body = await res.json();
 
@@ -94,7 +78,11 @@ describe("Financial Account Integration Tests", () => {
     });
 
     test("returns validation error if id is not a valid uuid", async () => {
-      const res = await fetcher(`/api/accounts/some-non-existing-id`, {}, jwt1);
+      const res = await fetcher(
+        `/api/accounts/some-non-existing-id`,
+        {},
+        user.session_token
+      );
 
       const body = await res.json();
 
@@ -106,7 +94,7 @@ describe("Financial Account Integration Tests", () => {
 
   describe("GET /accounts", () => {
     test("returns empty array when user has no financial accounts", async () => {
-      const res = await fetcher("/api/accounts", {}, jwt2);
+      const res = await fetcher("/api/accounts", {}, user.session_token);
 
       const body = await res.json();
 
@@ -138,11 +126,11 @@ describe("Financial Account Integration Tests", () => {
             method: "POST",
             body: JSON.stringify(account),
           },
-          jwt2
+          user.session_token
         );
       }
 
-      const res = await fetcher("/api/accounts", {}, jwt2);
+      const res = await fetcher("/api/accounts", {}, user.session_token);
 
       const body = await res.json();
 
@@ -151,7 +139,7 @@ describe("Financial Account Integration Tests", () => {
       expect(body.data).toHaveLength(newAccounts.length);
 
       body.data.forEach((account: any) => {
-        expect(account.user_id).toEqual(user2.id);
+        expect(account.user_id).toEqual(user.id);
       });
     });
   });
@@ -170,7 +158,7 @@ describe("Financial Account Integration Tests", () => {
         {
           method: "POST",
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -188,7 +176,7 @@ describe("Financial Account Integration Tests", () => {
           method: "POST",
           body: JSON.stringify(newAccountPayload),
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -229,7 +217,7 @@ describe("Financial Account Integration Tests", () => {
           method: "POST",
           body: JSON.stringify(newAccountPayloadNegative),
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -302,7 +290,7 @@ describe("Financial Account Integration Tests", () => {
             newAccountPayload3Invalid,
           ]),
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -324,7 +312,7 @@ describe("Financial Account Integration Tests", () => {
             newAccountPayload3,
           ]),
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -361,15 +349,15 @@ describe("Financial Account Integration Tests", () => {
   describe("PUT /accounts/:id", () => {
     let account: any;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       const newAccountPayload = {
         type: "bank",
         name: "Hola!",
         currency: "EUR",
         initial_balance: 1000,
-      };
+      } as const;
 
-      account = await createAccount(newAccountPayload, jwt1);
+      account = await createAccount(newAccountPayload, user);
     });
 
     test("updates financial account with valid data", async () => {
@@ -390,7 +378,7 @@ describe("Financial Account Integration Tests", () => {
             initial_balance: 5000,
           }),
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -419,7 +407,7 @@ describe("Financial Account Integration Tests", () => {
         {
           method: "PUT",
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -445,7 +433,7 @@ describe("Financial Account Integration Tests", () => {
             name: "I do not exist",
           }),
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -467,7 +455,7 @@ describe("Financial Account Integration Tests", () => {
             initial_balance: 5000,
           }),
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -489,7 +477,7 @@ describe("Financial Account Integration Tests", () => {
             name: "I do not exist",
           }),
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -511,7 +499,7 @@ describe("Financial Account Integration Tests", () => {
             is_deleted: true,
           }),
         },
-        jwt1
+        user.session_token
       );
 
       const res = await fetcher(
@@ -522,7 +510,7 @@ describe("Financial Account Integration Tests", () => {
             name: "Trying to update deleted account",
           }),
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -538,15 +526,15 @@ describe("Financial Account Integration Tests", () => {
   describe("DELETE /accounts/:id", () => {
     let account: any;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       const newAccountPayload = {
         type: "bank",
         name: "Hola!",
         currency: "EUR",
         initial_balance: 1000,
-      };
+      } as const;
 
-      account = await createAccount(newAccountPayload, jwt1);
+      account = await createAccount(newAccountPayload, user);
     });
 
     test("soft-deletes the financial account", async () => {
@@ -563,7 +551,7 @@ describe("Financial Account Integration Tests", () => {
         {
           method: "DELETE",
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -589,7 +577,7 @@ describe("Financial Account Integration Tests", () => {
         {
           method: "DELETE",
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -605,7 +593,7 @@ describe("Financial Account Integration Tests", () => {
         {
           method: "DELETE",
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();

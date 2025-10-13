@@ -2,10 +2,11 @@ import { beforeAll, describe, expect, test } from "vitest";
 import { db } from "@/lib/db.js";
 import { cleanDb } from "@/tests/utils/cleanDb.js";
 import { fetcher } from "@/tests/utils/fetcher.js";
+import type { User } from "@/types/User.js";
 
-describe("Auth Integration Tests", () => {
-  let user: any;
-  let jwt: string;
+describe.sequential("Auth Integration Tests", () => {
+  let user: User;
+  let session_token: string;
 
   beforeAll(async () => {
     await cleanDb();
@@ -26,7 +27,7 @@ describe("Auth Integration Tests", () => {
     const body = await res.json();
     const setCookie = res.headers.get("set-cookie");
     const match = setCookie?.match(/better-auth\.session_token=([^;]+)/);
-    jwt = (match ? match[1] : undefined) as string;
+    session_token = (match ? match[1] : undefined) as string;
     user = body.user;
 
     expect(body).toHaveProperty("user");
@@ -58,7 +59,7 @@ describe("Auth Integration Tests", () => {
       {
         method: "POST",
       },
-      jwt
+      session_token
     );
 
     expect(res.status).toBe(200);

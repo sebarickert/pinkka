@@ -72,6 +72,7 @@ accounts.post("/accounts", requireAuth, async (c) => {
     user_id,
     current_balance: data.initial_balance,
     pending_balance: data.initial_balance,
+    is_deleted: false,
   }));
 
   try {

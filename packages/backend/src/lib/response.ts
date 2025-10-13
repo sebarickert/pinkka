@@ -18,6 +18,8 @@ type ErrorResponse = {
   data?: any;
 };
 
+export type JsonResponse<T> = SuccessResponse<T> | FailResponse | ErrorResponse;
+
 // JSend specification
 // https://github.com/omniti-labs/jsend
 

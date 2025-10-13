@@ -1,39 +1,19 @@
 import { db } from "@/lib/db.js";
 import { cleanDb } from "@/tests/utils/cleanDb.js";
-import { createTestUser } from "@/tests/utils/createTestUser.js";
+import { createCategory } from "@/tests/utils/createCategory.js";
+import {
+  createTestUser,
+  type UserWithSessionToken,
+} from "@/tests/utils/createTestUser.js";
 import { fetcher } from "@/tests/utils/fetcher.js";
-import { beforeAll, describe, expect, test } from "vitest";
-
-const createCategory = async (newCategoryPayload: any, jwt: string) => {
-  const res = await fetcher(
-    "/api/categories",
-    {
-      method: "POST",
-      body: JSON.stringify(newCategoryPayload),
-    },
-    jwt
-  );
-
-  const body = await res.json();
-
-  return body.data;
-};
+import { beforeEach, describe, expect, test } from "vitest";
 
 describe("Category Integration Tests", () => {
-  let user1: any;
-  let jwt1: string;
-  let user2: any;
-  let jwt2: string;
+  let user: UserWithSessionToken;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     await cleanDb();
-    const auth = await createTestUser();
-    const auth2 = await createTestUser();
-
-    user1 = auth.user;
-    jwt1 = auth.jwt;
-    user2 = auth2.user;
-    jwt2 = auth2.jwt;
+    user = await createTestUser();
   });
 
   describe("Authorization", () => {
@@ -60,17 +40,21 @@ describe("Category Integration Tests", () => {
   describe("GET /categories/:id", () => {
     let category: any;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       const newCategoryPayload = {
         type: "income",
         name: "Hola!",
-      };
+      } as const;
 
-      category = await createCategory(newCategoryPayload, jwt1);
+      category = await createCategory(newCategoryPayload, user);
     });
 
     test("returns the category for given id", async () => {
-      const res = await fetcher(`/api/categories/${category.id}`, {}, jwt1);
+      const res = await fetcher(
+        `/api/categories/${category.id}`,
+        {},
+        user.session_token
+      );
 
       const body = await res.json();
 
@@ -82,7 +66,11 @@ describe("Category Integration Tests", () => {
     test("returns 404 when category does not exist", async () => {
       const id = "c2b8f3ee-c9ae-4104-8f89-173e3871ebb9";
 
-      const res = await fetcher(`/api/categories/${id}`, {}, jwt1);
+      const res = await fetcher(
+        `/api/categories/${id}`,
+        {},
+        user.session_token
+      );
 
       const body = await res.json();
 
@@ -95,7 +83,7 @@ describe("Category Integration Tests", () => {
       const res = await fetcher(
         `/api/categories/some-non-existing-id`,
         {},
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -108,7 +96,7 @@ describe("Category Integration Tests", () => {
 
   describe("GET /categories", () => {
     test("returns empty array when user has no categories", async () => {
-      const res = await fetcher("/api/categories", {}, jwt2);
+      const res = await fetcher("/api/categories", {}, user.session_token);
 
       const body = await res.json();
 
@@ -136,11 +124,11 @@ describe("Category Integration Tests", () => {
             method: "POST",
             body: JSON.stringify(category),
           },
-          jwt2
+          user.session_token
         );
       }
 
-      const res = await fetcher("/api/categories", {}, jwt2);
+      const res = await fetcher("/api/categories", {}, user.session_token);
 
       const body = await res.json();
 
@@ -148,8 +136,8 @@ describe("Category Integration Tests", () => {
       expect(body.status).toEqual("success");
       expect(body.data).toHaveLength(newCategories.length);
 
-      body.data.forEach((account: any) => {
-        expect(account.user_id).toEqual(user2.id);
+      body.data.forEach(({ user_id }: { user_id: string }) => {
+        expect(user_id).toEqual(user.id);
       });
     });
   });
@@ -166,7 +154,7 @@ describe("Category Integration Tests", () => {
         {
           method: "POST",
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -184,7 +172,7 @@ describe("Category Integration Tests", () => {
           method: "POST",
           body: JSON.stringify(newCategoryPayload),
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -202,7 +190,7 @@ describe("Category Integration Tests", () => {
 
       expect(newCategory).toMatchObject({
         ...newCategoryPayload,
-        user_id: user1.id,
+        user_id: user.id,
         is_deleted: false,
       });
 
@@ -215,13 +203,13 @@ describe("Category Integration Tests", () => {
   describe("PUT /categories/:id", () => {
     let category: any;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       const newCategoryPayload = {
         type: "transfer",
         name: "Hola!",
-      };
+      } as const;
 
-      category = await createCategory(newCategoryPayload, jwt1);
+      category = await createCategory(newCategoryPayload, user);
     });
 
     test("updates category with valid data", async () => {
@@ -240,7 +228,7 @@ describe("Category Integration Tests", () => {
             type: "income",
           }),
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -269,7 +257,7 @@ describe("Category Integration Tests", () => {
         {
           method: "PUT",
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -295,7 +283,7 @@ describe("Category Integration Tests", () => {
             name: "I do not exist",
           }),
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -314,7 +302,7 @@ describe("Category Integration Tests", () => {
             asd: "I was just updated!",
           }),
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -334,7 +322,7 @@ describe("Category Integration Tests", () => {
             name: "I do not exist",
           }),
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -356,7 +344,7 @@ describe("Category Integration Tests", () => {
             is_deleted: true,
           }),
         },
-        jwt1
+        user.session_token
       );
 
       const res = await fetcher(
@@ -367,7 +355,7 @@ describe("Category Integration Tests", () => {
             name: "Trying to update deleted category",
           }),
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -381,13 +369,13 @@ describe("Category Integration Tests", () => {
   describe("DELETE /categories/:id", () => {
     let category: any;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       const newCategoryPayload = {
         type: "expense",
         name: "Test category to delete",
-      };
+      } as const;
 
-      category = await createCategory(newCategoryPayload, jwt1);
+      category = await createCategory(newCategoryPayload, user);
     });
 
     test("soft-deletes the category", async () => {
@@ -404,7 +392,7 @@ describe("Category Integration Tests", () => {
         {
           method: "DELETE",
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -430,7 +418,7 @@ describe("Category Integration Tests", () => {
         {
           method: "DELETE",
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();
@@ -446,7 +434,7 @@ describe("Category Integration Tests", () => {
         {
           method: "DELETE",
         },
-        jwt1
+        user.session_token
       );
 
       const body = await res.json();

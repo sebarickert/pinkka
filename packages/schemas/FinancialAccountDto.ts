@@ -32,6 +32,7 @@ export const NewFinancialAccountDto = FinancialAccountDto.omit({
   updated_at: true,
   current_balance: true,
   pending_balance: true,
+  is_deleted: true,
 }).strict();
 
 export const UpdateFinancialAccountDto = FinancialAccountDto.omit({

@@ -17,6 +17,7 @@ export const NewCategoryDto = CategoryDto.omit({
   user_id: true,
   created_at: true,
   updated_at: true,
+  is_deleted: true,
 }).strict();
 
 export const UpdateCategoryDto = CategoryDto.omit({
