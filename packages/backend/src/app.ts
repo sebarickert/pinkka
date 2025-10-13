@@ -3,14 +3,14 @@ dotenv.config({ path: "../../.env" });
 
 import { auth } from "@/lib/auth.js";
 import createApp from "@/lib/create-app.js";
-// import { db } from "@/lib/db.js";
 import accounts from "@/routes/accounts.js";
 import authRoute from "@/routes/auth.js";
 import { cors } from "hono/cors";
+import categories from "@/routes/categories.js";
 
 const app = createApp();
 
-const routes = [authRoute, accounts] as const;
+const routes = [authRoute, accounts, categories] as const;
 
 app.use(
   "*",
@@ -37,26 +37,6 @@ app.use("*", async (c, next) => {
   c.set("session", session.session);
 
   return next();
-});
-
-// Simple test endpoint
-app.get("/api/ping", async (c) => {
-  const session = c.get("session");
-  const user = c.get("user");
-
-  console.log(session, user);
-
-  if (!user) return c.body(null, 401);
-
-  // console.log(
-  //   await db
-  //     .selectFrom("user")
-  //     .where("id", "=", "83cc6094-9d89-40cc-b841-7210e30362c0")
-  //     .select(["name"])
-  //     .execute()
-  // );
-
-  return c.json({ message: "pong", user, session });
 });
 
 routes.forEach((route) => {

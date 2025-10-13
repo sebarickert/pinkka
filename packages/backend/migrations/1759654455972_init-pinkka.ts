@@ -66,6 +66,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       references: "financial_account",
       onDelete: "SET NULL",
     },
+    is_deleted: { type: "boolean", notNull: true, default: false },
     type: { type: "transaction_type", notNull: true },
     amount: { type: "numeric", notNull: true },
     description: { type: "text", notNull: true },
@@ -83,6 +84,48 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       type: "timestamptz",
       notNull: true,
       default: pgm.func("CURRENT_TIMESTAMP"),
+    },
+  });
+
+  pgm.createTable("category", {
+    id: {
+      type: "uuid",
+      primaryKey: true,
+      default: pgm.func("gen_random_uuid()"),
+    },
+    user_id: {
+      type: "uuid",
+      references: "user",
+      notNull: true,
+      onDelete: "CASCADE",
+    },
+    is_deleted: { type: "boolean", notNull: true, default: false },
+    type: { type: "transaction_type", notNull: true },
+    name: { type: "text", notNull: true },
+    created_at: {
+      type: "timestamptz",
+      notNull: true,
+      default: pgm.func("CURRENT_TIMESTAMP"),
+    },
+    updated_at: {
+      type: "timestamptz",
+      notNull: true,
+      default: pgm.func("CURRENT_TIMESTAMP"),
+    },
+  });
+
+  pgm.createTable("transaction_category", {
+    category_id: {
+      type: "uuid",
+      references: "category",
+      notNull: true,
+      onDelete: "CASCADE",
+    },
+    transaction_id: {
+      type: "uuid",
+      references: "transaction",
+      notNull: true,
+      onDelete: "CASCADE",
     },
   });
 }

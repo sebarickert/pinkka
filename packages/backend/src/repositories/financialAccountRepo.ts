@@ -5,6 +5,7 @@ import type {
   NewFinancialAccount,
 } from "@/types/FinancialAccount.js";
 
+// TODO: Move to a shared location
 export interface BaseQueryOptions {
   sortBy?: string; // default sorting field
   order?: "asc" | "desc"; // default order
