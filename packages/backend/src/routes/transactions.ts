@@ -27,25 +27,6 @@ transactions.get("/transactions", requireAuth, async (c) => {
   }
 });
 
-transactions.get("/transactions/:id", requireAuth, async (c) => {
-  const user_id = c.get("user")!.id;
-  const { id } = c.req.param();
-
-  if (!validate(id)) {
-    return error(c, "Invalid id format", { status: 400 });
-  }
-
-  const transaction = await TransactionRepo.findOne({ id, user_id });
-
-  if (!transaction || transaction.is_deleted) {
-    return error(c, `Financial account with id ${id} not found`, {
-      status: 404,
-    });
-  }
-
-  return success(c, transaction);
-});
-
 transactions.post("/transactions", requireAuth, async (c) => {
   let body;
 
@@ -72,6 +53,25 @@ transactions.post("/transactions", requireAuth, async (c) => {
   } catch (err) {
     return error(c, "Failed to create transactions", { data: err });
   }
+});
+
+transactions.get("/transactions/:id", requireAuth, async (c) => {
+  const user_id = c.get("user")!.id;
+  const { id } = c.req.param();
+
+  if (!validate(id)) {
+    return error(c, "Invalid id format", { status: 400 });
+  }
+
+  const transaction = await TransactionRepo.findOne({ id, user_id });
+
+  if (!transaction || transaction.is_deleted) {
+    return error(c, `Transaction with id ${id} not found`, {
+      status: 404,
+    });
+  }
+
+  return success(c, transaction);
 });
 
 transactions.put("/transactions/:id", requireAuth, async (c) => {

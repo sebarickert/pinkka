@@ -7,10 +7,11 @@ import accounts from "@/routes/accounts.js";
 import authRoute from "@/routes/auth.js";
 import { cors } from "hono/cors";
 import categories from "@/routes/categories.js";
+import transactions from "@/routes/transactions.js";
 
 const app = createApp();
 
-const routes = [authRoute, accounts, categories] as const;
+const routes = [authRoute, accounts, categories, transactions] as const;
 
 app.use(
   "*",

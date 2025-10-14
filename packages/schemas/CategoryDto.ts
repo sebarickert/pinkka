@@ -7,8 +7,8 @@ export const CategoryDto = z.object({
   name: z.string(),
   type: transactionType,
   is_deleted: z.boolean().optional().default(false),
-  created_at: z.iso.datetime({ offset: true }),
-  updated_at: z.iso.datetime({ offset: true }),
+  created_at: z.coerce.date(),
+  updated_at: z.coerce.date(),
 });
 
 export const NewCategoryDto = CategoryDto.omit({
