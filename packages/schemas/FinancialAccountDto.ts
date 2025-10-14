@@ -20,7 +20,7 @@ export const FinancialAccountDto = z.object({
   initial_balance: z.number(),
   current_balance: z.number(),
   pending_balance: z.number(),
-  is_deleted: z.boolean().default(false),
+  is_deleted: z.boolean().optional().default(false),
   created_at: z.iso.datetime({ offset: true }),
   updated_at: z.iso.datetime({ offset: true }),
 });
@@ -32,7 +32,6 @@ export const NewFinancialAccountDto = FinancialAccountDto.omit({
   updated_at: true,
   current_balance: true,
   pending_balance: true,
-  is_deleted: true,
 }).strict();
 
 export const UpdateFinancialAccountDto = FinancialAccountDto.omit({

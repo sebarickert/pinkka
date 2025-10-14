@@ -9,7 +9,7 @@ export interface TransactionTable {
   type: "income" | "expense" | "transfer";
   amount: number;
   description: string;
-  date: Generated<Timestamp>;
+  date: Timestamp;
   created_at: Generated<Timestamp>;
   updated_at: Generated<Timestamp>;
   is_deleted: boolean;
