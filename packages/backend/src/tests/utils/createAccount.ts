@@ -4,7 +4,7 @@ import type { FinancialAccount } from "@/types/FinancialAccount.js";
 import type { NewFinancialAccountDto } from "@pinkka/schemas/FinancialAccountDto.js";
 
 export async function createAccount(
-  newAccountPayload: NewFinancialAccountDto,
+  newAccountPayload: Omit<NewFinancialAccountDto, "is_deleted">,
   user: UserWithSessionToken
 ): Promise<FinancialAccount> {
   const res = await fetcher(

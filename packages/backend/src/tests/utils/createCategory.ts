@@ -4,7 +4,7 @@ import type { Category } from "@/types/Category.js";
 import type { NewCategoryDto } from "@pinkka/schemas/CategoryDto.js";
 
 export async function createCategory(
-  newCategoryPayload: NewCategoryDto,
+  newCategoryPayload: Omit<NewCategoryDto, "is_deleted">,
   user: UserWithSessionToken
 ): Promise<Category> {
   const res = await fetcher(
