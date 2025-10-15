@@ -2,6 +2,8 @@ import type { AuthType } from "@/lib/auth.js";
 import { requireAuth } from "@/middlewares/requireAuth.js";
 import { Hono } from "hono";
 import * as TransactionRepo from "@/repositories/transactionRepo.js";
+import * as CategoryRepo from "@/repositories/categoryRepo.js";
+import * as TransactionCategoryRepo from "@/repositories/transactionCategoryRepo.js";
 import { error, fail, success } from "@/lib/response.js";
 import * as z from "zod";
 import { mapZodErrors } from "@/lib/mapZodErrors.js";
@@ -44,10 +46,51 @@ transactions.post("/transactions", requireAuth, async (c) => {
 
   const user_id = c.get("user")!.id;
 
+  const categoryIds = validation.data
+    .map(({ category_id }) => category_id)
+    .filter(Boolean) as string[];
+
+  if (categoryIds.length > 0) {
+    const existingCategories = await CategoryRepo.findMany({
+      user_id,
+      id: categoryIds,
+    });
+
+    const existingCategoryIds = new Set(existingCategories.map((c) => c.id));
+    const invalidCategoryIds = categoryIds.filter(
+      (id) => !existingCategoryIds.has(id)
+    );
+
+    if (invalidCategoryIds.length > 0) {
+      return fail(c, {
+        category_id: "One or more categories not found",
+      });
+    }
+  }
+
   try {
     const newTransactions = await TransactionRepo.createMany({
-      data: validation.data.map((data) => ({ ...data, user_id })),
+      // Omitting category_id from here, as it's handled in a separate table
+      data: validation.data.map(({ category_id, ...data }) => ({
+        ...data,
+        user_id,
+      })),
     });
+
+    await Promise.all(
+      newTransactions.map(async (transaction, index) => {
+        const category_id = validation.data[index]?.category_id;
+
+        if (category_id) {
+          await TransactionCategoryRepo.create({
+            data: {
+              category_id,
+              transaction_id: transaction.id,
+            },
+          });
+        }
+      })
+    );
 
     return success(c, newTransactions, 201);
   } catch (err) {

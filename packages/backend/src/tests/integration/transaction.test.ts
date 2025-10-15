@@ -11,6 +11,7 @@ import { createTransactions } from "@/tests/utils/createTransactions.js";
 import type { FinancialAccount } from "@/types/FinancialAccount.js";
 import type { NewTransactionDto } from "@pinkka/schemas/TransactionDto.js";
 import type { Transaction } from "@/types/Transaction.js";
+import { createCategory } from "@/tests/utils/createCategory.js";
 
 describe("Financial Account Integration Tests", () => {
   let user: UserWithSessionToken;
@@ -309,6 +310,49 @@ describe("Financial Account Integration Tests", () => {
           id: newTransactions[i].id,
         });
       });
+    });
+
+    test("creates transaction with category", async () => {
+      const newCategoryPayload = {
+        type: "income",
+        name: "Hola!",
+      } as const;
+
+      const category = await createCategory(newCategoryPayload, user);
+
+      const newTransactionsPayload: Omit<NewTransactionDto, "is_deleted">[] = [
+        {
+          description: "Grocery Shopping",
+          amount: 50,
+          to_account_id: account.id,
+          type: "income",
+          date: new Date(),
+          category_id: category.id,
+        },
+      ];
+
+      const res = await fetcher(
+        "/api/transactions",
+        {
+          method: "POST",
+          body: JSON.stringify(newTransactionsPayload),
+        },
+        user.session_token
+      );
+
+      const body = await res.json();
+
+      const transactionCategoryLink = await db
+        .selectFrom("transaction_category")
+        .where("category_id", "=", category.id)
+        .selectAll()
+        .execute();
+
+      expect(transactionCategoryLink).toHaveLength(1);
+      expect(transactionCategoryLink[0].category_id).toEqual(category.id);
+      expect(transactionCategoryLink[0].transaction_id).toEqual(
+        body.data[0].id
+      );
     });
   });
 

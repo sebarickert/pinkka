@@ -1,5 +1,25 @@
 import * as z from "zod";
 
+const transactionAccountValidation = (data: any) => {
+  if (data.type === "income") {
+    return !!data.to_account_id && !data.from_account_id;
+  }
+
+  if (data.type === "expense") {
+    return !!data.from_account_id && !data.to_account_id;
+  }
+
+  if (data.type === "transfer") {
+    return (
+      !!data.to_account_id &&
+      !!data.from_account_id &&
+      data.to_account_id !== data.from_account_id
+    );
+  }
+
+  return false;
+};
+
 export const transactionType = z.enum(["income", "expense", "transfer"]);
 
 export const TransactionDto = z
@@ -16,30 +36,10 @@ export const TransactionDto = z
     updated_at: z.coerce.date(),
     is_deleted: z.boolean().optional().default(false),
   })
-  .refine(
-    (data) => {
-      if (data.type === "income") {
-        return !!data.to_account_id && !data.from_account_id;
-      }
-
-      if (data.type === "expense") {
-        return !!data.from_account_id && !data.to_account_id;
-      }
-
-      if (data.type === "transfer") {
-        return (
-          !!data.to_account_id &&
-          !!data.from_account_id &&
-          data.to_account_id !== data.from_account_id
-        );
-      }
-      return false;
-    },
-    {
-      message: "Invalid accounts for transaction type",
-      path: [], // can add path if you want to highlight a field
-    }
-  );
+  .refine(transactionAccountValidation, {
+    message: "Invalid accounts for transaction type",
+    path: ["to_account_id"],
+  });
 
 export const NewTransactionDto = TransactionDto.omit({
   id: true,
@@ -48,6 +48,10 @@ export const NewTransactionDto = TransactionDto.omit({
   updated_at: true,
 })
   .safeExtend({ category_id: z.uuid().optional() })
+  .refine(transactionAccountValidation, {
+    message: "Invalid accounts for transaction type",
+    path: ["to_account_id"],
+  })
   .strict();
 
 export const UpdateTransactionDto = TransactionDto.omit({
@@ -59,6 +63,10 @@ export const UpdateTransactionDto = TransactionDto.omit({
 })
   .strict()
   .partial()
+  .refine(transactionAccountValidation, {
+    message: "Invalid accounts for transaction type",
+    path: ["to_account_id"],
+  })
   .safeExtend({ category_id: z.uuid().optional() });
 
 export const TransactionWithCategoryDto = TransactionDto.safeExtend({

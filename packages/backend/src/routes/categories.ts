@@ -18,7 +18,7 @@ categories.get("/categories", requireAuth, async (c) => {
   const user_id = c.get("user")!.id;
 
   try {
-    const categories = await CategoryRepo.findMany({ user_id });
+    const categories = await CategoryRepo.getAll({ user_id });
 
     return success(c, categories);
   } catch (err) {

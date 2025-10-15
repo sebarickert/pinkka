@@ -5,6 +5,6 @@ export interface TransactionCategoryTable {
   transaction_id: string;
 }
 
-// export type TransactionCategory = Selectable<TransactionCategoryTable>;
-// export type NewTransactionCategory = Insertable<TransactionCategoryTable>;
-// export type TransactionCategoryUpdate = Updateable<TransactionCategoryTable>;
+export type TransactionCategory = Selectable<TransactionCategoryTable>;
+export type NewTransactionCategory = Insertable<TransactionCategoryTable>;
+export type TransactionCategoryUpdate = Updateable<TransactionCategoryTable>;

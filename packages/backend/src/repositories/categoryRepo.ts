@@ -38,12 +38,30 @@ export async function findOne({
 }
 
 interface FindManyCategoryParams extends BaseQueryOptions {
+  id: string[];
   user_id: string;
 }
 
 export async function findMany({
+  id,
   user_id,
 }: FindManyCategoryParams): Promise<Category[]> {
+  return await db
+    .selectFrom("category")
+    .where("user_id", "=", user_id)
+    .where("is_deleted", "=", false)
+    .where("id", "in", id)
+    .selectAll()
+    .execute();
+}
+
+interface GetAllCategoryParams extends BaseQueryOptions {
+  user_id: string;
+}
+
+export async function getAll({
+  user_id,
+}: GetAllCategoryParams): Promise<Category[]> {
   return await db
     .selectFrom("category")
     .where("user_id", "=", user_id)
