@@ -66,7 +66,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       references: "financial_account",
       onDelete: "SET NULL",
     },
-    is_deleted: { type: "boolean", notNull: true, default: false },
     type: { type: "transaction_type", notNull: true },
     amount: { type: "numeric", notNull: true },
     description: { type: "text", notNull: true },

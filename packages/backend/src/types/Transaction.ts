@@ -12,7 +12,6 @@ export interface TransactionTable {
   date: Timestamp;
   created_at: Generated<Timestamp>;
   updated_at: Generated<Timestamp>;
-  is_deleted: boolean;
 }
 
 export type Transaction = Selectable<TransactionTable>;

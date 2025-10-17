@@ -13,7 +13,7 @@ interface CreateCategoryParams extends BaseQueryOptions {
 export async function create({
   data,
 }: CreateCategoryParams): Promise<Category> {
-  return await db
+  return db
     .insertInto("category")
     .values(data)
     .returningAll()
@@ -29,7 +29,7 @@ export async function findOne({
   id,
   user_id,
 }: FindOneCategoryParams): Promise<Category | undefined> {
-  return await db
+  return db
     .selectFrom("category")
     .where("id", "=", id)
     .where("user_id", "=", user_id)
@@ -46,7 +46,7 @@ export async function findMany({
   id,
   user_id,
 }: FindManyCategoryParams): Promise<Category[]> {
-  return await db
+  return db
     .selectFrom("category")
     .where("user_id", "=", user_id)
     .where("is_deleted", "=", false)
@@ -62,7 +62,7 @@ interface GetAllCategoryParams extends BaseQueryOptions {
 export async function getAll({
   user_id,
 }: GetAllCategoryParams): Promise<Category[]> {
-  return await db
+  return db
     .selectFrom("category")
     .where("user_id", "=", user_id)
     .where("is_deleted", "=", false)
@@ -81,7 +81,7 @@ export async function update({
   user_id,
   data,
 }: UpdateCategoryParams): Promise<Category> {
-  return await db
+  return db
     .updateTable("category")
     .where("id", "=", id)
     .where("user_id", "=", user_id)
@@ -97,7 +97,7 @@ interface FindTransactionLinksCategoryParams extends BaseQueryOptions {
 export async function findTransactionLinksForCategory({
   id,
 }: FindTransactionLinksCategoryParams) {
-  return await db
+  return db
     .selectFrom("transaction_category")
     .where("category_id", "=", id)
     .selectAll()

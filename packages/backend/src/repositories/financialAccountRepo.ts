@@ -21,7 +21,7 @@ interface CreateFinancialAccountParams extends BaseQueryOptions {
 export async function create({
   data,
 }: CreateFinancialAccountParams): Promise<FinancialAccount> {
-  return await db
+  return db
     .insertInto("financial_account")
     .values(data)
     .returningAll()
@@ -35,7 +35,7 @@ interface CreateManyFinancialAccountParams extends BaseQueryOptions {
 export async function createMany({
   data,
 }: CreateManyFinancialAccountParams): Promise<FinancialAccount[]> {
-  return await db
+  return db
     .insertInto("financial_account")
     .values(data)
     .returningAll()
@@ -51,7 +51,7 @@ export async function findOne({
   id,
   user_id,
 }: FindOneFinancialAccountParams): Promise<FinancialAccount | undefined> {
-  return await db
+  return db
     .selectFrom("financial_account")
     .where("id", "=", id)
     .where("user_id", "=", user_id)
@@ -66,7 +66,7 @@ interface FindManyFinancialAccountParams extends BaseQueryOptions {
 export async function findMany({
   user_id,
 }: FindManyFinancialAccountParams): Promise<FinancialAccount[]> {
-  return await db
+  return db
     .selectFrom("financial_account")
     .where("user_id", "=", user_id)
     .where("is_deleted", "=", false)
@@ -85,7 +85,7 @@ export async function update({
   user_id,
   data,
 }: UpdateFinancialAccountParams): Promise<FinancialAccount> {
-  return await db
+  return db
     .updateTable("financial_account")
     .where("id", "=", id)
     .where("user_id", "=", user_id)
@@ -103,7 +103,7 @@ export async function findTransactionsForTransactionAccount({
   id,
   user_id,
 }: FindTransactionsFinancialAccountParams) {
-  return await db
+  return db
     .selectFrom("transaction")
     .where(({ eb, or }) =>
       or([eb("from_account_id", "=", id), eb("to_account_id", "=", id)])

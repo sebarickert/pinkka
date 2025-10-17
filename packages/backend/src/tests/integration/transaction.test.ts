@@ -577,35 +577,6 @@ describe("Financial Account Integration Tests", () => {
         expect(body.status).toEqual("error");
         expect(body.message).toEqual(`Transaction with id ${id} not found`);
       });
-
-      test("returns 404 when trying to update deleted transaction", async () => {
-        await fetcher(
-          `/api/transactions/${transactions[0].id}`,
-          {
-            method: "PUT",
-            body: JSON.stringify({
-              is_deleted: true,
-            }),
-          },
-          user.session_token
-        );
-        const res = await fetcher(
-          `/api/transactions/${transactions[0].id}`,
-          {
-            method: "PUT",
-            body: JSON.stringify({
-              name: "Trying to update deleted transaction",
-            }),
-          },
-          user.session_token
-        );
-        const body = await res.json();
-        expect(res.status).toEqual(404);
-        expect(body.status).toEqual("error");
-        expect(body.message).toEqual(
-          `Transaction with id ${transactions[0].id} not found`
-        );
-      });
     });
   });
 
@@ -626,14 +597,14 @@ describe("Financial Account Integration Tests", () => {
       transactions = await createTransactions(newTransactionsPayload, user);
     });
 
-    test("soft-deletes transaction", async () => {
+    test("deletes transaction", async () => {
       const transactionBefore = await db
         .selectFrom("transaction")
         .where("id", "=", transactions[0].id)
         .selectAll()
         .executeTakeFirst();
 
-      expect(transactionBefore?.is_deleted).toEqual(false);
+      expect(transactionBefore).toBeDefined();
 
       const res = await fetcher(
         `/api/transactions/${transactions[0].id}`,
@@ -647,7 +618,9 @@ describe("Financial Account Integration Tests", () => {
 
       expect(res.status).toEqual(200);
       expect(body.status).toEqual("success");
-      expect(body.data.is_deleted).toEqual(true);
+      expect(body.data).toEqual(
+        `Transaction with id ${transactions[0].id} deleted`
+      );
 
       const transactionAfter = await db
         .selectFrom("transaction")
@@ -655,7 +628,7 @@ describe("Financial Account Integration Tests", () => {
         .selectAll()
         .executeTakeFirst();
 
-      expect(transactionAfter?.is_deleted).toEqual(true);
+      expect(transactionAfter).toBeUndefined();
     });
 
     test("returns 404 when trying to delete non-existing account", async () => {

@@ -34,7 +34,6 @@ export const TransactionDto = z
     date: z.coerce.date(),
     created_at: z.coerce.date(),
     updated_at: z.coerce.date(),
-    is_deleted: z.boolean().optional().default(false),
   })
   .strict()
   .refine(transactionAccountValidation, {

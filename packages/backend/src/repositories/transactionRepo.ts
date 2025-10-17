@@ -13,11 +13,7 @@ interface CreateManyTransactionParams extends BaseQueryOptions {
 export async function createMany({
   data,
 }: CreateManyTransactionParams): Promise<Transaction[]> {
-  return await db
-    .insertInto("transaction")
-    .values(data)
-    .returningAll()
-    .execute();
+  return db.insertInto("transaction").values(data).returningAll().execute();
 }
 
 interface FindOneTransactionParams extends BaseQueryOptions {
@@ -29,7 +25,7 @@ export async function findOne({
   id,
   user_id,
 }: FindOneTransactionParams): Promise<Transaction | undefined> {
-  return await db
+  return db
     .selectFrom("transaction")
     .where("id", "=", id)
     .where("user_id", "=", user_id)
@@ -44,10 +40,9 @@ interface FindManyTransactionParams extends BaseQueryOptions {
 export async function findMany({
   user_id,
 }: FindManyTransactionParams): Promise<Transaction[]> {
-  return await db
+  return db
     .selectFrom("transaction")
     .where("user_id", "=", user_id)
-    .where("is_deleted", "=", false)
     .selectAll()
     .execute();
 }
@@ -63,11 +58,27 @@ export async function update({
   user_id,
   data,
 }: UpdateTransactionParams): Promise<Transaction> {
-  return await db
+  return db
     .updateTable("transaction")
     .where("id", "=", id)
     .where("user_id", "=", user_id)
     .set(data)
     .returningAll()
     .executeTakeFirstOrThrow();
+}
+
+interface DeleteTransactionParams extends BaseQueryOptions {
+  id: string;
+  user_id: string;
+}
+
+export async function deleteTransaction({
+  id,
+  user_id,
+}: DeleteTransactionParams) {
+  return db
+    .deleteFrom("transaction")
+    .where("id", "=", id)
+    .where("user_id", "=", user_id)
+    .execute();
 }

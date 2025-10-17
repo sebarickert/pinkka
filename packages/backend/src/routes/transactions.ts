@@ -125,7 +125,7 @@ transactions.get("/transactions/:id", requireAuth, async (c) => {
 
   const transaction = await TransactionRepo.findOne({ id, user_id });
 
-  if (!transaction || transaction.is_deleted) {
+  if (!transaction) {
     return error(c, `Transaction with id ${id} not found`, {
       status: 404,
     });
@@ -144,7 +144,7 @@ transactions.put("/transactions/:id", requireAuth, async (c) => {
 
   const transaction = await TransactionRepo.findOne({ id, user_id });
 
-  if (!transaction || transaction.is_deleted) {
+  if (!transaction) {
     return error(c, `Transaction with id ${id} not found`, {
       status: 404,
     });
@@ -242,20 +242,19 @@ transactions.delete("/transactions/:id", requireAuth, async (c) => {
 
   const transaction = await TransactionRepo.findOne({ id, user_id });
 
-  if (!transaction || transaction.is_deleted) {
+  if (!transaction) {
     return error(c, `Transaction with id ${id} not found`, {
       status: 404,
     });
   }
 
   try {
-    const updatedTransaction = await TransactionRepo.update({
+    await TransactionRepo.deleteTransaction({
       id,
       user_id,
-      data: { is_deleted: true },
     });
 
-    return success(c, updatedTransaction);
+    return success(c, `Transaction with id ${id} deleted`);
   } catch (err) {
     return error(c, `Failed to delete transaction with id ${id}`, {
       data: err,
