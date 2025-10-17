@@ -11,19 +11,21 @@ export const financialAccountTypes = z.enum([
 export const currencyEnum = z.enum(["EUR", "USD", "GBP"]);
 export type Currency = z.infer<typeof currencyEnum>;
 
-export const FinancialAccountDto = z.object({
-  id: z.uuid(),
-  user_id: z.uuid(),
-  name: z.string(),
-  type: financialAccountTypes,
-  currency: currencyEnum,
-  initial_balance: z.number(),
-  current_balance: z.number(),
-  pending_balance: z.number(),
-  is_deleted: z.boolean().optional().default(false),
-  created_at: z.coerce.date(),
-  updated_at: z.coerce.date(),
-});
+export const FinancialAccountDto = z
+  .object({
+    id: z.uuid(),
+    user_id: z.uuid(),
+    name: z.string(),
+    type: financialAccountTypes,
+    currency: currencyEnum,
+    initial_balance: z.number(),
+    current_balance: z.number(),
+    pending_balance: z.number(),
+    is_deleted: z.boolean().optional().default(false),
+    created_at: z.coerce.date(),
+    updated_at: z.coerce.date(),
+  })
+  .strict();
 
 export const NewFinancialAccountDto = FinancialAccountDto.omit({
   id: true,
@@ -32,7 +34,7 @@ export const NewFinancialAccountDto = FinancialAccountDto.omit({
   updated_at: true,
   current_balance: true,
   pending_balance: true,
-}).strict();
+});
 
 export const UpdateFinancialAccountDto = FinancialAccountDto.omit({
   id: true,
@@ -42,8 +44,7 @@ export const UpdateFinancialAccountDto = FinancialAccountDto.omit({
   current_balance: true,
   pending_balance: true,
 })
-  .strict()
-  .partial();
+.partial();
 
 export type FinancialAccountDto = z.infer<typeof FinancialAccountDto>;
 export type NewFinancialAccountDto = z.infer<typeof NewFinancialAccountDto>;

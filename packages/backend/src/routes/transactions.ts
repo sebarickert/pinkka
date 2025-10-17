@@ -10,6 +10,7 @@ import { mapZodErrors } from "@/lib/mapZodErrors.js";
 import { validate } from "uuid";
 import {
   NewTransactionDto,
+  TransactionDto,
   UpdateTransactionDto,
 } from "@pinkka/schemas/TransactionDto.js";
 
@@ -64,6 +65,22 @@ transactions.post("/transactions", requireAuth, async (c) => {
     if (invalidCategoryIds.length > 0) {
       return fail(c, {
         category_id: "One or more categories not found",
+      });
+    }
+
+    const categoryMap = new Map(
+      existingCategories.map((category) => [category.id, category])
+    );
+
+    const typeMismatch = validation.data.some(
+      (transaction) =>
+        transaction.category_id &&
+        categoryMap.get(transaction.category_id)!.type !== transaction.type
+    );
+
+    if (typeMismatch) {
+      return fail(c, {
+        category_id: "One or more categories do not match transaction type",
       });
     }
   }
@@ -141,18 +158,71 @@ transactions.put("/transactions/:id", requireAuth, async (c) => {
     body = {};
   }
 
-  const validation = UpdateTransactionDto.safeParse(body);
+  if (!body || Object.keys(body).length === 0) {
+    return success(c, transaction);
+  }
+
+  const updateValidation = UpdateTransactionDto.safeParse(body);
+
+  if (!updateValidation.success) {
+    return fail(c, mapZodErrors(updateValidation.error));
+  }
+
+  const { category_id, ...transactionFields } = body;
+  const mergedData = { ...transaction, ...transactionFields };
+
+  const validation = TransactionDto.safeParse(mergedData);
 
   if (!validation.success) {
     return fail(c, mapZodErrors(validation.error));
   }
 
+  // Handle category_id logic
+  if (body.hasOwnProperty("category_id")) {
+    if (category_id === null) {
+      // If category_id is explicitly null, skip lookup/type check, just delete link below
+    } else if (category_id) {
+      // If category_id is present and not null, do lookup and type check
+      const category = await CategoryRepo.findOne({ id: category_id, user_id });
+      if (!category) {
+        return error(c, `Category with id ${category_id} not found`, {
+          status: 404,
+        });
+      }
+      if (category.type !== mergedData.type) {
+        return fail(c, {
+          category_id: "Category type does not match transaction type",
+        });
+      }
+    }
+  }
+
+  const hasFieldsToUpdate = Object.keys(transactionFields).length === 0;
+
   try {
-    const updatedTransaction = await TransactionRepo.update({
-      id,
-      user_id,
-      data: validation.data,
-    });
+    let updatedTransaction;
+
+    if (!hasFieldsToUpdate) {
+      updatedTransaction = await TransactionRepo.update({
+        id,
+        user_id,
+        data: transactionFields,
+      });
+    } else {
+      updatedTransaction = transaction;
+    }
+
+    if (body.hasOwnProperty("category_id")) {
+      if (category_id) {
+        await TransactionCategoryRepo.upsert({
+          data: { transaction_id: id, category_id },
+        });
+      } else {
+        await TransactionCategoryRepo.deleteLink({
+          data: { transaction_id: id },
+        });
+      }
+    }
 
     return success(c, updatedTransaction);
   } catch (err) {

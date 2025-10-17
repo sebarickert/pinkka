@@ -26,8 +26,8 @@ export const TransactionDto = z
   .object({
     id: z.uuid(),
     user_id: z.uuid(),
-    to_account_id: z.uuid().optional(),
-    from_account_id: z.uuid().optional(),
+    to_account_id: z.uuid().nullable().optional(),
+    from_account_id: z.uuid().nullable().optional(),
     type: transactionType,
     amount: z.coerce.number().min(0),
     description: z.string().max(255),
@@ -36,6 +36,7 @@ export const TransactionDto = z
     updated_at: z.coerce.date(),
     is_deleted: z.boolean().optional().default(false),
   })
+  .strict()
   .refine(transactionAccountValidation, {
     message: "Invalid accounts for transaction type",
     path: ["to_account_id"],
@@ -47,12 +48,11 @@ export const NewTransactionDto = TransactionDto.omit({
   created_at: true,
   updated_at: true,
 })
-  .safeExtend({ category_id: z.uuid().optional() })
+  .safeExtend({ category_id: z.uuid().nullable().optional() })
   .refine(transactionAccountValidation, {
     message: "Invalid accounts for transaction type",
     path: ["to_account_id"],
-  })
-  .strict();
+  });
 
 export const UpdateTransactionDto = TransactionDto.omit({
   id: true,
@@ -61,13 +61,8 @@ export const UpdateTransactionDto = TransactionDto.omit({
   updated_at: true,
   type: true,
 })
-  .strict()
   .partial()
-  .refine(transactionAccountValidation, {
-    message: "Invalid accounts for transaction type",
-    path: ["to_account_id"],
-  })
-  .safeExtend({ category_id: z.uuid().optional() });
+  .safeExtend({ category_id: z.uuid().nullable().optional() });
 
 export const TransactionWithCategoryDto = TransactionDto.safeExtend({
   category: z
@@ -75,7 +70,7 @@ export const TransactionWithCategoryDto = TransactionDto.safeExtend({
       id: z.uuid(),
       name: z.string(),
     })
-    .nullable(),
+    .optional(),
 });
 
 export type TransactionDto = z.infer<typeof TransactionDto>;

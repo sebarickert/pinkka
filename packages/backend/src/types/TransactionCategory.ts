@@ -7,4 +7,3 @@ export interface TransactionCategoryTable {
 
 export type TransactionCategory = Selectable<TransactionCategoryTable>;
 export type NewTransactionCategory = Insertable<TransactionCategoryTable>;
-export type TransactionCategoryUpdate = Updateable<TransactionCategoryTable>;

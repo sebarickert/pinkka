@@ -7,11 +7,17 @@ import {
 import { beforeEach, describe, expect, test } from "vitest";
 import { cleanDb } from "@/tests/utils/cleanDb.js";
 import { createAccount } from "@/tests/utils/createAccount.js";
-import { createTransactions } from "@/tests/utils/createTransactions.js";
 import type { FinancialAccount } from "@/types/FinancialAccount.js";
 import type { NewTransactionDto } from "@pinkka/schemas/TransactionDto.js";
 import type { Transaction } from "@/types/Transaction.js";
 import { createCategory } from "@/tests/utils/createCategory.js";
+import type { Category } from "@/types/Category.js";
+import {
+  createTransactions,
+  getTransaction,
+  updateTransaction,
+  expectCategoryLink,
+} from "@/tests/utils/transaction.js";
 
 describe("Financial Account Integration Tests", () => {
   let user: UserWithSessionToken;
@@ -47,7 +53,7 @@ describe("Financial Account Integration Tests", () => {
 
         expect(res.status).toEqual(401);
         expect(body.status).toEqual("error");
-        expect(body.message).toBe("Unauthorized");
+        expect(body.message).toEqual("Unauthorized");
       });
     });
   });
@@ -96,7 +102,7 @@ describe("Financial Account Integration Tests", () => {
 
       expect(res.status).toEqual(404);
       expect(body.status).toEqual("error");
-      expect(body.message).toBe(`Transaction with id ${id} not found`);
+      expect(body.message).toEqual(`Transaction with id ${id} not found`);
     });
 
     test("returns validation error if id is not a valid uuid", async () => {
@@ -110,7 +116,7 @@ describe("Financial Account Integration Tests", () => {
 
       expect(res.status).toEqual(400);
       expect(body.status).toEqual("error");
-      expect(body.message).toBe("Invalid id format");
+      expect(body.message).toEqual("Invalid id format");
     });
   });
 
@@ -160,7 +166,7 @@ describe("Financial Account Integration Tests", () => {
       expect(body.status).toEqual("success");
       expect(body.data).toHaveLength(newTransactions.length);
 
-      body.data.forEach((transaction: any) => {
+      body.data.forEach((transaction: Transaction) => {
         expect(transaction.user_id).toEqual(user.id);
       });
     });
@@ -358,8 +364,23 @@ describe("Financial Account Integration Tests", () => {
 
   describe("PUT /transactions/:id", () => {
     let transactions: Transaction[];
+    let category1: Category;
+    let category2: Category;
+    let category3: Category;
 
     beforeEach(async () => {
+      const newCategoryPayload = {
+        type: "expense",
+        name: "Hola!",
+      } as const;
+
+      category1 = await createCategory(newCategoryPayload, user);
+      category2 = await createCategory(newCategoryPayload, user);
+      category3 = await createCategory(
+        { ...newCategoryPayload, type: "income" },
+        user
+      );
+
       const newTransactionsPayload: Omit<NewTransactionDto, "is_deleted">[] = [
         {
           description: "Grocery Shopping",
@@ -368,167 +389,223 @@ describe("Financial Account Integration Tests", () => {
           type: "expense",
           date: new Date(),
         },
+        {
+          description: "Transaction with Category",
+          amount: 100,
+          from_account_id: account.id,
+          type: "expense",
+          date: new Date(),
+          category_id: category1.id,
+        },
       ];
 
       transactions = await createTransactions(newTransactionsPayload, user);
     });
 
-    test("updates transaction with valid data", async () => {
-      const transactionBefore = await db
-        .selectFrom("transaction")
-        .where("id", "=", transactions[0].id)
-        .selectAll()
-        .executeTakeFirst();
+    describe("Category Link Management", () => {
+      test("adds category link", async () => {
+        const transactionBefore = await getTransaction(transactions[0].id);
+        await expectCategoryLink(transactions[0].id, null);
 
-      const res = await fetcher(
-        `/api/transactions/${transactions[0].id}`,
-        {
-          method: "PUT",
-          body: JSON.stringify({
+        const { status, body } = await updateTransaction(
+          transactions[0].id,
+          {
             amount: 100,
             description: "I was just updated!",
-          }),
-        },
-        user.session_token
-      );
+            category_id: category1.id,
+          },
+          user.session_token
+        );
 
-      const body = await res.json();
+        expect(status).toEqual(200);
+        expect(body.status).toEqual("success");
+        await expectCategoryLink(transactions[0].id, category1.id);
+        const transactionAfter = await getTransaction(transactions[0].id);
+        expect(transactionAfter).not.toMatchObject(transactionBefore!);
+      });
 
-      expect(res.status).toEqual(200);
-      expect(body.status).toEqual("success");
+      test("updates category link", async () => {
+        await expectCategoryLink(transactions[1].id, category1.id);
+        const { status, body } = await updateTransaction(
+          transactions[1].id,
+          {
+            amount: 100,
+            description: "I was just updated!",
+            category_id: category2.id,
+          },
+          user.session_token
+        );
+        expect(status).toEqual(200);
+        expect(body.status).toEqual("success");
+        await expectCategoryLink(transactions[1].id, category2.id);
+      });
 
-      const transactionAfter = await db
-        .selectFrom("transaction")
-        .where("id", "=", transactions[0].id)
-        .selectAll()
-        .executeTakeFirst();
+      test("removes category link", async () => {
+        await expectCategoryLink(transactions[1].id, category1.id);
+        const { status, body } = await updateTransaction(
+          transactions[1].id,
+          { category_id: null },
+          user.session_token
+        );
+        expect(status).toEqual(200);
+        expect(body.status).toEqual("success");
+        await expectCategoryLink(transactions[1].id, null);
+      });
 
-      expect(transactionAfter).not.toMatchObject(transactionBefore!);
+      test("rejects mismatched category type", async () => {
+        const { status, body } = await updateTransaction(
+          transactions[0].id,
+          { category_id: category3.id },
+          user.session_token
+        );
+        expect(status).toEqual(400);
+        expect(body.status).toEqual("fail");
+        expect(body.data).toHaveProperty("category_id");
+        expect(body.data.category_id).toEqual(
+          "Category type does not match transaction type"
+        );
+        await expectCategoryLink(transactions[0].id, null);
+      });
+
+      test("rejects non-existent category_id", async () => {
+        const fakeCategoryId = "00000000-0000-0000-0000-000000000000";
+        const { status, body } = await updateTransaction(
+          transactions[0].id,
+          { category_id: fakeCategoryId },
+          user.session_token
+        );
+        expect(status).toEqual(404);
+        expect(body.status).toEqual("error");
+        expect(body.message).toEqual(
+          `Category with id ${fakeCategoryId} not found`
+        );
+        await expectCategoryLink(transactions[0].id, null);
+      });
     });
 
-    test("sending empty body results in no changes", async () => {
-      const transactionBefore = await db
-        .selectFrom("transaction")
-        .where("id", "=", transactions[0].id)
-        .selectAll()
-        .executeTakeFirst();
+    describe("General Update & Validation", () => {
+      test("updates amount and description only (no category)", async () => {
+        // Transaction[0] has no category
+        const transactionBefore = await getTransaction(transactions[0].id);
+        await expectCategoryLink(transactions[0].id, null);
 
-      const res = await fetcher(
-        `/api/transactions/${transactions[0].id}`,
-        {
-          method: "PUT",
-        },
-        user.session_token
-      );
+        const { status, body } = await updateTransaction(
+          transactions[0].id,
+          {
+            amount: transactionBefore!.amount + 10,
+            description: "Updated description only",
+          },
+          user.session_token
+        );
 
-      const body = await res.json();
+        expect(status).toEqual(200);
+        expect(body.status).toEqual("success");
 
-      expect(res.status).toEqual(200);
-      expect(body.status).toEqual("success");
+        const transactionAfter = await getTransaction(transactions[0].id);
+        expect(transactionAfter!.amount).toEqual(
+          transactionBefore!.amount + 10
+        );
+        expect(transactionAfter!.description).toEqual(
+          "Updated description only"
+        );
+        // Category link should remain absent
+        await expectCategoryLink(transactions[0].id, null);
+      });
+      test("sending empty body results in no changes", async () => {
+        const transactionBefore = await getTransaction(transactions[0].id);
+        const { status, body } = await updateTransaction(
+          transactions[0].id,
+          undefined,
+          user.session_token
+        );
+        expect(status).toEqual(200);
+        expect(body.status).toEqual("success");
+        const transactionAfter = await getTransaction(transactions[0].id);
+        expect(transactionAfter).toMatchObject(transactionBefore!);
+      });
 
-      const transactionAfter = await db
-        .selectFrom("transaction")
-        .where("id", "=", transactions[0].id)
-        .selectAll()
-        .executeTakeFirst();
+      test("returns validation error if id is not a valid uuid", async () => {
+        const res = await fetcher(
+          `/api/transactions/some-non-existing-id`,
+          {
+            method: "PUT",
+            body: JSON.stringify({
+              name: "I do not exist",
+            }),
+          },
+          user.session_token
+        );
+        const body = await res.json();
+        expect(res.status).toEqual(400);
+        expect(body.status).toEqual("error");
+        expect(body.message).toEqual("Invalid id format");
+      });
 
-      expect(transactionAfter).toMatchObject(transactionBefore!);
-    });
+      test("returns validation errors if trying to update with invalid data", async () => {
+        const res = await fetcher(
+          `/api/transactions/${transactions[0].id}`,
+          {
+            method: "PUT",
+            body: JSON.stringify({
+              amount: -123,
+              description: 123,
+            }),
+          },
+          user.session_token
+        );
+        const body = await res.json();
+        expect(res.status).toEqual(400);
+        expect(body.status).toEqual("fail");
+        expect(body.data).toHaveProperty("amount");
+        expect(body.data).toHaveProperty("description");
+      });
 
-    test("returns validation error if id is not a valid uuid", async () => {
-      const res = await fetcher(
-        `/api/transactions/some-non-existing-id`,
-        {
-          method: "PUT",
-          body: JSON.stringify({
-            name: "I do not exist",
-          }),
-        },
-        user.session_token
-      );
+      test("returns 404 when trying to update non-existing transaction", async () => {
+        const id = "c2b8f3ee-c9ae-4104-8f89-173e3871ebb9";
+        const res = await fetcher(
+          `/api/transactions/${id}`,
+          {
+            method: "PUT",
+            body: JSON.stringify({
+              description: "I do not exist",
+            }),
+          },
+          user.session_token
+        );
+        const body = await res.json();
+        expect(res.status).toEqual(404);
+        expect(body.status).toEqual("error");
+        expect(body.message).toEqual(`Transaction with id ${id} not found`);
+      });
 
-      const body = await res.json();
-
-      expect(res.status).toEqual(400);
-      expect(body.status).toEqual("error");
-      expect(body.message).toBe("Invalid id format");
-    });
-
-    test("returns validation errors if trying to update with invalid data", async () => {
-      const res = await fetcher(
-        `/api/transactions/${transactions[0].id}`,
-        {
-          method: "PUT",
-          body: JSON.stringify({
-            amount: -123,
-            description: 123,
-          }),
-        },
-        user.session_token
-      );
-
-      const body = await res.json();
-
-      expect(res.status).toEqual(400);
-      expect(body.status).toEqual("fail");
-      expect(body.data).toHaveProperty("amount");
-      expect(body.data).toHaveProperty("description");
-    });
-
-    test("returns 404 when trying to update non-existing transaction", async () => {
-      const id = "c2b8f3ee-c9ae-4104-8f89-173e3871ebb9";
-
-      const res = await fetcher(
-        `/api/transactions/${id}`,
-        {
-          method: "PUT",
-          body: JSON.stringify({
-            description: "I do not exist",
-          }),
-        },
-        user.session_token
-      );
-
-      const body = await res.json();
-
-      expect(res.status).toEqual(404);
-      expect(body.status).toEqual("error");
-      expect(body.message).toBe(`Transaction with id ${id} not found`);
-    });
-
-    // TODO: Implement this test when transactions are implemented
-    test.skip("prevents updating initial_balance if account has transactions", async () => {});
-
-    test("returns 404 when trying to update deleted transaction", async () => {
-      await fetcher(
-        `/api/transactions/${transactions[0].id}`,
-        {
-          method: "PUT",
-          body: JSON.stringify({
-            is_deleted: true,
-          }),
-        },
-        user.session_token
-      );
-
-      const res = await fetcher(
-        `/api/transactions/${transactions[0].id}`,
-        {
-          method: "PUT",
-          body: JSON.stringify({
-            name: "Trying to update deleted transaction",
-          }),
-        },
-        user.session_token
-      );
-
-      const body = await res.json();
-
-      expect(res.status).toEqual(404);
-      expect(body.status).toEqual("error");
-      expect(body.message).toBe(
-        `Transaction with id ${transactions[0].id} not found`
-      );
+      test("returns 404 when trying to update deleted transaction", async () => {
+        await fetcher(
+          `/api/transactions/${transactions[0].id}`,
+          {
+            method: "PUT",
+            body: JSON.stringify({
+              is_deleted: true,
+            }),
+          },
+          user.session_token
+        );
+        const res = await fetcher(
+          `/api/transactions/${transactions[0].id}`,
+          {
+            method: "PUT",
+            body: JSON.stringify({
+              name: "Trying to update deleted transaction",
+            }),
+          },
+          user.session_token
+        );
+        const body = await res.json();
+        expect(res.status).toEqual(404);
+        expect(body.status).toEqual("error");
+        expect(body.message).toEqual(
+          `Transaction with id ${transactions[0].id} not found`
+        );
+      });
     });
   });
 
@@ -556,7 +633,7 @@ describe("Financial Account Integration Tests", () => {
         .selectAll()
         .executeTakeFirst();
 
-      expect(transactionBefore?.is_deleted).toBe(false);
+      expect(transactionBefore?.is_deleted).toEqual(false);
 
       const res = await fetcher(
         `/api/transactions/${transactions[0].id}`,
@@ -570,7 +647,7 @@ describe("Financial Account Integration Tests", () => {
 
       expect(res.status).toEqual(200);
       expect(body.status).toEqual("success");
-      expect(body.data.is_deleted).toBe(true);
+      expect(body.data.is_deleted).toEqual(true);
 
       const transactionAfter = await db
         .selectFrom("transaction")
@@ -578,7 +655,7 @@ describe("Financial Account Integration Tests", () => {
         .selectAll()
         .executeTakeFirst();
 
-      expect(transactionAfter?.is_deleted).toBe(true);
+      expect(transactionAfter?.is_deleted).toEqual(true);
     });
 
     test("returns 404 when trying to delete non-existing account", async () => {
@@ -596,7 +673,7 @@ describe("Financial Account Integration Tests", () => {
 
       expect(res.status).toEqual(404);
       expect(body.status).toEqual("error");
-      expect(body.message).toBe(`Transaction with id ${id} not found`);
+      expect(body.message).toEqual(`Transaction with id ${id} not found`);
     });
 
     test("returns validation error if id is not a valid uuid", async () => {
@@ -612,7 +689,7 @@ describe("Financial Account Integration Tests", () => {
 
       expect(res.status).toEqual(400);
       expect(body.status).toEqual("error");
-      expect(body.message).toBe("Invalid id format");
+      expect(body.message).toEqual("Invalid id format");
     });
   });
 });

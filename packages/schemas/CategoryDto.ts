@@ -1,22 +1,24 @@
 import * as z from "zod";
 import { transactionType } from "./TransactionDto.js";
 
-export const CategoryDto = z.object({
-  id: z.uuid(),
-  user_id: z.uuid(),
-  name: z.string(),
-  type: transactionType,
-  is_deleted: z.boolean().optional().default(false),
-  created_at: z.coerce.date(),
-  updated_at: z.coerce.date(),
-});
+export const CategoryDto = z
+  .object({
+    id: z.uuid(),
+    user_id: z.uuid(),
+    name: z.string(),
+    type: transactionType,
+    is_deleted: z.boolean().optional().default(false),
+    created_at: z.coerce.date(),
+    updated_at: z.coerce.date(),
+  })
+  .strict();
 
 export const NewCategoryDto = CategoryDto.omit({
   id: true,
   user_id: true,
   created_at: true,
   updated_at: true,
-}).strict();
+});
 
 export const UpdateCategoryDto = CategoryDto.omit({
   id: true,
@@ -24,8 +26,7 @@ export const UpdateCategoryDto = CategoryDto.omit({
   created_at: true,
   updated_at: true,
 })
-  .strict()
-  .partial();
+.partial();
 
 export type CategoryDto = z.infer<typeof CategoryDto>;
 export type NewCategoryDto = z.infer<typeof NewCategoryDto>;

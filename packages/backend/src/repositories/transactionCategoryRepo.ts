@@ -1,6 +1,5 @@
 import { db } from "@/lib/db.js";
 import type { BaseQueryOptions } from "@/repositories/financialAccountRepo.js";
-import type { Category, NewCategory } from "@/types/Category.js";
 import type {
   NewTransactionCategory,
   TransactionCategory,
@@ -13,9 +12,42 @@ interface CreateTransactionCategoryParams extends BaseQueryOptions {
 export async function create({
   data: { transaction_id, category_id },
 }: CreateTransactionCategoryParams): Promise<TransactionCategory> {
-  return await db
+  return db
     .insertInto("transaction_category")
     .values({ transaction_id, category_id })
     .returningAll()
     .executeTakeFirstOrThrow();
+}
+
+interface UpsertTransactionCategoryParams extends BaseQueryOptions {
+  data: TransactionCategory;
+}
+
+export async function upsert({
+  data: { transaction_id, category_id },
+}: UpsertTransactionCategoryParams): Promise<TransactionCategory> {
+  await db
+    .deleteFrom("transaction_category")
+    .where("transaction_id", "=", transaction_id)
+    .execute();
+
+  // Insert the new link
+  return db
+    .insertInto("transaction_category")
+    .values({ transaction_id, category_id })
+    .returningAll()
+    .executeTakeFirstOrThrow();
+}
+
+export async function deleteLink({
+  data: { transaction_id },
+}: {
+  data: {
+    transaction_id: string;
+  };
+}) {
+  return db
+    .deleteFrom("transaction_category")
+    .where("transaction_id", "=", transaction_id)
+    .execute();
 }
