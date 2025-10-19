@@ -1,11 +1,13 @@
 import { db } from "@/lib/db.js";
 import { cleanDb } from "@/tests/utils/cleanDb.js";
+import { createAccount } from "@/tests/utils/createAccount.js";
 import { createCategory } from "@/tests/utils/createCategory.js";
 import {
   createTestUser,
   type UserWithSessionToken,
 } from "@/tests/utils/createTestUser.js";
 import { fetcher } from "@/tests/utils/fetcher.js";
+import { createTransaction } from "@/tests/utils/transaction.js";
 import { beforeEach, describe, expect, test } from "vitest";
 
 describe("Category Integration Tests", () => {
@@ -205,7 +207,7 @@ describe("Category Integration Tests", () => {
 
     beforeEach(async () => {
       const newCategoryPayload = {
-        type: "transfer",
+        type: "expense",
         name: "Hola!",
       } as const;
 
@@ -332,8 +334,45 @@ describe("Category Integration Tests", () => {
       expect(body.message).toBe(`Category with id ${id} not found`);
     });
 
-    // TODO: Implement this test when transactions are implemented
-    test.skip("prevents updating type if category is linked to a transaction", async () => {});
+    test("prevents updating type if category is linked to a transaction", async () => {
+      const account = await createAccount(
+        {
+          name: "Account 1",
+          initial_balance: 1000,
+          type: "bank",
+          currency: "EUR",
+        },
+        user
+      );
+
+      const newTransactionPayload = {
+        description: "Grocery Shopping",
+        amount: 50,
+        from_account_id: account.id,
+        type: "expense",
+        date: new Date().toISOString(),
+        category_id: category.id,
+      } as const;
+
+      await createTransaction(newTransactionPayload, user);
+
+      const res = await fetcher(
+        `/api/categories/${category.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            type: "income",
+          }),
+        },
+        user.session_token
+      );
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(400);
+      expect(body.status).toEqual("fail");
+      expect(body.data).toHaveProperty("type");
+    });
 
     test("returns 404 when trying to update deleted category", async () => {
       await fetcher(

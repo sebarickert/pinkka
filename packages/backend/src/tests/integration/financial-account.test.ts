@@ -7,6 +7,8 @@ import {
 import { beforeEach, describe, expect, test } from "vitest";
 import { cleanDb } from "@/tests/utils/cleanDb.js";
 import { createAccount } from "@/tests/utils/createAccount.js";
+import { createTransaction } from "@/tests/utils/transaction.js";
+import type { FinancialAccount } from "@/types/FinancialAccount.js";
 
 describe("Financial Account Integration Tests", () => {
   let user: UserWithSessionToken;
@@ -347,7 +349,7 @@ describe("Financial Account Integration Tests", () => {
   });
 
   describe("PUT /accounts/:id", () => {
-    let account: any;
+    let account: FinancialAccount;
 
     beforeEach(async () => {
       const newAccountPayload = {
@@ -487,8 +489,34 @@ describe("Financial Account Integration Tests", () => {
       expect(body.message).toBe(`Financial account with id ${id} not found`);
     });
 
-    // TODO: Implement this test when transactions are implemented
-    test.skip("prevents updating initial_balance if account has transactions", async () => {});
+    test("prevents updating initial_balance if account has transactions", async () => {
+      const newTransactionPayload = {
+        description: "Grocery Shopping",
+        amount: 50,
+        from_account_id: account.id,
+        type: "expense",
+        date: new Date().toISOString(),
+      } as const;
+
+      await createTransaction(newTransactionPayload, user);
+
+      const res = await fetcher(
+        `/api/accounts/${account.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            initial_balance: 6000,
+          }),
+        },
+        user.session_token
+      );
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(400);
+      expect(body.status).toEqual("fail");
+      expect(body.data).toHaveProperty("initial_balance");
+    });
 
     test("returns 404 when trying to update deleted account", async () => {
       await fetcher(

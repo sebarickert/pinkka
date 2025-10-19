@@ -2,11 +2,9 @@ import type { AuthType } from "@/lib/auth.js";
 import { requireAuth } from "@/middlewares/requireAuth.js";
 import { Hono } from "hono";
 import * as TransactionRepo from "@/repositories/transactionRepo.js";
-import * as FinancialAccountRepo from "@/repositories/financialAccountRepo.js";
 import * as CategoryRepo from "@/repositories/categoryRepo.js";
 import * as TransactionCategoryRepo from "@/repositories/transactionCategoryRepo.js";
 import { error, fail, success } from "@/lib/response.js";
-import * as z from "zod";
 import { mapZodErrors } from "@/lib/mapZodErrors.js";
 import { validate } from "uuid";
 import {
@@ -14,85 +12,11 @@ import {
   TransactionDto,
   UpdateTransactionDto,
 } from "@pinkka/schemas/TransactionDto.js";
-import { createTransactions } from "@/services/transactions.js";
+import { createTransaction } from "@/services/transactions.js";
+import { transactionMapper } from "@/mappers/transactionMapper.js";
 
 const transactions = new Hono<{ Variables: AuthType["Variables"] }>({
   strict: false,
-});
-
-transactions.get("/transactions", requireAuth, async (c) => {
-  const user_id = c.get("user")!.id;
-
-  try {
-    const transactions = await TransactionRepo.findMany({ user_id });
-
-    return success(c, transactions);
-  } catch (err) {
-    return error(c, "Failed to fetch transactions", { data: err });
-  }
-});
-
-transactions.post("/transactions", requireAuth, async (c) => {
-  let body: unknown;
-
-  try {
-    body = await c.req.json();
-  } catch (err) {
-    body = {};
-  }
-
-  const validation = z.array(NewTransactionDto).safeParse(body);
-
-  if (!validation.success) {
-    return fail(c, mapZodErrors(validation.error));
-  }
-
-  const user_id = c.get("user")!.id;
-
-  const categoryIds = validation.data
-    .map(({ category_id }) => category_id)
-    .filter(Boolean) as string[];
-
-  if (categoryIds.length > 0) {
-    const existingCategories = await CategoryRepo.findMany({
-      user_id,
-      id: categoryIds,
-    });
-
-    const existingCategoryIds = new Set(existingCategories.map((c) => c.id));
-    const invalidCategoryIds = categoryIds.filter(
-      (id) => !existingCategoryIds.has(id)
-    );
-
-    if (invalidCategoryIds.length > 0) {
-      return fail(c, {
-        category_id: "One or more categories not found",
-      });
-    }
-
-    const categoryMap = new Map(
-      existingCategories.map((category) => [category.id, category])
-    );
-
-    const typeMismatch = validation.data.some(
-      (transaction) =>
-        transaction.category_id &&
-        categoryMap.get(transaction.category_id)!.type !== transaction.type
-    );
-
-    if (typeMismatch) {
-      return fail(c, {
-        category_id: "One or more categories do not match transaction type",
-      });
-    }
-  }
-
-  try {
-    const newTransactions = await createTransactions(validation.data, user_id);
-    return success(c, newTransactions, 201);
-  } catch (err) {
-    return error(c, "Failed to create transactions", { data: err });
-  }
 });
 
 transactions.get("/transactions/:id", requireAuth, async (c) => {
@@ -111,7 +35,69 @@ transactions.get("/transactions/:id", requireAuth, async (c) => {
     });
   }
 
-  return success(c, transaction);
+  return success(c, transactionMapper.fromDb(transaction));
+});
+
+transactions.get("/transactions", requireAuth, async (c) => {
+  const user_id = c.get("user")!.id;
+
+  try {
+    const transactions = await TransactionRepo.findMany({ user_id });
+
+    return success(c, transactions.map(transactionMapper.fromDb));
+  } catch (err) {
+    return error(c, "Failed to fetch transactions", { data: err });
+  }
+});
+
+transactions.post("/transactions", requireAuth, async (c) => {
+  let body: unknown;
+
+  try {
+    body = await c.req.json();
+  } catch (err) {
+    body = {};
+  }
+
+  const validation = NewTransactionDto.safeParse(body);
+
+  if (!validation.success) {
+    return fail(c, mapZodErrors(validation.error));
+  }
+
+  const user_id = c.get("user")!.id;
+
+  const categoryId = validation.data.category_id;
+
+  if (categoryId) {
+    const existingCategory = await CategoryRepo.findOne({
+      id: categoryId,
+      user_id,
+    });
+
+    if (!existingCategory) {
+      return fail(c, {
+        category_id: `Category with id ${categoryId} not found`,
+      });
+    }
+
+    if (existingCategory.type !== validation.data.type) {
+      return fail(c, {
+        category_id: "Category type does not match transaction type",
+      });
+    }
+  }
+
+  try {
+    const newTransaction = await createTransaction({
+      data: transactionMapper.newDtoToDb(validation.data, user_id),
+      category_id: categoryId,
+    });
+
+    return success(c, transactionMapper.fromDb(newTransaction), 201);
+  } catch (err) {
+    return error(c, "Failed to create transaction", { data: err });
+  }
 });
 
 transactions.put("/transactions/:id", requireAuth, async (c) => {
@@ -130,7 +116,7 @@ transactions.put("/transactions/:id", requireAuth, async (c) => {
     });
   }
 
-  let body;
+  let body: unknown;
 
   try {
     body = await c.req.json();
@@ -149,7 +135,10 @@ transactions.put("/transactions/:id", requireAuth, async (c) => {
   }
 
   const { category_id, ...transactionFields } = body;
-  const mergedData = { ...transaction, ...transactionFields };
+  const mergedData = transactionMapper.fromDb({
+    ...transaction,
+    ...transactionFields,
+  });
 
   const validation = TransactionDto.safeParse(mergedData);
 
@@ -204,7 +193,7 @@ transactions.put("/transactions/:id", requireAuth, async (c) => {
       }
     }
 
-    return success(c, updatedTransaction);
+    return success(c, transactionMapper.fromDb(updatedTransaction));
   } catch (err) {
     return error(c, `Failed to update transaction with id ${id}`, {
       data: err,

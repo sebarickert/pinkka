@@ -1,9 +1,11 @@
 import { db } from "@/lib/db.js";
+import type { Database } from "@/types/Database.js";
 import type {
   FinancialAccount,
   FinancialAccountUpdate,
   NewFinancialAccount,
 } from "@/types/FinancialAccount.js";
+import type { Transaction } from "kysely";
 
 // TODO: Move to a shared location
 export interface BaseQueryOptions {
@@ -12,6 +14,7 @@ export interface BaseQueryOptions {
   limit?: number; // pagination
   offset?: number; // pagination
   includeDeleted?: boolean; // whether to include soft-deleted records
+  trx?: Transaction<Database>; // transaction object
 }
 
 interface CreateFinancialAccountParams extends BaseQueryOptions {
@@ -120,4 +123,38 @@ export async function getAccountBalance(id: string): Promise<number> {
     .select("balance")
     .executeTakeFirst()
     .then((row) => Number(row?.balance) || 0);
+}
+
+interface IncrementBalanceParams extends BaseQueryOptions {
+  id: string;
+  amount: number;
+}
+
+export async function incrementBalance({
+  id,
+  amount,
+  trx,
+}: IncrementBalanceParams) {
+  return (trx ?? db)
+    .updateTable("financial_account")
+    .set((eb) => ({ balance: eb("balance", "+", amount) }))
+    .where("id", "=", id)
+    .execute();
+}
+
+interface DecrementBalanceParams extends BaseQueryOptions {
+  id: string;
+  amount: number;
+}
+
+export async function decrementBalance({
+  id,
+  amount,
+  trx,
+}: DecrementBalanceParams) {
+  return (trx ?? db)
+    .updateTable("financial_account")
+    .set((eb) => ({ balance: eb("balance", "-", amount) }))
+    .where("id", "=", id)
+    .execute();
 }

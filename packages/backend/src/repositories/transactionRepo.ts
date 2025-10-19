@@ -8,19 +8,19 @@ import type {
 } from "@/types/Transaction.js";
 import type { Transaction as KyselyTransaction } from "kysely";
 
-interface CreateManyTransactionParams extends BaseQueryOptions {
-  data: NewTransaction[];
+interface CreateOneTransactionParams extends BaseQueryOptions {
+  data: NewTransaction;
 }
 
-export async function createMany(
-  { data }: CreateManyTransactionParams,
-  trx?: KyselyTransaction<Database>
-): Promise<Transaction[]> {
+export async function createOne({
+  data,
+  trx,
+}: CreateOneTransactionParams): Promise<Transaction> {
   return (trx ?? db)
     .insertInto("transaction")
     .values(data)
     .returningAll()
-    .execute();
+    .executeTakeFirstOrThrow();
 }
 
 interface FindOneTransactionParams extends BaseQueryOptions {

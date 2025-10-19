@@ -22,8 +22,8 @@ export const FinancialAccountDto = z
     balance: z.number(),
     pending_balance: z.number(),
     is_deleted: z.boolean().optional().default(false),
-    created_at: z.coerce.date(),
-    updated_at: z.coerce.date(),
+    created_at: z.iso.datetime({ offset: true }),
+    updated_at: z.iso.datetime({ offset: true }),
   })
   .strict();
 

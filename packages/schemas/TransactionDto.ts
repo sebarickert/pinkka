@@ -31,9 +31,9 @@ export const TransactionDto = z
     type: transactionType,
     amount: z.coerce.number().min(0),
     description: z.string().max(255),
-    date: z.coerce.date(),
-    created_at: z.coerce.date(),
-    updated_at: z.coerce.date(),
+    date: z.iso.datetime({ offset: true }),
+    created_at: z.iso.datetime({ offset: true }),
+    updated_at: z.iso.datetime({ offset: true }),
   })
   .strict()
   .refine(transactionAccountValidation, {

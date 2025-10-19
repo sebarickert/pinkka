@@ -10,7 +10,7 @@ import type { VerificationTable } from "@/types/Verification.js";
 import type { ColumnType } from "kysely";
 
 // Generic Timestamp type
-export type Timestamp = ColumnType<Date, Date | string, Date | string>;
+export type Timestamp = ColumnType<Date, Date, Date>;
 
 export interface Database {
   financial_account: FinancialAccountTable;

@@ -10,10 +10,10 @@ interface CreateTransactionCategoryParams extends BaseQueryOptions {
   data: NewTransactionCategory;
 }
 
-export async function create(
-  { data: { transaction_id, category_id } }: CreateTransactionCategoryParams,
-  trx?: Transaction<Database>
-): Promise<TransactionCategory> {
+export async function create({
+  data: { transaction_id, category_id },
+  trx,
+}: CreateTransactionCategoryParams): Promise<TransactionCategory> {
   return (trx ?? db)
     .insertInto("transaction_category")
     .values({ transaction_id, category_id })

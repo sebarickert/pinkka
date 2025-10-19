@@ -8,8 +8,8 @@ export const CategoryDto = z
     name: z.string(),
     type: transactionType,
     is_deleted: z.boolean().optional().default(false),
-    created_at: z.coerce.date(),
-    updated_at: z.coerce.date(),
+    created_at: z.iso.datetime({ offset: true }),
+    updated_at: z.iso.datetime({ offset: true }),
   })
   .strict();
 
@@ -25,8 +25,7 @@ export const UpdateCategoryDto = CategoryDto.omit({
   user_id: true,
   created_at: true,
   updated_at: true,
-})
-.partial();
+}).partial();
 
 export type CategoryDto = z.infer<typeof CategoryDto>;
 export type NewCategoryDto = z.infer<typeof NewCategoryDto>;

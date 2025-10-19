@@ -5,20 +5,23 @@ import type { Transaction } from "@/types/Transaction.js";
 import type { NewTransactionDto } from "@pinkka/schemas/TransactionDto.js";
 import { expect } from "vitest";
 
-export async function createTransactions(
-  newTransactionsPayload: Omit<NewTransactionDto, "is_deleted">[],
+export async function createTransaction(
+  newTransactionPayload: NewTransactionDto,
   user: UserWithSessionToken
-): Promise<Transaction[]> {
+): Promise<Transaction> {
   const res = await fetcher(
     "/api/transactions",
     {
       method: "POST",
-      body: JSON.stringify(newTransactionsPayload),
+      body: JSON.stringify(newTransactionPayload),
     },
     user.session_token
   );
 
   const body = await res.json();
+
+  expect(res.status).toEqual(201);
+  expect(body.status).toEqual("success");
 
   return body.data;
 }
