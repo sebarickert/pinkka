@@ -70,7 +70,7 @@ accounts.post("/accounts", requireAuth, async (c) => {
   const mappedValidationData = [...[validation.data].flat()].map((data) => ({
     ...data,
     user_id,
-    current_balance: data.initial_balance,
+    balance: data.initial_balance,
     pending_balance: data.initial_balance,
   }));
 
@@ -143,7 +143,7 @@ accounts.put("/accounts/:id", requireAuth, async (c) => {
     ...validation.data,
     ...(!hasTransactions &&
       "initial_balance" in validation.data && {
-        current_balance: validation.data.initial_balance,
+        balance: validation.data.initial_balance,
         pending_balance: validation.data.initial_balance,
       }),
   };

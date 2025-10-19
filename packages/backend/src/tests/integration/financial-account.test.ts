@@ -196,7 +196,7 @@ describe("Financial Account Integration Tests", () => {
         ...newAccountPayload,
         id: newAccount?.id,
         initial_balance: newAccountPayload.initial_balance.toString(),
-        current_balance: newAccountPayload.initial_balance.toString(),
+        balance: newAccountPayload.initial_balance.toString(),
         pending_balance: newAccountPayload.initial_balance.toString(),
       });
 
@@ -237,7 +237,7 @@ describe("Financial Account Integration Tests", () => {
         ...newAccountPayload,
         id: newAccount?.id,
         initial_balance: newAccountPayloadNegative.initial_balance.toString(),
-        current_balance: newAccountPayloadNegative.initial_balance.toString(),
+        balance: newAccountPayloadNegative.initial_balance.toString(),
         pending_balance: newAccountPayloadNegative.initial_balance.toString(),
       });
 
@@ -338,7 +338,7 @@ describe("Financial Account Integration Tests", () => {
             ...payload,
             id: newAccounts[i].id,
             initial_balance: String(payload.initial_balance),
-            current_balance: String(payload.initial_balance),
+            balance: String(payload.initial_balance),
             pending_balance: String(payload.initial_balance),
           });
         }

@@ -112,3 +112,12 @@ export async function findTransactionsForTransactionAccount({
     .selectAll()
     .execute();
 }
+
+export async function getAccountBalance(id: string): Promise<number> {
+  return db
+    .selectFrom("financial_account")
+    .where("id", "=", id)
+    .select("balance")
+    .executeTakeFirst()
+    .then((row) => Number(row?.balance) || 0);
+}

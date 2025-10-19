@@ -18,6 +18,7 @@ import {
   updateTransaction,
   expectCategoryLink,
 } from "@/tests/utils/transaction.js";
+import { getFinancialAccountBalances } from "@/tests/utils/financial-account.js";
 
 describe("Financial Account Integration Tests", () => {
   let user: UserWithSessionToken;
@@ -359,6 +360,203 @@ describe("Financial Account Integration Tests", () => {
       expect(transactionCategoryLink[0].transaction_id).toEqual(
         body.data[0].id
       );
+    });
+
+    describe("Account Balance Updates", () => {
+      test("updates account balance for single income transaction", async () => {
+        const account = await createAccount(
+          {
+            name: "Income Account",
+            initial_balance: 1000,
+            type: "bank",
+            currency: "EUR",
+          },
+          user
+        );
+        const balancesBefore = await getFinancialAccountBalances(account.id);
+        const payload: Omit<NewTransactionDto, "is_deleted">[] = [
+          {
+            description: "Income",
+            amount: 200,
+            to_account_id: account.id,
+            type: "income",
+            date: new Date(),
+          },
+        ];
+        await createTransactions(payload, user);
+        const balancesAfter = await getFinancialAccountBalances(account.id);
+        expect(Number(balancesAfter?.balance)).toEqual(
+          Number(balancesBefore?.balance) + 200
+        );
+      });
+
+      test("updates account balance for single expense transaction", async () => {
+        const account = await createAccount(
+          {
+            name: "Expense Account",
+            initial_balance: 1000,
+            type: "bank",
+            currency: "EUR",
+          },
+          user
+        );
+        const balancesBefore = await getFinancialAccountBalances(account.id);
+        const payload: Omit<NewTransactionDto, "is_deleted">[] = [
+          {
+            description: "Expense",
+            amount: 150,
+            from_account_id: account.id,
+            type: "expense",
+            date: new Date(),
+          },
+        ];
+        await createTransactions(payload, user);
+        const balancesAfter = await getFinancialAccountBalances(account.id);
+        expect(Number(balancesAfter?.balance)).toEqual(
+          Number(balancesBefore?.balance) - 150
+        );
+      });
+
+      test("updates account balances for single transfer transaction", async () => {
+        const fromAccount = await createAccount(
+          {
+            name: "From Account",
+            initial_balance: 1000,
+            type: "bank",
+            currency: "EUR",
+          },
+          user
+        );
+        const toAccount = await createAccount(
+          {
+            name: "To Account",
+            initial_balance: 500,
+            type: "bank",
+            currency: "EUR",
+          },
+          user
+        );
+        const fromBefore = await getFinancialAccountBalances(fromAccount.id);
+        const toBefore = await getFinancialAccountBalances(toAccount.id);
+        const payload: Omit<NewTransactionDto, "is_deleted">[] = [
+          {
+            description: "Transfer",
+            amount: 75,
+            from_account_id: fromAccount.id,
+            to_account_id: toAccount.id,
+            type: "transfer",
+            date: new Date(),
+          },
+        ];
+        await createTransactions(payload, user);
+        const fromAfter = await getFinancialAccountBalances(fromAccount.id);
+        const toAfter = await getFinancialAccountBalances(toAccount.id);
+        expect(Number(fromAfter?.balance)).toEqual(
+          Number(fromBefore?.balance) - 75
+        );
+        expect(Number(toAfter?.balance)).toEqual(
+          Number(toBefore?.balance) + 75
+        );
+      });
+
+      test("does not update balance for zero-amount transaction", async () => {
+        const account = await createAccount(
+          {
+            name: "Zero Account",
+            initial_balance: 1000,
+            type: "bank",
+            currency: "EUR",
+          },
+          user
+        );
+        const balancesBefore = await getFinancialAccountBalances(account.id);
+        const payload: Omit<NewTransactionDto, "is_deleted">[] = [
+          {
+            description: "Zero Transaction",
+            amount: 0,
+            to_account_id: account.id,
+            type: "income",
+            date: new Date(),
+          },
+        ];
+        await createTransactions(payload, user);
+        const balancesAfter = await getFinancialAccountBalances(account.id);
+        expect(Number(balancesAfter?.balance)).toEqual(
+          Number(balancesBefore?.balance)
+        );
+      });
+
+      test("updates account balances for multiple transactions", async () => {
+        const account1 = await createAccount(
+          {
+            name: "Test Account",
+            initial_balance: 1000,
+            type: "bank",
+            currency: "EUR",
+          },
+          user
+        );
+
+        const account2 = await createAccount(
+          {
+            name: "Test Account 2",
+            initial_balance: 500,
+            type: "bank",
+            currency: "EUR",
+          },
+          user
+        );
+
+        const account1BalancesBefore = await getFinancialAccountBalances(
+          account1.id
+        );
+        const account2BalancesBefore = await getFinancialAccountBalances(
+          account2.id
+        );
+
+        const newTransactionsPayload: Omit<NewTransactionDto, "is_deleted">[] =
+          [
+            {
+              description: "Income",
+              amount: 50,
+              to_account_id: account1.id,
+              type: "income",
+              date: new Date(),
+            },
+            {
+              description: "Expense",
+              amount: 100,
+              from_account_id: account2.id,
+              type: "expense",
+              date: new Date(),
+            },
+            {
+              description: "Transfer",
+              amount: 20,
+              from_account_id: account1.id,
+              to_account_id: account2.id,
+              type: "transfer",
+              date: new Date(),
+            },
+          ];
+
+        await createTransactions(newTransactionsPayload, user);
+
+        const account1BalancesAfter = await getFinancialAccountBalances(
+          account1.id
+        );
+        const account2BalancesAfter = await getFinancialAccountBalances(
+          account2.id
+        );
+
+        const account1BalanceBefore = Number(account1BalancesBefore?.balance);
+        const account1BalanceAfter = Number(account1BalancesAfter?.balance);
+        const account2BalanceBefore = Number(account2BalancesBefore?.balance);
+        const account2BalanceAfter = Number(account2BalancesAfter?.balance);
+
+        expect(account1BalanceAfter).toEqual(account1BalanceBefore + 50 - 20);
+        expect(account2BalanceAfter).toEqual(account2BalanceBefore - 100 + 20);
+      });
     });
   });
 

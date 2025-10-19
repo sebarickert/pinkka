@@ -2,6 +2,7 @@ import type { AuthType } from "@/lib/auth.js";
 import { requireAuth } from "@/middlewares/requireAuth.js";
 import { Hono } from "hono";
 import * as TransactionRepo from "@/repositories/transactionRepo.js";
+import * as FinancialAccountRepo from "@/repositories/financialAccountRepo.js";
 import * as CategoryRepo from "@/repositories/categoryRepo.js";
 import * as TransactionCategoryRepo from "@/repositories/transactionCategoryRepo.js";
 import { error, fail, success } from "@/lib/response.js";
@@ -13,6 +14,7 @@ import {
   TransactionDto,
   UpdateTransactionDto,
 } from "@pinkka/schemas/TransactionDto.js";
+import { createTransactions } from "@/services/transactions.js";
 
 const transactions = new Hono<{ Variables: AuthType["Variables"] }>({
   strict: false,
@@ -31,7 +33,7 @@ transactions.get("/transactions", requireAuth, async (c) => {
 });
 
 transactions.post("/transactions", requireAuth, async (c) => {
-  let body;
+  let body: unknown;
 
   try {
     body = await c.req.json();
@@ -86,29 +88,7 @@ transactions.post("/transactions", requireAuth, async (c) => {
   }
 
   try {
-    const newTransactions = await TransactionRepo.createMany({
-      // Omitting category_id from here, as it's handled in a separate table
-      data: validation.data.map(({ category_id, ...data }) => ({
-        ...data,
-        user_id,
-      })),
-    });
-
-    await Promise.all(
-      newTransactions.map(async (transaction, index) => {
-        const category_id = validation.data[index]?.category_id;
-
-        if (category_id) {
-          await TransactionCategoryRepo.create({
-            data: {
-              category_id,
-              transaction_id: transaction.id,
-            },
-          });
-        }
-      })
-    );
-
+    const newTransactions = await createTransactions(validation.data, user_id);
     return success(c, newTransactions, 201);
   } catch (err) {
     return error(c, "Failed to create transactions", { data: err });

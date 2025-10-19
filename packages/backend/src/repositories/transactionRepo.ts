@@ -1,19 +1,26 @@
 import { db } from "@/lib/db.js";
 import type { BaseQueryOptions } from "@/repositories/financialAccountRepo.js";
+import type { Database } from "@/types/Database.js";
 import type {
   Transaction,
   TransactionUpdate,
   NewTransaction,
 } from "@/types/Transaction.js";
+import type { Transaction as KyselyTransaction } from "kysely";
 
 interface CreateManyTransactionParams extends BaseQueryOptions {
   data: NewTransaction[];
 }
 
-export async function createMany({
-  data,
-}: CreateManyTransactionParams): Promise<Transaction[]> {
-  return db.insertInto("transaction").values(data).returningAll().execute();
+export async function createMany(
+  { data }: CreateManyTransactionParams,
+  trx?: KyselyTransaction<Database>
+): Promise<Transaction[]> {
+  return (trx ?? db)
+    .insertInto("transaction")
+    .values(data)
+    .returningAll()
+    .execute();
 }
 
 interface FindOneTransactionParams extends BaseQueryOptions {

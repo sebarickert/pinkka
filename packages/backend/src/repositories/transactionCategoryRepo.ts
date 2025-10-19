@@ -1,18 +1,20 @@
 import { db } from "@/lib/db.js";
 import type { BaseQueryOptions } from "@/repositories/financialAccountRepo.js";
+import type { Database } from "@/types/Database.js";
 import type {
   NewTransactionCategory,
   TransactionCategory,
 } from "@/types/TransactionCategory.js";
-
+import type { Transaction } from "kysely";
 interface CreateTransactionCategoryParams extends BaseQueryOptions {
   data: NewTransactionCategory;
 }
 
-export async function create({
-  data: { transaction_id, category_id },
-}: CreateTransactionCategoryParams): Promise<TransactionCategory> {
-  return db
+export async function create(
+  { data: { transaction_id, category_id } }: CreateTransactionCategoryParams,
+  trx?: Transaction<Database>
+): Promise<TransactionCategory> {
+  return (trx ?? db)
     .insertInto("transaction_category")
     .values({ transaction_id, category_id })
     .returningAll()
