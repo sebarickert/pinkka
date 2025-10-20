@@ -1,6 +1,7 @@
-import { z, type ZodError } from "zod";
+import { z } from "zod";
+import type { $ZodError } from "zod/v4/core";
 
-export function mapZodErrors(errors: ZodError) {
+export function mapZodErrors(errors: $ZodError<Record<string, unknown>>) {
   const isArrayError = errors.issues.some((e) => typeof e.path[0] === "number");
 
   if (isArrayError) {

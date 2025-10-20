@@ -6,6 +6,7 @@ import type {
   TransactionCategory,
 } from "@/types/TransactionCategory.js";
 import type { Transaction } from "kysely";
+
 interface CreateTransactionCategoryParams extends BaseQueryOptions {
   data: NewTransactionCategory;
 }
@@ -27,8 +28,9 @@ interface UpsertTransactionCategoryParams extends BaseQueryOptions {
 
 export async function upsert({
   data: { transaction_id, category_id },
+  trx,
 }: UpsertTransactionCategoryParams): Promise<TransactionCategory> {
-  await db
+  await (trx ?? db)
     .deleteFrom("transaction_category")
     .where("transaction_id", "=", transaction_id)
     .execute();
@@ -43,12 +45,14 @@ export async function upsert({
 
 export async function deleteLink({
   data: { transaction_id },
+  trx,
 }: {
   data: {
     transaction_id: string;
   };
+  trx?: Transaction<Database>;
 }) {
-  return db
+  return (trx ?? db)
     .deleteFrom("transaction_category")
     .where("transaction_id", "=", transaction_id)
     .execute();

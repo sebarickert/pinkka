@@ -2,10 +2,13 @@ import { db } from "@/lib/db.js";
 import { betterAuth } from "better-auth";
 import { v4 as uuidv4 } from "uuid";
 
+export type AuthUser = typeof auth.$Infer.Session.user;
+export type AuthSession = typeof auth.$Infer.Session.session;
+
 export type AuthType = {
   Variables: {
-    user: typeof auth.$Infer.Session.user | null;
-    session: typeof auth.$Infer.Session.session | null;
+    user: AuthUser | null;
+    session: AuthSession | null;
   };
 };
 

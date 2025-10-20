@@ -1,4 +1,8 @@
-import type { NewTransaction, Transaction } from "@/types/Transaction.js";
+import type {
+  NewTransaction,
+  Transaction,
+  TransactionUpdate,
+} from "@/types/Transaction.js";
 import type {
   NewTransactionDto,
   TransactionDto,
@@ -28,6 +32,20 @@ export const transactionMapper = {
       from_account_id: dto.from_account_id ?? null,
       to_account_id: dto.to_account_id ?? null,
       user_id,
+    };
+  },
+  updateDtoToDb(dto: Partial<NewTransactionDto>): Partial<TransactionUpdate> {
+    return {
+      ...(dto.type !== undefined && { type: dto.type }),
+      ...(dto.amount !== undefined && { amount: dto.amount }),
+      ...(dto.description !== undefined && { description: dto.description }),
+      ...(dto.date !== undefined && { date: new Date(dto.date) }),
+      ...(dto.from_account_id !== undefined && {
+        from_account_id: dto.from_account_id,
+      }),
+      ...(dto.to_account_id !== undefined && {
+        to_account_id: dto.to_account_id,
+      }),
     };
   },
 };

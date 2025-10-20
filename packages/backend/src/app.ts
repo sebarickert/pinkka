@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config({ path: "../../.env" });
 
-import { auth } from "@/lib/auth.js";
 import createApp from "@/lib/create-app.js";
 import accounts from "@/routes/accounts.js";
 import authRoute from "@/routes/auth.js";
@@ -24,21 +23,6 @@ app.use(
     credentials: true,
   })
 );
-
-app.use("*", async (c, next) => {
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
-
-  if (!session) {
-    c.set("user", null);
-    c.set("session", null);
-    return next();
-  }
-
-  c.set("user", session.user);
-  c.set("session", session.session);
-
-  return next();
-});
 
 routes.forEach((route) => {
   app.basePath("/api").route("/", route);

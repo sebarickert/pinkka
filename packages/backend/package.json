@@ -14,8 +14,9 @@
     "test:integration": "DATABASE_DB=pinkka_test_db vitest --project integration --no-file-parallelism"
   },
   "dependencies": {
-    "@pinkka/schemas": "*",
     "@hono/node-server": "^1.19.5",
+    "@hono/zod-validator": "^0.7.4",
+    "@pinkka/schemas": "*",
     "hono": "^4.9.9",
     "kysely": "^0.28.7",
     "pg": "^8.16.3",

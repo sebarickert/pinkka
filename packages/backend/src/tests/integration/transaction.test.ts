@@ -176,6 +176,25 @@ describe("Financial Account Integration Tests", () => {
       categoryExpense = await createCategory(newExpenseCategoryPayload, user);
     });
 
+    test("returns validation error for empty body", async () => {
+      const res = await fetcher(
+        "/api/transactions",
+        {
+          method: "POST",
+        },
+        user.session_token
+      );
+
+      const body = await res.json();
+
+      expect(res.status).toEqual(400);
+      expect(body.status).toEqual("fail");
+      expect(body.data).toHaveProperty("type");
+      expect(body.data).toHaveProperty("amount");
+      expect(body.data).toHaveProperty("date");
+      expect(body.data).toHaveProperty("description");
+    });
+
     test("returns validation error for invalid data", async () => {
       const newTransactionPayload = {
         amount: 50,
@@ -535,6 +554,7 @@ describe("Financial Account Integration Tests", () => {
         // Category link should remain absent
         await expectCategoryLink(transaction1.id, null);
       });
+
       test("sending empty body results in no changes", async () => {
         const transactionBefore = await getTransaction(transaction1.id);
         const { status, body } = await updateTransaction(

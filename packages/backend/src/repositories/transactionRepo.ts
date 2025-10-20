@@ -64,8 +64,9 @@ export async function update({
   id,
   user_id,
   data,
+  trx,
 }: UpdateTransactionParams): Promise<Transaction> {
-  return db
+  return (trx ?? db)
     .updateTable("transaction")
     .where("id", "=", id)
     .where("user_id", "=", user_id)

@@ -1,15 +1,22 @@
-import type { AuthType } from "@/lib/auth.js";
+import type { AuthSession, AuthType, AuthUser } from "@/lib/auth.js";
 import { error } from "@/lib/response.js";
 import { createMiddleware } from "hono/factory";
+import { auth } from "@/lib/auth.js";
 
 export const requireAuth = createMiddleware<{
-  Variables: AuthType["Variables"];
+  Variables: {
+    user: AuthUser;
+    session: AuthSession;
+  };
 }>(async (c, next) => {
-  const user = c.get("user");
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
 
-  if (!user) {
+  if (!session) {
     return error(c, "Unauthorized", { status: 401 });
   }
+
+  c.set("user", session.user);
+  c.set("session", session.session);
 
   return next();
 });
