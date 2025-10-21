@@ -19,7 +19,7 @@ import {
 } from "@/tests/utils/transaction.js";
 import { getFinancialAccountBalances } from "@/tests/utils/financial-account.js";
 
-describe("Financial Account Integration Tests", () => {
+describe("Transaction Integration Tests", () => {
   let user: UserWithSessionToken;
   let account: FinancialAccount;
 
@@ -247,7 +247,7 @@ describe("Financial Account Integration Tests", () => {
 
         expect(res.status).toEqual(400);
         expect(body.status).toEqual("fail");
-        expect(body.data).toHaveProperty("to_account_id");
+        expect(body.data).toHaveProperty(key);
       }
     );
 
@@ -276,6 +276,7 @@ describe("Financial Account Integration Tests", () => {
       expect(res.status).toEqual(400);
       expect(body.status).toEqual("fail");
       expect(body.data).toHaveProperty("to_account_id");
+      expect(body.data).toHaveProperty("from_account_id");
     });
 
     test("creates transaction with valid data (with category)", async () => {
