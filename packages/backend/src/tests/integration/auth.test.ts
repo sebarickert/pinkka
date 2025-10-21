@@ -4,7 +4,7 @@ import { cleanDb } from "@/tests/utils/cleanDb.js";
 import { fetcher } from "@/tests/utils/fetcher.js";
 import type { User } from "@/types/User.js";
 
-describe.sequential("Auth Integration Tests", () => {
+describe("Auth Integration Tests", () => {
   let user: User;
   let session_token: string;
 

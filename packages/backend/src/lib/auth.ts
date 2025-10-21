@@ -7,8 +7,8 @@ export type AuthSession = typeof auth.$Infer.Session.session;
 
 export type AuthType = {
   Variables: {
-    user: AuthUser | null;
-    session: AuthSession | null;
+    user: AuthUser;
+    session: AuthSession;
   };
 };
 

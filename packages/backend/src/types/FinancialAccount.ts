@@ -1,9 +1,14 @@
-import type { Timestamp } from "@/types/Database.js";
-import type { Generated, Insertable, Selectable, Updateable } from "kysely";
+import type {
+  Generated,
+  GeneratedAlways,
+  Insertable,
+  Selectable,
+  Updateable,
+} from "kysely";
 
 // Named FinancialAccount to avoid confusion with Account from better-auth
 export interface FinancialAccountTable {
-  id: Generated<string>;
+  id: GeneratedAlways<string>;
   user_id: string;
   name: string;
   type: "bank" | "credit_card" | "wallet" | "investment" | "loan";
@@ -11,8 +16,8 @@ export interface FinancialAccountTable {
   initial_balance: number;
   balance: number;
   is_deleted: boolean;
-  created_at: Generated<Timestamp>;
-  updated_at: Generated<Timestamp>;
+  created_at: Generated<Date>;
+  updated_at: Generated<Date>;
 }
 
 export type FinancialAccount = Selectable<FinancialAccountTable>;

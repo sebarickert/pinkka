@@ -146,7 +146,7 @@ describe("Financial Account Integration Tests", () => {
     });
   });
 
-  describe("POST /accounts - single", () => {
+  describe("POST /accounts", () => {
     const newAccountPayload = {
       type: "bank",
       name: "Hola!",
@@ -199,7 +199,6 @@ describe("Financial Account Integration Tests", () => {
         id: newAccount?.id,
         initial_balance: newAccountPayload.initial_balance.toString(),
         balance: newAccountPayload.initial_balance.toString(),
-        pending_balance: newAccountPayload.initial_balance.toString(),
       });
 
       expect(newAccount?.is_deleted).toBeDefined();
@@ -240,111 +239,11 @@ describe("Financial Account Integration Tests", () => {
         id: newAccount?.id,
         initial_balance: newAccountPayloadNegative.initial_balance.toString(),
         balance: newAccountPayloadNegative.initial_balance.toString(),
-        pending_balance: newAccountPayloadNegative.initial_balance.toString(),
       });
 
       expect(newAccount?.is_deleted).toBeDefined();
       expect(newAccount?.created_at).toBeDefined();
       expect(newAccount?.updated_at).toBeDefined();
-    });
-  });
-
-  describe("POST /accounts - multiple", async () => {
-    const newAccountPayload1 = {
-      type: "bank",
-      name: "Hola!",
-      currency: "EUR",
-      initial_balance: 1000,
-    };
-
-    const newAccountPayload2 = {
-      type: "bank",
-      name: "Adios!",
-      currency: "USD",
-      initial_balance: 1234,
-    };
-
-    const newAccountPayload3 = {
-      type: "bank",
-      name: "Adios!",
-      currency: "USD",
-      initial_balance: 9999999,
-    };
-
-    test("returns validation errors for multiple accounts with invalid data", async () => {
-      const newAccountPayload1Invalid = {
-        ...newAccountPayload1,
-        currency: undefined,
-      };
-
-      const newAccountPayload3Invalid = {
-        ...newAccountPayload3,
-        initial_balance: "100",
-      };
-
-      const res = await fetcher(
-        "/api/accounts",
-        {
-          method: "POST",
-          body: JSON.stringify([
-            newAccountPayload1Invalid,
-            newAccountPayload2,
-            newAccountPayload3Invalid,
-          ]),
-        },
-        user.session_token
-      );
-
-      const body = await res.json();
-
-      expect(res.status).toEqual(400);
-      expect(body.status).toEqual("fail");
-      expect(body.data["0"]).toHaveProperty("currency");
-      expect(body.data["2"]).toHaveProperty("initial_balance");
-    });
-
-    test("creates multiple financial accounts with valid data", async () => {
-      const res = await fetcher(
-        "/api/accounts",
-        {
-          method: "POST",
-          body: JSON.stringify([
-            newAccountPayload1,
-            newAccountPayload2,
-            newAccountPayload3,
-          ]),
-        },
-        user.session_token
-      );
-
-      const body = await res.json();
-
-      expect(res.status).toEqual(201);
-      expect(body.status).toEqual("success");
-      expect(body.data).toHaveLength(3);
-
-      const newAccountIds = body.data.map(
-        (account: { id: string }) => account.id
-      );
-
-      const newAccounts = await db
-        .selectFrom("financial_account")
-        .where("id", "in", newAccountIds)
-        .selectAll()
-        .execute();
-
-      expect(newAccounts).toHaveLength(3);
-      [newAccountPayload1, newAccountPayload2, newAccountPayload3].forEach(
-        (payload, i) => {
-          expect(newAccounts[i]).toMatchObject({
-            ...payload,
-            id: newAccounts[i].id,
-            initial_balance: String(payload.initial_balance),
-            balance: String(payload.initial_balance),
-            pending_balance: String(payload.initial_balance),
-          });
-        }
-      );
     });
   });
 

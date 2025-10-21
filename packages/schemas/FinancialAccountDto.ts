@@ -20,7 +20,6 @@ export const FinancialAccountDto = z
     currency: currencyEnum,
     initial_balance: z.number(),
     balance: z.number(),
-    pending_balance: z.number(),
     is_deleted: z.boolean().optional().default(false),
     created_at: z.iso.datetime({ offset: true }),
     updated_at: z.iso.datetime({ offset: true }),
@@ -33,7 +32,7 @@ export const NewFinancialAccountDto = FinancialAccountDto.omit({
   created_at: true,
   updated_at: true,
   balance: true,
-  pending_balance: true,
+  is_deleted: true,
 });
 
 export const UpdateFinancialAccountDto = FinancialAccountDto.omit({
@@ -42,7 +41,6 @@ export const UpdateFinancialAccountDto = FinancialAccountDto.omit({
   created_at: true,
   updated_at: true,
   balance: true,
-  pending_balance: true,
 }).partial();
 
 export type FinancialAccountDto = z.infer<typeof FinancialAccountDto>;

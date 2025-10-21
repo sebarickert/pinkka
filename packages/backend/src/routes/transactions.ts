@@ -14,31 +14,25 @@ import { transactionMapper } from "@/mappers/transactionMapper.js";
 import { validateBody, validateIdParam } from "@/lib/validator.js";
 import { db } from "@/lib/db.js";
 
-const transactions = new Hono<{ Variables: AuthType["Variables"] }>({
-  strict: false,
+const transactions = new Hono<{ Variables: AuthType["Variables"] }>();
+transactions.use("/transactions/*", requireAuth);
+
+transactions.get("/transactions/:id", validateIdParam, async (c) => {
+  const user_id = c.get("user").id;
+  const { id } = c.req.param();
+
+  const transaction = await TransactionRepo.findOne({ id, user_id });
+
+  if (!transaction) {
+    return error(c, `Transaction with id ${id} not found`, {
+      status: 404,
+    });
+  }
+
+  return success(c, transactionMapper.fromDb(transaction));
 });
 
-transactions.get(
-  "/transactions/:id",
-  requireAuth,
-  validateIdParam,
-  async (c) => {
-    const user_id = c.get("user").id;
-    const { id } = c.req.param();
-
-    const transaction = await TransactionRepo.findOne({ id, user_id });
-
-    if (!transaction) {
-      return error(c, `Transaction with id ${id} not found`, {
-        status: 404,
-      });
-    }
-
-    return success(c, transactionMapper.fromDb(transaction));
-  }
-);
-
-transactions.get("/transactions", requireAuth, async (c) => {
+transactions.get("/transactions", async (c) => {
   const user_id = c.get("user").id;
 
   try {
@@ -51,7 +45,6 @@ transactions.get("/transactions", requireAuth, async (c) => {
 
 transactions.post(
   "/transactions",
-  requireAuth,
   validateBody(NewTransactionDto),
   async (c) => {
     const body = c.req.valid("json");
@@ -92,7 +85,6 @@ transactions.post(
 
 transactions.put(
   "/transactions/:id",
-  requireAuth,
   validateIdParam,
   validateBody(UpdateTransactionDto),
   async (c) => {
@@ -186,35 +178,30 @@ transactions.put(
   }
 );
 
-transactions.delete(
-  "/transactions/:id",
-  requireAuth,
-  validateIdParam,
-  async (c) => {
-    const user_id = c.get("user").id;
-    const { id } = c.req.param();
+transactions.delete("/transactions/:id", validateIdParam, async (c) => {
+  const user_id = c.get("user").id;
+  const { id } = c.req.param();
 
-    const transaction = await TransactionRepo.findOne({ id, user_id });
+  const transaction = await TransactionRepo.findOne({ id, user_id });
 
-    if (!transaction) {
-      return error(c, `Transaction with id ${id} not found`, {
-        status: 404,
-      });
-    }
-
-    try {
-      await TransactionRepo.deleteTransaction({
-        id,
-        user_id,
-      });
-
-      return success(c, `Transaction with id ${id} deleted`);
-    } catch (err) {
-      return error(c, `Failed to delete transaction with id ${id}`, {
-        data: err,
-      });
-    }
+  if (!transaction) {
+    return error(c, `Transaction with id ${id} not found`, {
+      status: 404,
+    });
   }
-);
+
+  try {
+    await TransactionRepo.deleteTransaction({
+      id,
+      user_id,
+    });
+
+    return success(c, `Transaction with id ${id} deleted`);
+  } catch (err) {
+    return error(c, `Failed to delete transaction with id ${id}`, {
+      data: err,
+    });
+  }
+});
 
 export default transactions;
