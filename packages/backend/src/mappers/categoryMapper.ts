@@ -2,7 +2,7 @@ import type {
   Category,
   CategoryUpdate,
   NewCategory,
-} from "@/types/Category.js";
+} from "@/types/db/Category.js";
 import type {
   CategoryDto,
   NewCategoryDto,

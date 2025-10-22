@@ -1,7 +1,7 @@
 import { db } from "@/lib/db.js";
 import { fetcher } from "@/tests/utils/fetcher.js";
 import type { UserWithSessionToken } from "@/tests/utils/createTestUser.js";
-import type { Transaction } from "@/types/Transaction.js";
+import type { Transaction } from "@/types/db/Transaction.js";
 import type { NewTransactionDto } from "@pinkka/schemas/TransactionDto.js";
 import { expect } from "vitest";
 

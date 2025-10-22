@@ -1,10 +1,10 @@
 import { db } from "@/lib/db.js";
-import type { Database } from "@/types/Database.js";
+import type { Database } from "@/types/db/Database.js";
 import type {
   FinancialAccount,
   FinancialAccountUpdate,
   NewFinancialAccount,
-} from "@/types/FinancialAccount.js";
+} from "@/types/db/FinancialAccount.js";
 import type { Transaction } from "kysely";
 
 // TODO: Move to a shared location

@@ -2,7 +2,7 @@ import type {
   FinancialAccount,
   FinancialAccountUpdate,
   NewFinancialAccount,
-} from "@/types/FinancialAccount.js";
+} from "@/types/db/FinancialAccount.js";
 import type {
   FinancialAccountDto,
   NewFinancialAccountDto,

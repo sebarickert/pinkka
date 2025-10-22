@@ -1,10 +1,10 @@
 import { db } from "@/lib/db.js";
 import type { BaseQueryOptions } from "@/repositories/financialAccountRepo.js";
-import type { Database } from "@/types/Database.js";
+import type { Database } from "@/types/db/Database.js";
 import type {
   NewTransactionCategory,
   TransactionCategory,
-} from "@/types/TransactionCategory.js";
+} from "@/types/db/TransactionCategory.js";
 import type { Transaction } from "kysely";
 
 interface CreateTransactionCategoryParams extends BaseQueryOptions {

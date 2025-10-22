@@ -1,6 +1,6 @@
 import type { UserWithSessionToken } from "@/tests/utils/createTestUser.js";
 import { fetcher } from "@/tests/utils/fetcher.js";
-import type { FinancialAccount } from "@/types/FinancialAccount.js";
+import type { FinancialAccount } from "@/types/db/FinancialAccount.js";
 import type { NewFinancialAccountDto } from "@pinkka/schemas/FinancialAccountDto.js";
 
 export async function createAccount(

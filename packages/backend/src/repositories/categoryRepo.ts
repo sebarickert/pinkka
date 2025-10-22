@@ -4,7 +4,7 @@ import type {
   Category,
   CategoryUpdate,
   NewCategory,
-} from "@/types/Category.js";
+} from "@/types/db/Category.js";
 
 interface CreateCategoryParams extends BaseQueryOptions {
   data: NewCategory;

@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, test } from "vitest";
 import { db } from "@/lib/db.js";
 import { cleanDb } from "@/tests/utils/cleanDb.js";
 import { fetcher } from "@/tests/utils/fetcher.js";
-import type { User } from "@/types/User.js";
+import type { User } from "@/types/db/User.js";
 
 describe("Auth Integration Tests", () => {
   let user: User;

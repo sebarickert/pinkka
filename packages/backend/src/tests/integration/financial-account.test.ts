@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { cleanDb } from "@/tests/utils/cleanDb.js";
 import { createAccount } from "@/tests/utils/createAccount.js";
 import { createTransaction } from "@/tests/utils/transaction.js";
-import type { FinancialAccount } from "@/types/FinancialAccount.js";
+import type { FinancialAccount } from "@/types/db/FinancialAccount.js";
 
 describe("Financial Account Integration Tests", () => {
   let user: UserWithSessionToken;

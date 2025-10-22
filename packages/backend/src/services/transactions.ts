@@ -4,7 +4,7 @@ import type {
   NewTransaction,
   Transaction,
   TransactionUpdate,
-} from "@/types/Transaction.js";
+} from "@/types/db/Transaction.js";
 import { db } from "@/lib/db.js";
 import { updateAccountBalancesForTransaction } from "@/services/financial-accounts.js";
 

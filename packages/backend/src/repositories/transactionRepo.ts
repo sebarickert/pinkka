@@ -1,11 +1,11 @@
 import { db } from "@/lib/db.js";
 import type { BaseQueryOptions } from "@/repositories/financialAccountRepo.js";
-import type { Database } from "@/types/Database.js";
+import type { Database } from "@/types/db/Database.js";
 import type {
   Transaction,
   TransactionUpdate,
   NewTransaction,
-} from "@/types/Transaction.js";
+} from "@/types/db/Transaction.js";
 import type { Transaction as KyselyTransaction } from "kysely";
 
 interface CreateOneTransactionParams extends BaseQueryOptions {

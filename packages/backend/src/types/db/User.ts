@@ -1,4 +1,4 @@
-import type { Timestamp } from "@/types/Database.js";
+import type { Timestamp } from "@/types/db/Database.js";
 import type { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 export interface UserTable {

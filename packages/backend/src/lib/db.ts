@@ -3,7 +3,7 @@ dotenv.config({ path: "../../.env" });
 
 import { Pool } from "pg";
 import { Kysely, PostgresDialect } from "kysely";
-import type { Database } from "@/types/Database.js";
+import type { Database } from "@/types/db/Database.js";
 
 const { DATABASE_USER, DATABASE_PASSWORD, DATABASE_DB, DATABASE_PORT } =
   process.env;

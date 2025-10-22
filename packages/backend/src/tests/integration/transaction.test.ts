@@ -7,10 +7,10 @@ import {
 import { beforeEach, describe, expect, test } from "vitest";
 import { cleanDb } from "@/tests/utils/cleanDb.js";
 import { createAccount } from "@/tests/utils/createAccount.js";
-import type { FinancialAccount } from "@/types/FinancialAccount.js";
-import type { Transaction } from "@/types/Transaction.js";
+import type { FinancialAccount } from "@/types/db/FinancialAccount.js";
+import type { Transaction } from "@/types/db/Transaction.js";
 import { createCategory } from "@/tests/utils/createCategory.js";
-import type { Category } from "@/types/Category.js";
+import type { Category } from "@/types/db/Category.js";
 import {
   createTransaction,
   getTransaction,

@@ -2,7 +2,7 @@ import type {
   NewTransaction,
   Transaction,
   TransactionUpdate,
-} from "@/types/Transaction.js";
+} from "@/types/db/Transaction.js";
 import type {
   NewTransactionDto,
   TransactionDto,
