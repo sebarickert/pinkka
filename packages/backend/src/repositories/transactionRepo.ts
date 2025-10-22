@@ -83,8 +83,9 @@ interface DeleteTransactionParams extends BaseQueryOptions {
 export async function deleteTransaction({
   id,
   user_id,
+  trx,
 }: DeleteTransactionParams) {
-  return db
+  return (trx ?? db)
     .deleteFrom("transaction")
     .where("id", "=", id)
     .where("user_id", "=", user_id)

@@ -350,7 +350,9 @@ describe("Transaction Integration Tests", () => {
         await createTransaction(newTransactionPayload, user);
         const balancesAfter = await getFinancialAccountBalances(account1.id);
 
-        expect(balancesAfter?.balance).toEqual(balancesBefore?.balance + 250);
+        expect(balancesAfter?.balance).toEqual(
+          balancesBefore?.balance + newTransactionPayload.amount
+        );
       });
 
       test("updates account balance correctly for expense transaction", async () => {
@@ -367,7 +369,9 @@ describe("Transaction Integration Tests", () => {
         await createTransaction(newTransactionPayload, user);
         const balancesAfter = await getFinancialAccountBalances(account1.id);
 
-        expect(balancesAfter?.balance).toEqual(balancesBefore?.balance - 250);
+        expect(balancesAfter?.balance).toEqual(
+          balancesBefore?.balance - newTransactionPayload.amount
+        );
       });
 
       test("updates account balances correctly for transfer transaction", async () => {
@@ -388,8 +392,12 @@ describe("Transaction Integration Tests", () => {
         const fromAfter = await getFinancialAccountBalances(account1.id);
         const toAfter = await getFinancialAccountBalances(account2.id);
 
-        expect(fromAfter?.balance).toEqual(fromBefore?.balance - 99.99);
-        expect(toAfter?.balance).toEqual(toBefore?.balance + 99.99);
+        expect(fromAfter?.balance).toEqual(
+          fromBefore?.balance - newTransactionPayload.amount
+        );
+        expect(toAfter?.balance).toEqual(
+          toBefore?.balance + newTransactionPayload.amount
+        );
       });
 
       test("does not update balance for zero-amount transaction", async () => {
@@ -623,6 +631,152 @@ describe("Transaction Integration Tests", () => {
         expect(body.message).toEqual(`Transaction with id ${id} not found`);
       });
     });
+
+    describe("Account Balance Updates", () => {
+      let account1: FinancialAccount;
+      let account2: FinancialAccount;
+      let transactionExpense: Transaction;
+      let transactionIncome: Transaction;
+      let transactionTransfer: Transaction;
+
+      beforeEach(async () => {
+        account1 = await createAccount(
+          {
+            name: "Account 1",
+            initial_balance: 1000,
+            type: "bank",
+            currency: "EUR",
+          },
+          user
+        );
+
+        account2 = await createAccount(
+          {
+            name: "Account 1",
+            initial_balance: 1000,
+            type: "bank",
+            currency: "EUR",
+          },
+          user
+        );
+
+        const newTransactionPayload = {
+          description: "Grocery Shopping",
+          amount: 100,
+          date: new Date().toISOString(),
+        } as const;
+
+        transactionExpense = await createTransaction(
+          {
+            ...newTransactionPayload,
+            from_account_id: account1.id,
+            type: "expense",
+          },
+          user
+        );
+        transactionIncome = await createTransaction(
+          {
+            ...newTransactionPayload,
+            to_account_id: account2.id,
+            type: "income",
+          },
+          user
+        );
+        transactionTransfer = await createTransaction(
+          {
+            ...newTransactionPayload,
+            from_account_id: account1.id,
+            to_account_id: account2.id,
+            type: "transfer",
+          },
+          user
+        );
+      });
+
+      test.each([1, 50, 0, -1, -50, -99.99])(
+        "updates account balance correctly when amount is changed by %s for income transaction",
+        async (changeAmount) => {
+          const accountBalanceBefore = await getFinancialAccountBalances(
+            account2.id
+          );
+
+          const { status } = await updateTransaction(
+            transactionIncome.id,
+            { amount: transactionIncome.amount + changeAmount },
+            user.session_token
+          );
+
+          expect(status).toEqual(200);
+
+          const accountBalanceAfter = await getFinancialAccountBalances(
+            account2.id
+          );
+
+          expect(accountBalanceAfter?.balance).toEqual(
+            accountBalanceBefore!.balance + changeAmount
+          );
+        }
+      );
+
+      test.each([1, 50, 0, -1, -50, -99.99])(
+        "updates account balance correctly when amount is changed by %s for expense transaction",
+        async (changeAmount) => {
+          const accountBalanceBefore = await getFinancialAccountBalances(
+            account1.id
+          );
+
+          const { status } = await updateTransaction(
+            transactionExpense.id,
+            { amount: transactionExpense.amount + changeAmount },
+            user.session_token
+          );
+
+          expect(status).toEqual(200);
+
+          const accountBalanceAfter = await getFinancialAccountBalances(
+            account1.id
+          );
+
+          expect(accountBalanceAfter?.balance).toEqual(
+            accountBalanceBefore!.balance - changeAmount
+          );
+        }
+      );
+
+      test.each([1, 50, 0, -1, -50, -99.99])(
+        "updates account balance correctly when amount is changed by %s for transfer transaction",
+        async (changeAmount) => {
+          const account1BalanceBefore = await getFinancialAccountBalances(
+            account1.id
+          );
+          const account2BalanceBefore = await getFinancialAccountBalances(
+            account2.id
+          );
+
+          const { status } = await updateTransaction(
+            transactionTransfer.id,
+            { amount: transactionTransfer.amount + changeAmount },
+            user.session_token
+          );
+
+          expect(status).toEqual(200);
+
+          const account1BalanceAfter = await getFinancialAccountBalances(
+            account1.id
+          );
+          const account2BalanceAfter = await getFinancialAccountBalances(
+            account2.id
+          );
+
+          expect(account1BalanceAfter?.balance).toEqual(
+            account1BalanceBefore!.balance - changeAmount
+          );
+          expect(account2BalanceAfter?.balance).toEqual(
+            account2BalanceBefore!.balance + changeAmount
+          );
+        }
+      );
+    });
   });
 
   describe("DELETE /transactions/:id", () => {
@@ -638,6 +792,52 @@ describe("Transaction Integration Tests", () => {
       } as const;
 
       transaction = await createTransaction(newTransactionPayload, user);
+    });
+
+    test("deletes category link when transaction is deleted", async () => {
+      const newExpenseCategoryPayload = {
+        type: "expense",
+        name: "Hola!",
+      } as const;
+
+      const categoryExpense = await createCategory(
+        newExpenseCategoryPayload,
+        user
+      );
+
+      const newTransactionPayload = {
+        description: "Grocery Shopping",
+        amount: 50,
+        from_account_id: account.id,
+        type: "expense",
+        date: new Date().toISOString(),
+        category_id: categoryExpense.id,
+      } as const;
+
+      const transaction = await createTransaction(newTransactionPayload, user);
+      const transactionCategoryLinkBefore = await db
+        .selectFrom("transaction_category")
+        .where("transaction_id", "=", transaction.id)
+        .selectAll()
+        .execute();
+
+      expect(transactionCategoryLinkBefore).toHaveLength(1);
+
+      await fetcher(
+        `/api/transactions/${transaction.id}`,
+        {
+          method: "DELETE",
+        },
+        user.session_token
+      );
+
+      const transactionCategoryLinkAfter = await db
+        .selectFrom("transaction_category")
+        .where("transaction_id", "=", transaction.id)
+        .selectAll()
+        .execute();
+
+      expect(transactionCategoryLinkAfter).toHaveLength(0);
     });
 
     test("deletes transaction", async () => {
@@ -696,6 +896,143 @@ describe("Transaction Integration Tests", () => {
       expect(res.status).toEqual(400);
       expect(body.status).toEqual("error");
       expect(body.message).toEqual("Invalid id format");
+    });
+
+    describe("Account Balance Updates", () => {
+      let account1: FinancialAccount;
+      let account2: FinancialAccount;
+      let transactionExpense: Transaction;
+      let transactionIncome: Transaction;
+      let transactionTransfer: Transaction;
+
+      beforeEach(async () => {
+        account1 = await createAccount(
+          {
+            name: "Account 1",
+            initial_balance: 1000,
+            type: "bank",
+            currency: "EUR",
+          },
+          user
+        );
+
+        account2 = await createAccount(
+          {
+            name: "Account 1",
+            initial_balance: 1000,
+            type: "bank",
+            currency: "EUR",
+          },
+          user
+        );
+
+        const newTransactionPayload = {
+          description: "Grocery Shopping",
+          amount: 100,
+          date: new Date().toISOString(),
+        } as const;
+
+        transactionExpense = await createTransaction(
+          {
+            ...newTransactionPayload,
+            from_account_id: account1.id,
+            type: "expense",
+          },
+          user
+        );
+        transactionIncome = await createTransaction(
+          {
+            ...newTransactionPayload,
+            to_account_id: account2.id,
+            type: "income",
+          },
+          user
+        );
+        transactionTransfer = await createTransaction(
+          {
+            ...newTransactionPayload,
+            from_account_id: account1.id,
+            to_account_id: account2.id,
+            type: "transfer",
+          },
+          user
+        );
+      });
+
+      test("updates account balance correctly for deleted income transaction", async () => {
+        const accountBalanceBefore = await getFinancialAccountBalances(
+          account2.id
+        );
+
+        await fetcher(
+          `/api/transactions/${transactionIncome.id}`,
+          {
+            method: "DELETE",
+          },
+          user.session_token
+        );
+
+        const accountBalanceAfter = await getFinancialAccountBalances(
+          account2.id
+        );
+
+        expect(accountBalanceAfter?.balance).toEqual(
+          accountBalanceBefore!.balance - transactionIncome.amount
+        );
+      });
+
+      test("updates account balance correctly for deleted expense transaction", async () => {
+        const accountBalanceBefore = await getFinancialAccountBalances(
+          account1.id
+        );
+
+        await fetcher(
+          `/api/transactions/${transactionExpense.id}`,
+          {
+            method: "DELETE",
+          },
+          user.session_token
+        );
+
+        const accountBalanceAfter = await getFinancialAccountBalances(
+          account1.id
+        );
+
+        expect(accountBalanceAfter?.balance).toEqual(
+          accountBalanceBefore!.balance + transactionExpense.amount
+        );
+      });
+
+      test("updates account balances correctly for deleted transfer transaction", async () => {
+        const account1BalanceBefore = await getFinancialAccountBalances(
+          account1.id
+        );
+        const account2BalanceBefore = await getFinancialAccountBalances(
+          account2.id
+        );
+
+        await fetcher(
+          `/api/transactions/${transactionTransfer.id}`,
+          {
+            method: "DELETE",
+          },
+          user.session_token
+        );
+
+        const account1BalanceAfter = await getFinancialAccountBalances(
+          account1.id
+        );
+        const account2BalanceAfter = await getFinancialAccountBalances(
+          account2.id
+        );
+
+        expect(account1BalanceAfter?.balance).toEqual(
+          account1BalanceBefore!.balance + transactionTransfer.amount
+        );
+        expect(account2BalanceAfter?.balance).toEqual(
+          account2BalanceBefore!.balance - transactionTransfer.amount
+        );
+      });
     });
   });
 });

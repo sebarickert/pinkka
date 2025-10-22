@@ -3,16 +3,18 @@ import { requireAuth } from "@/middlewares/requireAuth.js";
 import { Hono } from "hono";
 import * as TransactionRepo from "@/repositories/transactionRepo.js";
 import * as CategoryRepo from "@/repositories/categoryRepo.js";
-import * as TransactionCategoryRepo from "@/repositories/transactionCategoryRepo.js";
 import { error, fail, success } from "@/lib/response.js";
 import {
   NewTransactionDto,
   UpdateTransactionDto,
 } from "@pinkka/schemas/TransactionDto.js";
-import { createTransaction } from "@/services/transactions.js";
+import {
+  createTransaction,
+  deleteTransaction,
+  updateTransaction,
+} from "@/services/transactions.js";
 import { transactionMapper } from "@/mappers/transactionMapper.js";
 import { validateBody, validateIdParam } from "@/lib/validator.js";
-import { db } from "@/lib/db.js";
 
 const transactions = new Hono<{ Variables: AuthType["Variables"] }>();
 transactions.use("/transactions/*", requireAuth);
@@ -138,35 +140,10 @@ transactions.put(
     }
 
     try {
-      const updatedTransaction = await db.transaction().execute(async (trx) => {
-        let updatedTransaction = transaction;
-
-        const hasFieldsToUpdate = Object.keys(updatedFields).length > 0;
-
-        if (hasFieldsToUpdate) {
-          updatedTransaction = await TransactionRepo.update({
-            id,
-            user_id,
-            data: transactionMapper.updateDtoToDb(updatedFields),
-            trx,
-          });
-        }
-
-        if (body.hasOwnProperty("category_id")) {
-          if (category_id) {
-            await TransactionCategoryRepo.upsert({
-              data: { transaction_id: id, category_id },
-              trx,
-            });
-          } else {
-            await TransactionCategoryRepo.deleteLink({
-              data: { transaction_id: id },
-              trx,
-            });
-          }
-        }
-
-        return updatedTransaction;
+      const updatedTransaction = await updateTransaction({
+        data: transactionMapper.updateDtoToDb(updatedFields),
+        category_id,
+        transaction,
       });
 
       return success(c, transactionMapper.fromDb(updatedTransaction));
@@ -191,9 +168,10 @@ transactions.delete("/transactions/:id", validateIdParam, async (c) => {
   }
 
   try {
-    await TransactionRepo.deleteTransaction({
+    await deleteTransaction({
       id,
       user_id,
+      transaction,
     });
 
     return success(c, `Transaction with id ${id} deleted`);

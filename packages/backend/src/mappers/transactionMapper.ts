@@ -14,7 +14,7 @@ export const transactionMapper = {
       id: db.id,
       user_id: db.user_id,
       type: db.type,
-      amount: Number(db.amount),
+      amount: Number(Number(db.amount).toFixed(2)),
       description: db.description,
       date: db.date.toISOString(),
       from_account_id: db.from_account_id ?? null,

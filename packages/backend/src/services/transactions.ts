@@ -1,8 +1,12 @@
 import * as TransactionRepo from "@/repositories/transactionRepo.js";
 import * as TransactionCategoryRepo from "@/repositories/transactionCategoryRepo.js";
-import * as FinancialAccountRepo from "@/repositories/financialAccountRepo.js";
-import type { NewTransaction, Transaction } from "@/types/Transaction.js";
+import type {
+  NewTransaction,
+  Transaction,
+  TransactionUpdate,
+} from "@/types/Transaction.js";
 import { db } from "@/lib/db.js";
+import { updateAccountBalancesForTransaction } from "@/services/financial-accounts.js";
 
 export async function createTransaction({
   data,
@@ -24,41 +28,91 @@ export async function createTransaction({
       });
     }
 
-    const amount = Number(transaction.amount);
-
-    if (transaction.type === "income" && transaction.to_account_id) {
-      await FinancialAccountRepo.incrementBalance({
-        id: transaction.to_account_id,
-        amount,
-        trx,
-      });
-    }
-
-    if (transaction.type === "expense" && transaction.from_account_id) {
-      await FinancialAccountRepo.decrementBalance({
-        id: transaction.from_account_id,
-        amount,
-        trx,
-      });
-    }
-
-    if (
-      transaction.type === "transfer" &&
-      transaction.from_account_id &&
-      transaction.to_account_id
-    ) {
-      await FinancialAccountRepo.decrementBalance({
-        id: transaction.from_account_id,
-        amount,
-        trx,
-      });
-      await FinancialAccountRepo.incrementBalance({
-        id: transaction.to_account_id,
-        amount,
-        trx,
-      });
-    }
+    await updateAccountBalancesForTransaction({
+      amount: Number(transaction.amount),
+      transaction,
+      trx,
+    });
 
     return transaction;
+  });
+}
+
+export async function updateTransaction({
+  data,
+  category_id,
+  transaction,
+}: {
+  data: TransactionUpdate;
+  category_id?: string | null;
+  transaction: Transaction;
+}): Promise<Transaction> {
+  return db.transaction().execute(async (trx) => {
+    let updatedTransaction = transaction;
+
+    const hasFieldsToUpdate = Object.keys(data).length > 0;
+
+    if (hasFieldsToUpdate) {
+      updatedTransaction = await TransactionRepo.update({
+        id: transaction.id,
+        user_id: transaction.user_id,
+        data,
+        trx,
+      });
+    }
+
+    if (typeof category_id === "string") {
+      await TransactionCategoryRepo.upsert({
+        data: { transaction_id: transaction.id, category_id },
+        trx,
+      });
+    }
+
+    if (category_id === null) {
+      await TransactionCategoryRepo.deleteLink({
+        data: { transaction_id: transaction.id },
+        trx,
+      });
+    }
+
+    if (data.amount) {
+      const currentAmount = Number(transaction.amount);
+      const newAmount = Number(updatedTransaction.amount);
+      const amountDifference = newAmount - currentAmount;
+
+      await updateAccountBalancesForTransaction({
+        amount: amountDifference,
+        transaction,
+        trx,
+      });
+    }
+
+    return updatedTransaction;
+  });
+}
+
+export async function deleteTransaction({
+  id,
+  user_id,
+  transaction,
+}: {
+  id: string;
+  user_id: string;
+  transaction: Transaction;
+}): Promise<boolean> {
+  return db.transaction().execute(async (trx) => {
+    await TransactionRepo.deleteTransaction({
+      id,
+      user_id,
+      trx,
+    });
+
+    await updateAccountBalancesForTransaction({
+      amount: -Number(transaction.amount),
+      transaction,
+      trx,
+    });
+
+    return true;
   });
 }
