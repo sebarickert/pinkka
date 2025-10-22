@@ -31,7 +31,7 @@ const validateTransferTransaction = (data: any) => {
 export const transactionType = z.enum(["income", "expense", "transfer"]);
 
 export const TransactionDto = z
-  .object({
+  .strictObject({
     id: z.uuid(),
     user_id: z.uuid(),
     to_account_id: z.uuid().nullable().optional(),
@@ -43,7 +43,6 @@ export const TransactionDto = z
     created_at: z.iso.datetime({ offset: true }),
     updated_at: z.iso.datetime({ offset: true }),
   })
-  .strict()
   .refine(validateIncomeTransaction, {
     message: "Not allowed for income transaction",
     path: ["from_account_id"],

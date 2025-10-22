@@ -1,17 +1,15 @@
 import * as z from "zod";
 import { transactionType } from "./TransactionDto.js";
 
-export const CategoryDto = z
-  .object({
-    id: z.uuid(),
-    user_id: z.uuid(),
-    name: z.string(),
-    type: transactionType,
-    is_deleted: z.boolean().optional().default(false),
-    created_at: z.iso.datetime({ offset: true }),
-    updated_at: z.iso.datetime({ offset: true }),
-  })
-  .strict();
+export const CategoryDto = z.strictObject({
+  id: z.uuid(),
+  user_id: z.uuid(),
+  name: z.string(),
+  type: transactionType,
+  is_deleted: z.boolean().optional().default(false),
+  created_at: z.iso.datetime({ offset: true }),
+  updated_at: z.iso.datetime({ offset: true }),
+});
 
 export const NewCategoryDto = CategoryDto.omit({
   id: true,

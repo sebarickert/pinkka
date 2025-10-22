@@ -1,24 +1,6 @@
 import type { Context } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
-
-type SuccessResponse<T> = {
-  status: "success";
-  data: T;
-};
-
-type FailResponse = {
-  status: "fail";
-  data: Record<string, any>;
-};
-
-type ErrorResponse = {
-  status: "error";
-  message: string;
-  code?: string | number;
-  data?: any;
-};
-
-export type JsonResponse<T> = SuccessResponse<T> | FailResponse | ErrorResponse;
+import type { JsonResponse } from "@pinkka/schemas/JsonResponse.js";
 
 // JSend specification
 // https://github.com/omniti-labs/jsend
@@ -28,7 +10,7 @@ export function success<T>(
   data: T,
   status: ContentfulStatusCode = 200
 ) {
-  return c.json<SuccessResponse<T>>({ status: "success", data }, status);
+  return c.json<JsonResponse<T>>({ status: "success", data }, status);
 }
 
 export function fail(
@@ -36,7 +18,7 @@ export function fail(
   data: Record<string, any>,
   status: ContentfulStatusCode = 400
 ) {
-  return c.json<FailResponse>({ status: "fail", data }, status);
+  return c.json<JsonResponse>({ status: "fail", data }, status);
 }
 
 export function error(
@@ -49,7 +31,7 @@ export function error(
   }
 ) {
   const { code, status = 500, data } = options ?? {};
-  return c.json<ErrorResponse>(
+  return c.json<JsonResponse>(
     { status: "error", message, ...(code && { code }), ...(data && { data }) },
     status
   );

@@ -3,9 +3,7 @@ import { error } from "@/lib/response.js";
 import { createMiddleware } from "hono/factory";
 import { auth } from "@/lib/auth.js";
 
-export const requireAuth = createMiddleware<{
-  Variables: AuthType["Variables"];
-}>(async (c, next) => {
+export const requireAuth = createMiddleware<AuthType>(async (c, next) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
 
   if (!session) {

@@ -11,20 +11,18 @@ export const financialAccountTypes = z.enum([
 export const currencyEnum = z.enum(["EUR", "USD", "GBP"]);
 export type Currency = z.infer<typeof currencyEnum>;
 
-export const FinancialAccountDto = z
-  .object({
-    id: z.uuid(),
-    user_id: z.uuid(),
-    name: z.string(),
-    type: financialAccountTypes,
-    currency: currencyEnum,
-    initial_balance: z.number(),
-    balance: z.number(),
-    is_deleted: z.boolean().optional().default(false),
-    created_at: z.iso.datetime({ offset: true }),
-    updated_at: z.iso.datetime({ offset: true }),
-  })
-  .strict();
+export const FinancialAccountDto = z.strictObject({
+  id: z.uuid(),
+  user_id: z.uuid(),
+  name: z.string(),
+  type: financialAccountTypes,
+  currency: currencyEnum,
+  initial_balance: z.number(),
+  balance: z.number(),
+  is_deleted: z.boolean().optional().default(false),
+  created_at: z.iso.datetime({ offset: true }),
+  updated_at: z.iso.datetime({ offset: true }),
+});
 
 export const NewFinancialAccountDto = FinancialAccountDto.omit({
   id: true,
