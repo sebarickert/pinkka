@@ -1,7 +1,6 @@
 import type { AuthType } from "@/lib/auth.js";
 import { error, fail, success } from "@/lib/response.js";
 import { requireAuth } from "@/middlewares/requireAuth.js";
-import { Hono } from "hono";
 import * as CategoryRepo from "@/repositories/categoryRepo.js";
 import {
   NewCategoryDto,
@@ -9,8 +8,9 @@ import {
 } from "@pinkka/schemas/CategoryDto.js";
 import { categoryMapper } from "@/mappers/categoryMapper.js";
 import { validateBody, validateIdParam } from "@/lib/validator.js";
+import { createRouter } from "@/lib/createRouter.js";
 
-const categories = new Hono<{ Variables: AuthType["Variables"] }>();
+const categories = createRouter();
 categories.use("/categories/*", requireAuth);
 
 categories.get("/categories", async (c) => {

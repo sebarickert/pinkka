@@ -1,6 +1,4 @@
-import type { AuthType } from "@/lib/auth.js";
 import { requireAuth } from "@/middlewares/requireAuth.js";
-import { Hono } from "hono";
 import * as TransactionRepo from "@/repositories/transactionRepo.js";
 import * as CategoryRepo from "@/repositories/categoryRepo.js";
 import { error, fail, success } from "@/lib/response.js";
@@ -15,8 +13,9 @@ import {
 } from "@/services/transactions.js";
 import { transactionMapper } from "@/mappers/transactionMapper.js";
 import { validateBody, validateIdParam } from "@/lib/validator.js";
+import { createRouter } from "@/lib/createRouter.js";
 
-const transactions = new Hono<{ Variables: AuthType["Variables"] }>();
+const transactions = createRouter();
 transactions.use("/transactions/*", requireAuth);
 
 transactions.get("/transactions/:id", validateIdParam, async (c) => {

@@ -1,14 +1,14 @@
 import dotenv from "dotenv";
 dotenv.config({ path: "../../.env" });
 
-import createApp from "@/lib/create-app.js";
+import { createRouter } from "@/lib/createRouter.js";
 import accounts from "@/routes/accounts.js";
 import authRoute from "@/routes/auth.js";
 import { cors } from "hono/cors";
 import categories from "@/routes/categories.js";
 import transactions from "@/routes/transactions.js";
 
-const app = createApp();
+const app = createRouter();
 
 const routes = [authRoute, accounts, categories, transactions] as const;
 

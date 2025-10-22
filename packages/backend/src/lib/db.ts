@@ -8,8 +8,6 @@ import type { Database } from "@/types/db/Database.js";
 const { DATABASE_USER, DATABASE_PASSWORD, DATABASE_DB, DATABASE_PORT } =
   process.env;
 
-console.log(DATABASE_DB);
-
 const dialect = new PostgresDialect({
   pool: new Pool({
     user: DATABASE_USER,

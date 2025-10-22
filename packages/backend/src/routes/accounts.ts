@@ -1,6 +1,4 @@
-import type { AuthType } from "@/lib/auth.js";
 import { requireAuth } from "@/middlewares/requireAuth.js";
-import { Hono } from "hono";
 import * as FinancialAccountRepo from "@/repositories/financialAccountRepo.js";
 import { error, fail, success } from "@/lib/response.js";
 import {
@@ -9,8 +7,9 @@ import {
 } from "@pinkka/schemas/FinancialAccountDto.js";
 import { validateBody, validateIdParam } from "@/lib/validator.js";
 import { financialAccountMapper } from "@/mappers/financialAccountMapper.js";
+import { createRouter } from "@/lib/createRouter.js";
 
-const accounts = new Hono<{ Variables: AuthType["Variables"] }>();
+const accounts = createRouter();
 accounts.use("/accounts/*", requireAuth);
 
 accounts.get("/accounts", async (c) => {

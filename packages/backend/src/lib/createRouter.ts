@@ -6,9 +6,3 @@ export function createRouter() {
     strict: false,
   });
 }
-
-export default function createApp() {
-  const app = createRouter();
-
-  return app;
-}
