@@ -1,23 +1,23 @@
 import { db } from "@/lib/db.js";
-import { fetcher } from "@/tests/utils/fetcher.js";
-import {
-  createTestUser,
-  type UserWithSessionToken,
-} from "@/tests/utils/createTestUser.js";
 import { beforeEach, describe, expect, test } from "vitest";
-import { cleanDb } from "@/tests/utils/cleanDb.js";
-import { createAccount } from "@/tests/utils/createAccount.js";
 import type { FinancialAccount } from "@/types/db/FinancialAccount.js";
 import type { Transaction } from "@/types/db/Transaction.js";
-import { createCategory } from "@/tests/utils/createCategory.js";
 import type { Category } from "@/types/db/Category.js";
+import { cleanDb } from "@test-utils/clean-db.js";
+import { createAccount } from "@test-utils/create-account.js";
+import { createCategory } from "@test-utils/create-category.js";
+import {
+  type UserWithSessionToken,
+  createTestUser,
+} from "@test-utils/create-test-user.js";
+import { fetcher } from "@test-utils/fetcher.js";
+import { getFinancialAccountBalances } from "@test-utils/financial-account.js";
 import {
   createTransaction,
   getTransaction,
-  updateTransaction,
   expectCategoryLink,
-} from "@/tests/utils/transaction.js";
-import { getFinancialAccountBalances } from "@/tests/utils/financial-account.js";
+  updateTransaction,
+} from "@test-utils/transaction.js";
 
 describe("Transaction Integration Tests", () => {
   let user: UserWithSessionToken;

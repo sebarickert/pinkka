@@ -1,4 +1,4 @@
-import type { UserWithSessionToken } from "@/tests/utils/createTestUser.js";
+import type { UserWithSessionToken } from "@test-utils/create-test-user.js";
 
 const BASE_URL = "http://localhost:3000";
 

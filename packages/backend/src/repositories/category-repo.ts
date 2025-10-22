@@ -1,5 +1,5 @@
 import { db } from "@/lib/db.js";
-import type { BaseQueryOptions } from "@/repositories/financialAccountRepo.js";
+import type { BaseQueryOptions } from "@/repositories/financial-account-repo.js";
 import type {
   Category,
   CategoryUpdate,

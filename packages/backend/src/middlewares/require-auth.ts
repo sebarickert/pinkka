@@ -1,4 +1,4 @@
-import type { AuthSession, AuthType, AuthUser } from "@/lib/auth.js";
+import type { AuthType } from "@/lib/auth.js";
 import { error } from "@/lib/response.js";
 import { createMiddleware } from "hono/factory";
 import { auth } from "@/lib/auth.js";

@@ -1,7 +1,7 @@
-import type { UserWithSessionToken } from "@/tests/utils/createTestUser.js";
-import { fetcher } from "@/tests/utils/fetcher.js";
 import type { FinancialAccount } from "@/types/db/FinancialAccount.js";
 import type { NewFinancialAccountDto } from "@pinkka/schemas/FinancialAccountDto.js";
+import type { UserWithSessionToken } from "@test-utils/create-test-user.js";
+import { fetcher } from "@test-utils/fetcher.js";
 
 export async function createAccount(
   newAccountPayload: Omit<NewFinancialAccountDto, "is_deleted">,

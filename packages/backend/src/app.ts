@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config({ path: "../../.env" });
 
-import { createRouter } from "@/lib/createRouter.js";
-import accounts from "@/routes/accounts.js";
+import { createRouter } from "@/lib/create-router.js";
+import accounts from "@/routes/financial-accounts.js";
 import authRoute from "@/routes/auth.js";
 import { cors } from "hono/cors";
 import categories from "@/routes/categories.js";

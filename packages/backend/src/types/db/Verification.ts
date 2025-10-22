@@ -1,12 +1,18 @@
 import type { Timestamp } from "@/types/db/Database.js";
-import type { Generated, Insertable, Selectable, Updateable } from "kysely";
+import type {
+  Generated,
+  GeneratedAlways,
+  Insertable,
+  Selectable,
+  Updateable,
+} from "kysely";
 
 export interface VerificationTable {
-  created_at: Generated<Timestamp>;
+  created_at: Generated<Date>;
   expires_at: Timestamp;
-  id: Generated<string>;
+  id: GeneratedAlways<string>;
   identifier: string;
-  updated_at: Generated<Timestamp>;
+  updated_at: Generated<Date>;
   value: string;
 }
 

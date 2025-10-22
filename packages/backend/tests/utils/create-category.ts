@@ -1,7 +1,7 @@
-import type { UserWithSessionToken } from "@/tests/utils/createTestUser.js";
-import { fetcher } from "@/tests/utils/fetcher.js";
 import type { Category } from "@/types/db/Category.js";
 import type { NewCategoryDto } from "@pinkka/schemas/CategoryDto.js";
+import type { UserWithSessionToken } from "@test-utils/create-test-user.js";
+import { fetcher } from "@test-utils/fetcher.js";
 import { expect } from "vitest";
 
 export async function createCategory(

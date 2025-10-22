@@ -1,13 +1,13 @@
-import { requireAuth } from "@/middlewares/requireAuth.js";
-import * as FinancialAccountRepo from "@/repositories/financialAccountRepo.js";
+import { requireAuth } from "@/middlewares/require-auth.js";
+import * as FinancialAccountRepo from "@/repositories/financial-account-repo.js";
 import { error, fail, success } from "@/lib/response.js";
 import {
   NewFinancialAccountDto,
   UpdateFinancialAccountDto,
 } from "@pinkka/schemas/FinancialAccountDto.js";
 import { validateBody, validateIdParam } from "@/lib/validator.js";
-import { financialAccountMapper } from "@/mappers/financialAccountMapper.js";
-import { createRouter } from "@/lib/createRouter.js";
+import { financialAccountMapper } from "@/mappers/financial-account-mapper.js";
+import { createRouter } from "@/lib/create-router.js";
 
 const accounts = createRouter();
 accounts.use("/accounts/*", requireAuth);

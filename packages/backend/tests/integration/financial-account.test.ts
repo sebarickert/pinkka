@@ -1,14 +1,15 @@
 import { db } from "@/lib/db.js";
-import { fetcher } from "@/tests/utils/fetcher.js";
-import {
-  createTestUser,
-  type UserWithSessionToken,
-} from "@/tests/utils/createTestUser.js";
+
 import { beforeEach, describe, expect, test } from "vitest";
-import { cleanDb } from "@/tests/utils/cleanDb.js";
-import { createAccount } from "@/tests/utils/createAccount.js";
-import { createTransaction } from "@/tests/utils/transaction.js";
 import type { FinancialAccount } from "@/types/db/FinancialAccount.js";
+import { cleanDb } from "tests/utils/clean-db.js";
+import { createAccount } from "@test-utils/create-account.js";
+import {
+  type UserWithSessionToken,
+  createTestUser,
+} from "@test-utils/create-test-user.js";
+import { fetcher } from "@test-utils/fetcher.js";
+import { createTransaction } from "@test-utils/transaction.js";
 
 describe("Financial Account Integration Tests", () => {
   let user: UserWithSessionToken;

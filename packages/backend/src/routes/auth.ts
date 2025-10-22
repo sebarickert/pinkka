@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth.js";
-import { createRouter } from "@/lib/createRouter.js";
+import { createRouter } from "@/lib/create-router.js";
 
 const router = createRouter();
 

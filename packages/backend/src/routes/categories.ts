@@ -1,14 +1,13 @@
-import type { AuthType } from "@/lib/auth.js";
 import { error, fail, success } from "@/lib/response.js";
-import { requireAuth } from "@/middlewares/requireAuth.js";
-import * as CategoryRepo from "@/repositories/categoryRepo.js";
+import { requireAuth } from "@/middlewares/require-auth.js";
+import * as CategoryRepo from "@/repositories/category-repo.js";
 import {
   NewCategoryDto,
   UpdateCategoryDto,
 } from "@pinkka/schemas/CategoryDto.js";
-import { categoryMapper } from "@/mappers/categoryMapper.js";
+import { categoryMapper } from "@/mappers/category-mapper.js";
 import { validateBody, validateIdParam } from "@/lib/validator.js";
-import { createRouter } from "@/lib/createRouter.js";
+import { createRouter } from "@/lib/create-router.js";
 
 const categories = createRouter();
 categories.use("/categories/*", requireAuth);

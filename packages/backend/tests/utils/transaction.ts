@@ -1,8 +1,8 @@
 import { db } from "@/lib/db.js";
-import { fetcher } from "@/tests/utils/fetcher.js";
-import type { UserWithSessionToken } from "@/tests/utils/createTestUser.js";
 import type { Transaction } from "@/types/db/Transaction.js";
 import type { NewTransactionDto } from "@pinkka/schemas/TransactionDto.js";
+import type { UserWithSessionToken } from "@test-utils/create-test-user.js";
+import { fetcher } from "@test-utils/fetcher.js";
 import { expect } from "vitest";
 
 export async function createTransaction(

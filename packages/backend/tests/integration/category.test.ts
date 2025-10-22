@@ -1,13 +1,14 @@
 import { db } from "@/lib/db.js";
-import { cleanDb } from "@/tests/utils/cleanDb.js";
-import { createAccount } from "@/tests/utils/createAccount.js";
-import { createCategory } from "@/tests/utils/createCategory.js";
+import { cleanDb } from "@test-utils/clean-db.js";
+import { createAccount } from "@test-utils/create-account.js";
+import { createCategory } from "@test-utils/create-category.js";
 import {
-  createTestUser,
   type UserWithSessionToken,
-} from "@/tests/utils/createTestUser.js";
-import { fetcher } from "@/tests/utils/fetcher.js";
-import { createTransaction } from "@/tests/utils/transaction.js";
+  createTestUser,
+} from "@test-utils/create-test-user.js";
+import { fetcher } from "@test-utils/fetcher.js";
+import { createTransaction } from "@test-utils/transaction.js";
+
 import { beforeEach, describe, expect, test } from "vitest";
 
 describe("Category Integration Tests", () => {

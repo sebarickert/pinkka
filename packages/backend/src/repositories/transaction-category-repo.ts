@@ -1,5 +1,5 @@
 import { db } from "@/lib/db.js";
-import type { BaseQueryOptions } from "@/repositories/financialAccountRepo.js";
+import type { BaseQueryOptions } from "@/repositories/financial-account-repo.js";
 import type { Database } from "@/types/db/Database.js";
 import type {
   NewTransactionCategory,

@@ -1,5 +1,5 @@
-import * as TransactionRepo from "@/repositories/transactionRepo.js";
-import * as TransactionCategoryRepo from "@/repositories/transactionCategoryRepo.js";
+import * as TransactionRepo from "@/repositories/transaction-repo.js";
+import * as TransactionCategoryRepo from "@/repositories/transaction-category-repo.js";
 import type {
   NewTransaction,
   Transaction,

@@ -1,14 +1,20 @@
 import type { Timestamp } from "@/types/db/Database.js";
-import type { Generated, Insertable, Selectable, Updateable } from "kysely";
+import type {
+  Generated,
+  GeneratedAlways,
+  Insertable,
+  Selectable,
+  Updateable,
+} from "kysely";
 
 export interface UserTable {
-  created_at: Generated<Timestamp>;
+  created_at: Generated<Date>;
   email: string;
   email_verified: boolean;
-  id: Generated<string>;
+  id: GeneratedAlways<string>;
   image: string | null;
   name: string;
-  updated_at: Generated<Timestamp>;
+  updated_at: Generated<Date>;
 }
 
 export type User = Selectable<UserTable>;

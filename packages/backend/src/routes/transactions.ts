@@ -1,6 +1,6 @@
-import { requireAuth } from "@/middlewares/requireAuth.js";
-import * as TransactionRepo from "@/repositories/transactionRepo.js";
-import * as CategoryRepo from "@/repositories/categoryRepo.js";
+import { requireAuth } from "@/middlewares/require-auth.js";
+import * as TransactionRepo from "@/repositories/transaction-repo.js";
+import * as CategoryRepo from "@/repositories/category-repo.js";
 import { error, fail, success } from "@/lib/response.js";
 import {
   NewTransactionDto,
@@ -11,9 +11,9 @@ import {
   deleteTransaction,
   updateTransaction,
 } from "@/services/transactions.js";
-import { transactionMapper } from "@/mappers/transactionMapper.js";
+import { transactionMapper } from "@/mappers/transaction-mapper.js";
 import { validateBody, validateIdParam } from "@/lib/validator.js";
-import { createRouter } from "@/lib/createRouter.js";
+import { createRouter } from "@/lib/create-router.js";
 
 const transactions = createRouter();
 transactions.use("/transactions/*", requireAuth);
