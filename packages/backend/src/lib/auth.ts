@@ -5,12 +5,12 @@ import { v4 as uuidv4 } from "uuid";
 export type AuthUser = typeof auth.$Infer.Session.user;
 export type AuthSession = typeof auth.$Infer.Session.session;
 
-export type AuthType = {
+export interface AuthType {
   Variables: {
     user: AuthUser;
     session: AuthSession;
   };
-};
+}
 
 export const auth = betterAuth({
   database: { db, case: "snake", type: "postgres" },

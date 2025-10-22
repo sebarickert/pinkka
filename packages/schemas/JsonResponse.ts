@@ -1,19 +1,19 @@
-type SuccessResponse<T> = {
+interface SuccessResponse<T> {
   status: "success";
   data: T;
-};
+}
 
-type FailResponse = {
+interface FailResponse {
   status: "fail";
-  data: Record<string, any>;
-};
+  data: Record<string, unknown>;
+}
 
-type ErrorResponse = {
+interface ErrorResponse {
   status: "error";
   message: string;
   code?: string | number;
-  data?: any;
-};
+  data?: unknown;
+}
 
 export type JsonResponse<T = unknown> =
   | SuccessResponse<T>
