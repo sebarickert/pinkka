@@ -6,25 +6,25 @@ import {error, fail, success} from '@/lib/response.js';
 import {requireAuth} from '@/middlewares/require-auth.js';
 import * as CategoryRepo from '@/repositories/category-repo.js';
 import {categoryMapper} from '@/mappers/category-mapper.js';
-import {validateBody, validateIdParam} from '@/lib/validator.js';
+import {validateBody, validateIdParameter} from '@/lib/validator.js';
 import {createRouter} from '@/lib/create-router.js';
 
 const categories = createRouter();
 categories.use('/categories/*', requireAuth);
 
 categories.get('/categories', async c => {
-	const user_id = c.get('user').id;
+	const userId = c.get('user').id;
 
 	try {
-		const categories = await CategoryRepo.getAll({user_id});
+		const categories = await CategoryRepo.getAll({userId});
 
-		return success(c, categories.map(categoryMapper.fromDb));
+		return success(c, categories.map(category => categoryMapper.fromDb(category)));
 	} catch {
 		return error(c, 'Failed to fetch categories', {data: error});
 	}
 });
 
-categories.get('/categories/:id', validateIdParam, async c => {
+categories.get('/categories/:id', validateIdParameter, async c => {
 	const user_id = c.get('user').id;
 	const {id} = c.req.param();
 
@@ -56,7 +56,7 @@ categories.post('/categories', validateBody(NewCategoryDto), async c => {
 
 categories.put(
 	'/categories/:id',
-	validateIdParam,
+	validateIdParameter,
 	validateBody(UpdateCategoryDto),
 	async c => {
 		const body = c.req.valid('json');
@@ -100,7 +100,7 @@ categories.put(
 	},
 );
 
-categories.delete('/categories/:id', validateIdParam, async c => {
+categories.delete('/categories/:id', validateIdParameter, async c => {
 	const user_id = c.get('user').id;
 	const {id} = c.req.param();
 

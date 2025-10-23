@@ -2,7 +2,7 @@ import type {NewCategoryDto} from '@pinkka/schemas/CategoryDto.js';
 import type {UserWithSessionToken} from '@test-utils/create-test-user.js';
 import {fetcher} from '@test-utils/fetcher.js';
 import {expect} from 'vitest';
-import type {Category} from '@/types/db/Category.js';
+import type {Category} from '@/types/db/category.js';
 
 export async function createCategory(
 	newCategoryPayload: Omit<NewCategoryDto, 'is_deleted'>,

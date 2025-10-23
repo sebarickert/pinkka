@@ -4,7 +4,7 @@ import type {
 	Transaction,
 	TransactionUpdate,
 	NewTransaction,
-} from '@/types/db/Transaction.js';
+} from '@/types/db/transaction.js';
 
 type CreateOneTransactionParameters = {
 	data: NewTransaction;

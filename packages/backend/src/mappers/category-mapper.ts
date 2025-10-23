@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import type {
 	CategoryDto,
 	NewCategoryDto,
@@ -7,7 +8,7 @@ import type {
 	Category,
 	CategoryUpdate,
 	NewCategory,
-} from '@/types/db/Category.js';
+} from '@/types/db/category.js';
 
 export const categoryMapper = {
 	fromDb(db: Category): CategoryDto {

@@ -10,7 +10,7 @@ import {
 } from '@test-utils/create-test-user.js';
 import {fetcher} from '@test-utils/fetcher.js';
 import {createTransaction} from '@test-utils/transaction.js';
-import type {FinancialAccount} from '@/types/db/FinancialAccount.js';
+import type {FinancialAccount} from '@/types/db/financial-account.js';
 import {db} from '@/lib/db.js';
 
 describe('Financial Account Integration Tests', () => {

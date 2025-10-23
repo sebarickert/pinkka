@@ -12,13 +12,13 @@ import {
 	updateTransaction,
 } from '@/services/transactions.js';
 import {transactionMapper} from '@/mappers/transaction-mapper.js';
-import {validateBody, validateIdParam} from '@/lib/validator.js';
+import {validateBody, validateIdParameter} from '@/lib/validator.js';
 import {createRouter} from '@/lib/create-router.js';
 
 const transactions = createRouter();
 transactions.use('/transactions/*', requireAuth);
 
-transactions.get('/transactions/:id', validateIdParam, async c => {
+transactions.get('/transactions/:id', validateIdParameter, async c => {
 	const user_id = c.get('user').id;
 	const {id} = c.req.param();
 
@@ -86,7 +86,7 @@ transactions.post(
 
 transactions.put(
 	'/transactions/:id',
-	validateIdParam,
+	validateIdParameter,
 	validateBody(UpdateTransactionDto),
 	async c => {
 		const body = c.req.valid('json');
@@ -155,7 +155,7 @@ transactions.put(
 	},
 );
 
-transactions.delete('/transactions/:id', validateIdParam, async c => {
+transactions.delete('/transactions/:id', validateIdParameter, async c => {
 	const user_id = c.get('user').id;
 	const {id} = c.req.param();
 

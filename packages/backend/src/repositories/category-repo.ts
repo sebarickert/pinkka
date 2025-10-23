@@ -4,7 +4,7 @@ import type {
 	Category,
 	CategoryUpdate,
 	NewCategory,
-} from '@/types/db/Category.js';
+} from '@/types/db/category.js';
 
 type CreateCategoryParameters = {
 	data: NewCategory;
@@ -56,15 +56,15 @@ export async function findMany({
 }
 
 type GetAllCategoryParameters = {
-	user_id: string;
+	userId: string;
 } & BaseQueryOptions;
 
 export async function getAll({
-	user_id,
+	userId,
 }: GetAllCategoryParameters): Promise<Category[]> {
 	return db
 		.selectFrom('category')
-		.where('user_id', '=', user_id)
+		.where('user_id', '=', userId)
 		.where('is_deleted', '=', false)
 		.selectAll()
 		.execute();

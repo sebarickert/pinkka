@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import type {
 	NewTransactionDto,
 	TransactionDto,
@@ -6,7 +7,7 @@ import type {
 	NewTransaction,
 	Transaction,
 	TransactionUpdate,
-} from '@/types/db/Transaction.js';
+} from '@/types/db/transaction.js';
 
 export const transactionMapper = {
 	fromDb(db: Transaction): TransactionDto {

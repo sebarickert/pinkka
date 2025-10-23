@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import {Pool} from 'pg';
 import {Kysely, PostgresDialect} from 'kysely';
-import type {Database} from '@/types/db/Database.js';
+import type {Database} from '@/types/db/database.js';
 
 dotenv.config({path: '../../.env'});
 

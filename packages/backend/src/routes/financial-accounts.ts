@@ -5,7 +5,7 @@ import {
 import {requireAuth} from '@/middlewares/require-auth.js';
 import * as FinancialAccountRepo from '@/repositories/financial-account-repo.js';
 import {error, fail, success} from '@/lib/response.js';
-import {validateBody, validateIdParam} from '@/lib/validator.js';
+import {validateBody, validateIdParameter} from '@/lib/validator.js';
 import {financialAccountMapper} from '@/mappers/financial-account-mapper.js';
 import {createRouter} from '@/lib/create-router.js';
 
@@ -24,7 +24,7 @@ accounts.get('/accounts', async c => {
 	}
 });
 
-accounts.get('/accounts/:id', validateIdParam, async c => {
+accounts.get('/accounts/:id', validateIdParameter, async c => {
 	const user_id = c.get('user').id;
 	const {id} = c.req.param();
 
@@ -62,7 +62,7 @@ accounts.post('/accounts', validateBody(NewFinancialAccountDto), async c => {
 
 accounts.put(
 	'/accounts/:id',
-	validateIdParam,
+	validateIdParameter,
 	validateBody(UpdateFinancialAccountDto),
 	async c => {
 		const body = c.req.valid('json');
@@ -118,7 +118,7 @@ accounts.put(
 	},
 );
 
-accounts.delete('/accounts/:id', validateIdParam, async c => {
+accounts.delete('/accounts/:id', validateIdParameter, async c => {
 	const user_id = c.get('user').id;
 	const {id} = c.req.param();
 

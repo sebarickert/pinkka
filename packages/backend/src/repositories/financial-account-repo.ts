@@ -1,11 +1,11 @@
 import type {Transaction} from 'kysely';
 import {db} from '@/lib/db.js';
-import type {Database} from '@/types/db/Database.js';
+import type {Database} from '@/types/db/database.js';
 import type {
 	FinancialAccount,
 	FinancialAccountUpdate,
 	NewFinancialAccount,
-} from '@/types/db/FinancialAccount.js';
+} from '@/types/db/financial-account.js';
 
 // TODO: Move to a shared location
 export type BaseQueryOptions = {

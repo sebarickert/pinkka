@@ -16,9 +16,9 @@ import {
 	expectCategoryLink,
 	updateTransaction,
 } from '@test-utils/transaction.js';
-import type {Category} from '@/types/db/Category.js';
-import type {Transaction} from '@/types/db/Transaction.js';
-import type {FinancialAccount} from '@/types/db/FinancialAccount.js';
+import type {Category} from '@/types/db/category.js';
+import type {Transaction} from '@/types/db/transaction.js';
+import type {FinancialAccount} from '@/types/db/financial-account.js';
 import {db} from '@/lib/db.js';
 
 describe('Transaction Integration Tests', () => {

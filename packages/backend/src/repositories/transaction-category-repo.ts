@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import type {Transaction} from 'kysely';
 import {db} from '@/lib/db.js';
 import type {BaseQueryOptions} from '@/repositories/financial-account-repo.js';
-import type {Database} from '@/types/db/Database.js';
+import type {Database} from '@/types/db/database.js';
 import type {
 	NewTransactionCategory,
 	TransactionCategory,
-} from '@/types/db/TransactionCategory.js';
+} from '@/types/db/transaction-category.js';
 
 type CreateTransactionCategoryParameters = {
 	data: NewTransactionCategory;

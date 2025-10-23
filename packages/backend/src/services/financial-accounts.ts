@@ -1,7 +1,7 @@
 import type {Transaction as KyselyTransaction} from 'kysely';
 import * as FinancialAccountRepo from '@/repositories/financial-account-repo.js';
-import type {Database} from '@/types/db/Database.js';
-import type {Transaction} from '@/types/db/Transaction.js';
+import type {Database} from '@/types/db/database.js';
+import type {Transaction} from '@/types/db/transaction.js';
 
 export async function updateAccountBalancesForTransaction({
 	amount,

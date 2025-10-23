@@ -1,13 +1,13 @@
 import type {ColumnType} from 'kysely';
-import type {AccountTable} from '@/types/db/Account.js';
-import type {CategoryTable} from '@/types/db/Category.js';
-import type {FinancialAccountTable} from '@/types/db/FinancialAccount.js';
-import type {PgMigrationsTable} from '@/types/db/PgMigrations.js';
-import type {SessionTable} from '@/types/db/Session.js';
-import type {TransactionTable} from '@/types/db/Transaction.js';
-import type {TransactionCategoryTable} from '@/types/db/TransactionCategory.js';
-import type {UserTable} from '@/types/db/User.js';
-import type {VerificationTable} from '@/types/db/Verification.js';
+import type {AccountTable} from '@/types/db/account.js';
+import type {CategoryTable} from '@/types/db/category.js';
+import type {FinancialAccountTable} from '@/types/db/financial-account.js';
+import type {PgMigrationsTable} from '@/types/db/pg-migrations.js';
+import type {SessionTable} from '@/types/db/session.js';
+import type {TransactionTable} from '@/types/db/transaction.js';
+import type {TransactionCategoryTable} from '@/types/db/transaction-category.js';
+import type {UserTable} from '@/types/db/user.js';
+import type {VerificationTable} from '@/types/db/verification.js';
 
 // Generic Timestamp type
 export type Timestamp = ColumnType<Date, Date, Date>;

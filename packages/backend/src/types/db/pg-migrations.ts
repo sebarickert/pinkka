@@ -1,5 +1,5 @@
 import type {Generated} from 'kysely';
-import type {Timestamp} from '@/types/db/Database.js';
+import type {Timestamp} from '@/types/db/database.js';
 
 export type PgMigrationsTable = {
 	id: Generated<number>;

@@ -27,7 +27,7 @@ export function error(
 	options?: {
 		code?: string | number;
 		status?: ContentfulStatusCode;
-		data?: any;
+		data?: unknown;
 	},
 ) {
 	const {code, status = 500, data} = options ?? {};

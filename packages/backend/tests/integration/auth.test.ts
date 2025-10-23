@@ -4,7 +4,7 @@ import {
 import {fetcher} from '@test-utils/fetcher.js';
 import {cleanDb} from '@test-utils/clean-db.js';
 import {db} from '@/lib/db.js';
-import type {User} from '@/types/db/User.js';
+import type {User} from '@/types/db/user.js';
 
 describe('Auth Integration Tests', () => {
 	let user: User;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import type {
 	FinancialAccountDto,
 	NewFinancialAccountDto,
@@ -7,7 +8,7 @@ import type {
 	FinancialAccount,
 	FinancialAccountUpdate,
 	NewFinancialAccount,
-} from '@/types/db/FinancialAccount.js';
+} from '@/types/db/financial-account.js';
 
 export const financialAccountMapper = {
 	fromDb(db: FinancialAccount): FinancialAccountDto {

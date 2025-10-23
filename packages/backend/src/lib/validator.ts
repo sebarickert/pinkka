@@ -28,7 +28,7 @@ export function mapZodErrors(errors: $ZodError<Record<string, unknown>>) {
 	return z.flattenError(errors).fieldErrors;
 }
 
-export const validateIdParam = validator('param', (value, c) => {
+export const validateIdParameter = validator('param', (value, c) => {
 	const {id} = value;
 
 	if (!validate(id)) {
