@@ -1,7 +1,7 @@
 import {
-	NewTransactionDto,
-	UpdateTransactionDto,
-} from '@pinkka/schemas/TransactionDto.js';
+	NewTransactionDtoSchema,
+	UpdateTransactionDtoSchema,
+} from '@pinkka/schemas/transaction-dto.js';
 import {requireAuth} from '@/middlewares/require-auth.js';
 import * as TransactionRepo from '@/repositories/transaction-repo.js';
 import * as CategoryRepo from '@/repositories/category-repo.js';
@@ -19,10 +19,10 @@ const transactions = createRouter();
 transactions.use('/transactions/*', requireAuth);
 
 transactions.get('/transactions/:id', validateIdParameter, async (c) => {
-	const user_id = c.get('user').id;
+	const userId = c.get('user').id;
 	const {id} = c.req.param();
 
-	const transaction = await TransactionRepo.findOne({id, user_id});
+	const transaction = await TransactionRepo.findOne({id, userId});
 
 	if (!transaction) {
 		return error(c, `Transaction with id ${id} not found`, {
@@ -34,11 +34,14 @@ transactions.get('/transactions/:id', validateIdParameter, async (c) => {
 });
 
 transactions.get('/transactions', async (c) => {
-	const user_id = c.get('user').id;
+	const userId = c.get('user').id;
 
 	try {
-		const transactions = await TransactionRepo.findMany({user_id});
-		return success(c, transactions.map(transactionMapper.fromDb));
+		const transactions = await TransactionRepo.findMany({userId});
+		return success(
+			c,
+			transactions.map((transaction) => transactionMapper.fromDb(transaction)),
+		);
 	} catch (error_) {
 		return error(c, 'Failed to fetch transactions', {data: error_});
 	}
@@ -46,34 +49,34 @@ transactions.get('/transactions', async (c) => {
 
 transactions.post(
 	'/transactions',
-	validateBody(NewTransactionDto),
+	validateBody(NewTransactionDtoSchema),
 	async (c) => {
 		const body = c.req.valid('json');
-		const user_id = c.get('user').id;
-		const categoryId = body.category_id;
+		const userId = c.get('user').id;
+		const {categoryId} = body;
 
 		if (categoryId) {
 			const existingCategory = await CategoryRepo.findOne({
 				id: categoryId,
-				user_id,
+				userId,
 			});
 
 			if (!existingCategory) {
 				return fail(c, {
-					category_id: `Category with id ${categoryId} not found`,
+					categoryId: `Category with id ${categoryId} not found`,
 				});
 			}
 
 			if (existingCategory.type !== body.type) {
 				return fail(c, {
-					category_id: 'Category type does not match transaction type',
+					categoryId: 'Category type does not match transaction type',
 				});
 			}
 		}
 
 		try {
 			const newTransaction = await createTransaction({
-				data: transactionMapper.newDtoToDb(body, user_id),
+				data: transactionMapper.newDtoToDb(body, userId),
 				category_id: categoryId,
 			});
 
@@ -87,13 +90,13 @@ transactions.post(
 transactions.put(
 	'/transactions/:id',
 	validateIdParameter,
-	validateBody(UpdateTransactionDto),
+	validateBody(UpdateTransactionDtoSchema),
 	async (c) => {
 		const body = c.req.valid('json');
-		const user_id = c.get('user').id;
+		const userId = c.get('user').id;
 		const {id} = c.req.param();
 
-		const transaction = await TransactionRepo.findOne({id, user_id});
+		const transaction = await TransactionRepo.findOne({id, userId});
 
 		if (!transaction) {
 			return error(c, `Transaction with id ${id} not found`, {
@@ -108,7 +111,7 @@ transactions.put(
 		}
 
 		const parsedTransaction = transactionMapper.fromDb(transaction);
-		const {category_id, ...updatedFields} = body;
+		const {categoryId, ...updatedFields} = body;
 
 		const updatedTransaction = {
 			...parsedTransaction,
@@ -116,24 +119,24 @@ transactions.put(
 		};
 
 		// Handle category_id logic
-		if (body.hasOwnProperty('category_id')) {
-			if (category_id === null) {
+		if (Object.hasOwn(body, 'categoryId')) {
+			if (categoryId === null) {
 				// If category_id is explicitly null, skip lookup/type check, just delete link below
-			} else if (category_id) {
+			} else if (categoryId) {
 				// If category_id is present and not null, do lookup and type check
 				const category = await CategoryRepo.findOne({
-					id: category_id,
-					user_id,
+					id: categoryId,
+					userId,
 				});
 				if (!category) {
-					return error(c, `Category with id ${category_id} not found`, {
+					return error(c, `Category with id ${categoryId} not found`, {
 						status: 404,
 					});
 				}
 
 				if (category.type !== updatedTransaction.type) {
 					return fail(c, {
-						category_id: 'Category type does not match transaction type',
+						categoryId: 'Category type does not match transaction type',
 					});
 				}
 			}
@@ -142,7 +145,7 @@ transactions.put(
 		try {
 			const updatedTransaction = await updateTransaction({
 				data: transactionMapper.updateDtoToDb(updatedFields),
-				category_id,
+				category_id: categoryId,
 				transaction,
 			});
 
@@ -156,10 +159,10 @@ transactions.put(
 );
 
 transactions.delete('/transactions/:id', validateIdParameter, async (c) => {
-	const user_id = c.get('user').id;
+	const userId = c.get('user').id;
 	const {id} = c.req.param();
 
-	const transaction = await TransactionRepo.findOne({id, user_id});
+	const transaction = await TransactionRepo.findOne({id, userId});
 
 	if (!transaction) {
 		return error(c, `Transaction with id ${id} not found`, {
@@ -170,7 +173,7 @@ transactions.delete('/transactions/:id', validateIdParameter, async (c) => {
 	try {
 		await deleteTransaction({
 			id,
-			user_id,
+			user_id: userId,
 			transaction,
 		});
 

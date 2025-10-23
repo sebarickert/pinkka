@@ -23,51 +23,51 @@ export async function createOne({
 
 type FindOneTransactionParameters = {
 	id: string;
-	user_id: string;
+	userId: string;
 } & BaseQueryOptions;
 
 export async function findOne({
 	id,
-	user_id,
+	userId,
 }: FindOneTransactionParameters): Promise<Transaction | undefined> {
 	return db
 		.selectFrom('transaction')
 		.where('id', '=', id)
-		.where('user_id', '=', user_id)
+		.where('user_id', '=', userId)
 		.selectAll()
 		.executeTakeFirst();
 }
 
 type FindManyTransactionParameters = {
-	user_id: string;
+	userId: string;
 } & BaseQueryOptions;
 
 export async function findMany({
-	user_id,
+	userId,
 }: FindManyTransactionParameters): Promise<Transaction[]> {
 	return db
 		.selectFrom('transaction')
-		.where('user_id', '=', user_id)
+		.where('user_id', '=', userId)
 		.selectAll()
 		.execute();
 }
 
 type UpdateTransactionParameters = {
 	id: string;
-	user_id: string;
+	userId: string;
 	data: TransactionUpdate;
 } & BaseQueryOptions;
 
 export async function update({
 	id,
-	user_id,
+	userId,
 	data,
 	trx,
 }: UpdateTransactionParameters): Promise<Transaction> {
 	return (trx ?? db)
 		.updateTable('transaction')
 		.where('id', '=', id)
-		.where('user_id', '=', user_id)
+		.where('user_id', '=', userId)
 		.set(data)
 		.returningAll()
 		.executeTakeFirstOrThrow();
@@ -75,17 +75,17 @@ export async function update({
 
 type DeleteTransactionParameters = {
 	id: string;
-	user_id: string;
+	userId: string;
 } & BaseQueryOptions;
 
 export async function deleteTransaction({
 	id,
-	user_id,
+	userId,
 	trx,
 }: DeleteTransactionParameters) {
 	return (trx ?? db)
 		.deleteFrom('transaction')
 		.where('id', '=', id)
-		.where('user_id', '=', user_id)
+		.where('user_id', '=', userId)
 		.execute();
 }

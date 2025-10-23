@@ -22,33 +22,33 @@ export async function create({
 
 type FindOneCategoryParameters = {
 	id: string;
-	user_id: string;
+	userId: string;
 } & BaseQueryOptions;
 
 export async function findOne({
 	id,
-	user_id,
+	userId,
 }: FindOneCategoryParameters): Promise<Category | undefined> {
 	return db
 		.selectFrom('category')
 		.where('id', '=', id)
-		.where('user_id', '=', user_id)
+		.where('user_id', '=', userId)
 		.selectAll()
 		.executeTakeFirst();
 }
 
 type FindManyCategoryParameters = {
 	id: string[];
-	user_id: string;
+	userId: string;
 } & BaseQueryOptions;
 
 export async function findMany({
 	id,
-	user_id,
+	userId,
 }: FindManyCategoryParameters): Promise<Category[]> {
 	return db
 		.selectFrom('category')
-		.where('user_id', '=', user_id)
+		.where('user_id', '=', userId)
 		.where('is_deleted', '=', false)
 		.where('id', 'in', id)
 		.selectAll()
@@ -72,19 +72,19 @@ export async function getAll({
 
 type UpdateCategoryParameters = {
 	id: string;
-	user_id: string;
+	userId: string;
 	data: CategoryUpdate;
 } & BaseQueryOptions;
 
 export async function update({
 	id,
-	user_id,
+	userId,
 	data,
 }: UpdateCategoryParameters): Promise<Category> {
 	return db
 		.updateTable('category')
 		.where('id', '=', id)
-		.where('user_id', '=', user_id)
+		.where('user_id', '=', userId)
 		.set(data)
 		.returningAll()
 		.executeTakeFirstOrThrow();

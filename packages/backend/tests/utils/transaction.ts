@@ -1,4 +1,4 @@
-import type {NewTransactionDto} from '@pinkka/schemas/TransactionDto.js';
+import {type NewTransactionDto} from '@pinkka/schemas/transaction-dto.js';
 import type {UserWithSessionToken} from '@test-utils/create-test-user.js';
 import {fetcher} from '@test-utils/fetcher.js';
 import {expect} from 'vitest';

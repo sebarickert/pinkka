@@ -1,11 +1,10 @@
 import {zValidator} from '@hono/zod-validator';
 import {validator} from 'hono/validator';
 import {validate} from 'uuid';
-import {z, type ZodObject} from 'zod';
-import type {$ZodError} from 'zod/v4/core';
+import * as z from 'zod';
 import {error, fail} from '@/lib/response.js';
 
-export function mapZodErrors(errors: $ZodError<Record<string, unknown>>) {
+export function mapZodErrors(errors: z.ZodError<Record<string, unknown>>) {
 	const isArrayError = errors.issues.some((e) => typeof e.path[0] === 'number');
 
 	if (isArrayError) {
@@ -39,7 +38,7 @@ export const validateIdParameter = validator('param', (value, c) => {
 	}
 });
 
-export function validateBody<T extends ZodObject>(schema: T) {
+export function validateBody<T extends z.ZodObject>(schema: T) {
 	return zValidator('json', schema, (result, c) => {
 		if (!result.success) {
 			return fail(c, mapZodErrors(result.error));

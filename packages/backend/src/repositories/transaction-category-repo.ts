@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import type {Transaction} from 'kysely';
 import {db} from '@/lib/db.js';
 import type {BaseQueryOptions} from '@/repositories/financial-account-repo.js';
@@ -13,12 +12,12 @@ type CreateTransactionCategoryParameters = {
 } & BaseQueryOptions;
 
 export async function create({
-	data: {transaction_id, category_id},
+	data,
 	trx,
 }: CreateTransactionCategoryParameters): Promise<TransactionCategory> {
 	return (trx ?? db)
 		.insertInto('transaction_category')
-		.values({transaction_id, category_id})
+		.values(data)
 		.returningAll()
 		.executeTakeFirstOrThrow();
 }
@@ -28,18 +27,18 @@ type UpsertTransactionCategoryParameters = {
 } & BaseQueryOptions;
 
 export async function upsert({
-	data: {transaction_id, category_id},
+	data,
 	trx,
 }: UpsertTransactionCategoryParameters): Promise<TransactionCategory> {
 	await (trx ?? db)
 		.deleteFrom('transaction_category')
-		.where('transaction_id', '=', transaction_id)
+		.where('transaction_id', '=', data.transaction_id)
 		.execute();
 
 	// Insert the new link
 	return db
 		.insertInto('transaction_category')
-		.values({transaction_id, category_id})
+		.values(data)
 		.returningAll()
 		.executeTakeFirstOrThrow();
 }

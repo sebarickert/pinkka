@@ -1,7 +1,7 @@
 import type {
 	NewTransactionDto,
 	TransactionDto,
-} from '@pinkka/schemas/TransactionDto.js';
+} from '@pinkka/schemas/transaction-dto.js';
 import type {
 	NewTransaction,
 	Transaction,
@@ -12,15 +12,15 @@ export const transactionMapper = {
 	fromDb(db: Transaction): TransactionDto {
 		return {
 			id: db.id,
-			user_id: db.user_id,
+			userId: db.user_id,
 			type: db.type,
 			amount: Number(Number(db.amount).toFixed(2)),
 			description: db.description,
 			date: db.date.toISOString(),
-			from_account_id: db.from_account_id ?? null,
-			to_account_id: db.to_account_id ?? null,
-			created_at: db.created_at.toISOString(),
-			updated_at: db.updated_at.toISOString(),
+			fromAccountId: db.from_account_id ?? null,
+			toAccountId: db.to_account_id ?? null,
+			createdAt: db.created_at.toISOString(),
+			updatedAt: db.updated_at.toISOString(),
 		};
 	},
 	newDtoToDb(dto: NewTransactionDto, user_id: string): NewTransaction {
@@ -29,8 +29,8 @@ export const transactionMapper = {
 			amount: dto.amount,
 			description: dto.description,
 			date: new Date(dto.date),
-			from_account_id: dto.from_account_id ?? null,
-			to_account_id: dto.to_account_id ?? null,
+			from_account_id: dto.fromAccountId ?? null,
+			to_account_id: dto.toAccountId ?? null,
 			user_id,
 		};
 	},
@@ -40,11 +40,11 @@ export const transactionMapper = {
 			...(dto.amount !== undefined && {amount: dto.amount}),
 			...(dto.description !== undefined && {description: dto.description}),
 			...(dto.date !== undefined && {date: new Date(dto.date)}),
-			...(dto.from_account_id !== undefined && {
-				from_account_id: dto.from_account_id,
+			...(dto.fromAccountId !== undefined && {
+				from_account_id: dto.fromAccountId,
 			}),
-			...(dto.to_account_id !== undefined && {
-				to_account_id: dto.to_account_id,
+			...(dto.toAccountId !== undefined && {
+				to_account_id: dto.toAccountId,
 			}),
 		};
 	},

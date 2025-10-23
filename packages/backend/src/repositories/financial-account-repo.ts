@@ -47,31 +47,31 @@ export async function createMany({
 
 type FindOneFinancialAccountParameters = {
 	id: string;
-	user_id: string;
+	userId: string;
 } & BaseQueryOptions;
 
 export async function findOne({
 	id,
-	user_id,
+	userId,
 }: FindOneFinancialAccountParameters): Promise<FinancialAccount | undefined> {
 	return db
 		.selectFrom('financial_account')
 		.where('id', '=', id)
-		.where('user_id', '=', user_id)
+		.where('user_id', '=', userId)
 		.selectAll()
 		.executeTakeFirst();
 }
 
 type FindManyFinancialAccountParameters = {
-	user_id: string;
+	userId: string;
 } & BaseQueryOptions;
 
 export async function findMany({
-	user_id,
+	userId,
 }: FindManyFinancialAccountParameters): Promise<FinancialAccount[]> {
 	return db
 		.selectFrom('financial_account')
-		.where('user_id', '=', user_id)
+		.where('user_id', '=', userId)
 		.where('is_deleted', '=', false)
 		.selectAll()
 		.execute();
@@ -79,19 +79,19 @@ export async function findMany({
 
 type UpdateFinancialAccountParameters = {
 	id: string;
-	user_id: string;
+	userId: string;
 	data: FinancialAccountUpdate;
 } & BaseQueryOptions;
 
 export async function update({
 	id,
-	user_id,
+	userId,
 	data,
 }: UpdateFinancialAccountParameters): Promise<FinancialAccount> {
 	return db
 		.updateTable('financial_account')
 		.where('id', '=', id)
-		.where('user_id', '=', user_id)
+		.where('user_id', '=', userId)
 		.set(data)
 		.returningAll()
 		.executeTakeFirstOrThrow();
@@ -99,30 +99,31 @@ export async function update({
 
 type FindTransactionsFinancialAccountParameters = {
 	id: string;
-	user_id: string;
+	userId: string;
 } & BaseQueryOptions;
 
 export async function findTransactionsForTransactionAccount({
 	id,
-	user_id,
+	userId,
 }: FindTransactionsFinancialAccountParameters) {
 	return db
 		.selectFrom('transaction')
 		.where(({eb, or}) =>
 			or([eb('from_account_id', '=', id), eb('to_account_id', '=', id)]),
 		)
-		.where('user_id', '=', user_id)
+		.where('user_id', '=', userId)
 		.selectAll()
 		.execute();
 }
 
 export async function getAccountBalance(id: string): Promise<number> {
-	return db
+	const result = await db
 		.selectFrom('financial_account')
 		.where('id', '=', id)
 		.select('balance')
-		.executeTakeFirst()
-		.then((row) => Number(row?.balance) || 0);
+		.executeTakeFirst();
+
+	return Number(result?.balance) || 0;
 }
 
 type IncrementBalanceParameters = {

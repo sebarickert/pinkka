@@ -1,6 +1,8 @@
+import eslintPluginZodX from 'eslint-plugin-zod-x';
 import {type FlatXoConfig} from 'xo';
 
 const xoConfig: FlatXoConfig = [
+	eslintPluginZodX.configs.recommended,
 	{
 		prettier: true,
 		rules: {
@@ -17,10 +19,18 @@ const xoConfig: FlatXoConfig = [
 		},
 	},
 	{
-		files: ['./packages/backend/migrations/*.ts'],
+		files: ['./packages/backend/migrations/*'],
 		rules: {
 			'unicorn/filename-case': 'off',
 			'@typescript-eslint/naming-convention': 'off',
+		},
+	},
+	{
+		files: ['./packages/schemas/**/*'],
+		rules: {
+			'@typescript-eslint/naming-convention': 'off',
+			'@typescript-eslint/no-unsafe-assignment': 'off',
+			'@typescript-eslint/no-unsafe-call': 'off',
 		},
 	},
 ];
