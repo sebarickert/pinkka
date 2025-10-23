@@ -1,6 +1,4 @@
-import {
-	beforeAll, describe, expect, test,
-} from 'vitest';
+import {beforeAll, describe, expect, test} from 'vitest';
 import {fetcher} from '@test-utils/fetcher.js';
 import {cleanDb} from '@test-utils/clean-db.js';
 import {db} from '@/lib/db.js';

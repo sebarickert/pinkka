@@ -7,9 +7,7 @@ import {
 } from '@test-utils/create-test-user.js';
 import {fetcher} from '@test-utils/fetcher.js';
 import {createTransaction} from '@test-utils/transaction.js';
-import {
-	beforeEach, describe, expect, test,
-} from 'vitest';
+import {beforeEach, describe, expect, test} from 'vitest';
 import {db} from '@/lib/db.js';
 
 describe('Category Integration Tests', () => {

@@ -19,9 +19,9 @@ const validateExpenseTransaction = (data: any) => {
 const validateTransferTransaction = (data: any) => {
 	if (data.type === 'transfer') {
 		return (
-			Boolean(data.to_account_id)
-			&& Boolean(data.from_account_id)
-			&& data.to_account_id !== data.from_account_id
+			Boolean(data.to_account_id) &&
+			Boolean(data.from_account_id) &&
+			data.to_account_id !== data.from_account_id
 		);
 	}
 
@@ -103,5 +103,5 @@ export type TransactionDto = z.infer<typeof TransactionDto>;
 export type NewTransactionDto = z.infer<typeof NewTransactionDto>;
 export type UpdateTransactionDto = z.infer<typeof UpdateTransactionDto>;
 export type TransactionWithCategoryDto = z.infer<
-  typeof TransactionWithCategoryDto
+	typeof TransactionWithCategoryDto
 >;

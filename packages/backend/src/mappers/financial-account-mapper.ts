@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import type {
 	FinancialAccountDto,
 	NewFinancialAccountDto,
@@ -39,7 +38,9 @@ export const financialAccountMapper = {
 			user_id,
 		};
 	},
-	updateDtoToDb(dto: Partial<UpdateFinancialAccountDto>): Partial<FinancialAccountUpdate> {
+	updateDtoToDb(
+		dto: Partial<UpdateFinancialAccountDto>,
+	): Partial<FinancialAccountUpdate> {
 		return {
 			...(dto.type !== undefined && {type: dto.type}),
 			...(dto.name !== undefined && {name: dto.name}),

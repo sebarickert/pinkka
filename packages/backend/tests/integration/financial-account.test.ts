@@ -1,7 +1,4 @@
-
-import {
-	beforeEach, describe, expect, test,
-} from 'vitest';
+import {beforeEach, describe, expect, test} from 'vitest';
 import {cleanDb} from 'tests/utils/clean-db.js';
 import {createAccount} from '@test-utils/create-account.js';
 import {
@@ -447,7 +444,9 @@ describe('Financial Account Integration Tests', () => {
 
 			expect(res.status).toEqual(404);
 			expect(body.status).toEqual('error');
-			expect(body.message).toBe(`Financial account with id ${account.id} not found`);
+			expect(body.message).toBe(
+				`Financial account with id ${account.id} not found`,
+			);
 		});
 	});
 

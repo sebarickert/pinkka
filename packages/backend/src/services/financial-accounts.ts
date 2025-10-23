@@ -29,9 +29,9 @@ export async function updateAccountBalancesForTransaction({
 	}
 
 	if (
-		transaction.type === 'transfer'
-		&& transaction.from_account_id
-		&& transaction.to_account_id
+		transaction.type === 'transfer' &&
+		transaction.from_account_id &&
+		transaction.to_account_id
 	) {
 		await FinancialAccountRepo.decrementBalance({
 			id: transaction.from_account_id,

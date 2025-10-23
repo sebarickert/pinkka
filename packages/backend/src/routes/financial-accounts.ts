@@ -12,7 +12,7 @@ import {createRouter} from '@/lib/create-router.js';
 const accounts = createRouter();
 accounts.use('/accounts/*', requireAuth);
 
-accounts.get('/accounts', async c => {
+accounts.get('/accounts', async (c) => {
 	const user_id = c.get('user').id;
 
 	try {
@@ -24,7 +24,7 @@ accounts.get('/accounts', async c => {
 	}
 });
 
-accounts.get('/accounts/:id', validateIdParameter, async c => {
+accounts.get('/accounts/:id', validateIdParameter, async (c) => {
 	const user_id = c.get('user').id;
 	const {id} = c.req.param();
 
@@ -39,7 +39,7 @@ accounts.get('/accounts/:id', validateIdParameter, async c => {
 	return success(c, financialAccountMapper.fromDb(account));
 });
 
-accounts.post('/accounts', validateBody(NewFinancialAccountDto), async c => {
+accounts.post('/accounts', validateBody(NewFinancialAccountDto), async (c) => {
 	const body = c.req.valid('json');
 	const user_id = c.get('user').id;
 
@@ -64,7 +64,7 @@ accounts.put(
 	'/accounts/:id',
 	validateIdParameter,
 	validateBody(UpdateFinancialAccountDto),
-	async c => {
+	async (c) => {
 		const body = c.req.valid('json');
 		const user_id = c.get('user').id;
 		const {id} = c.req.param();
@@ -78,11 +78,11 @@ accounts.put(
 		}
 
 		// Check if account has transactions
-		const transactions
-      = await FinancialAccountRepo.findTransactionsForTransactionAccount({
-      	id,
-      	user_id,
-      });
+		const transactions =
+			await FinancialAccountRepo.findTransactionsForTransactionAccount({
+				id,
+				user_id,
+			});
 
 		const hasTransactions = transactions.length > 0;
 
@@ -90,16 +90,16 @@ accounts.put(
 		if (hasTransactions && 'initial_balance' in body) {
 			return fail(c, {
 				initial_balance:
-          'Cannot update initial_balance for financial account with transactions',
+					'Cannot update initial_balance for financial account with transactions',
 			});
 		}
 
 		const updatedFinancialAccountData = {
 			...body,
-			...(!hasTransactions
-				&& 'initial_balance' in body && {
-				balance: body.initial_balance,
-			}),
+			...(!hasTransactions &&
+				'initial_balance' in body && {
+					balance: body.initial_balance,
+				}),
 		};
 
 		try {
@@ -118,7 +118,7 @@ accounts.put(
 	},
 );
 
-accounts.delete('/accounts/:id', validateIdParameter, async c => {
+accounts.delete('/accounts/:id', validateIdParameter, async (c) => {
 	const user_id = c.get('user').id;
 	const {id} = c.req.param();
 

@@ -6,23 +6,26 @@ import type {$ZodError} from 'zod/v4/core';
 import {error, fail} from '@/lib/response.js';
 
 export function mapZodErrors(errors: $ZodError<Record<string, unknown>>) {
-	const isArrayError = errors.issues.some(e => typeof e.path[0] === 'number');
+	const isArrayError = errors.issues.some((e) => typeof e.path[0] === 'number');
 
 	if (isArrayError) {
-		return errors.issues.reduce<Record<number, Record<string, string[]>>>((acc, e) => {
-			const [index, field] = e.path;
-			if (typeof index !== 'number' || typeof field !== 'string') {
-				return acc;
-			}
+		return errors.issues.reduce<Record<number, Record<string, string[]>>>(
+			(acc, e) => {
+				const [index, field] = e.path;
+				if (typeof index !== 'number' || typeof field !== 'string') {
+					return acc;
+				}
 
-			return {
-				...acc,
-				[index]: {
-					...acc[index],
-					[field]: [...(acc[index]?.[field] || []), e.message],
-				},
-			};
-		}, {});
+				return {
+					...acc,
+					[index]: {
+						...acc[index],
+						[field]: [...(acc[index]?.[field] || []), e.message],
+					},
+				};
+			},
+			{},
+		);
 	}
 
 	return z.flattenError(errors).fieldErrors;

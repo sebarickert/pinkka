@@ -44,5 +44,5 @@ export const UpdateFinancialAccountDto = FinancialAccountDto.omit({
 export type FinancialAccountDto = z.infer<typeof FinancialAccountDto>;
 export type NewFinancialAccountDto = z.infer<typeof NewFinancialAccountDto>;
 export type UpdateFinancialAccountDto = z.infer<
-  typeof UpdateFinancialAccountDto
+	typeof UpdateFinancialAccountDto
 >;

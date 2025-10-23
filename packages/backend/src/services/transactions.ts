@@ -15,7 +15,7 @@ export async function createTransaction({
 	data: NewTransaction;
 	category_id: string | null | undefined;
 }): Promise<Transaction> {
-	return db.transaction().execute(async trx => {
+	return db.transaction().execute(async (trx) => {
 		const transaction = await TransactionRepo.createOne({
 			data,
 			trx,
@@ -47,7 +47,7 @@ export async function updateTransaction({
 	category_id?: string | null;
 	transaction: Transaction;
 }): Promise<Transaction> {
-	return db.transaction().execute(async trx => {
+	return db.transaction().execute(async (trx) => {
 		let updatedTransaction = transaction;
 
 		const hasFieldsToUpdate = Object.keys(data).length > 0;
@@ -100,7 +100,7 @@ export async function deleteTransaction({
 	user_id: string;
 	transaction: Transaction;
 }): Promise<boolean> {
-	return db.transaction().execute(async trx => {
+	return db.transaction().execute(async (trx) => {
 		await TransactionRepo.deleteTransaction({
 			id,
 			user_id,

@@ -33,7 +33,10 @@ export function error(
 	const {code, status = 500, data} = options ?? {};
 	return c.json<JsonResponse>(
 		{
-			status: 'error', message, ...(code && {code}), ...(data && {data}),
+			status: 'error',
+			message,
+			...(code && {code}),
+			...(data && {data}),
 		},
 		status,
 	);

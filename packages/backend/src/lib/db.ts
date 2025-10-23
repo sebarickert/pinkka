@@ -5,8 +5,8 @@ import type {Database} from '@/types/db/database.js';
 
 dotenv.config({path: '../../.env'});
 
-const {DATABASE_USER, DATABASE_PASSWORD, DATABASE_DB, DATABASE_PORT}
-  = process.env;
+const {DATABASE_USER, DATABASE_PASSWORD, DATABASE_DB, DATABASE_PORT} =
+	process.env;
 
 const dialect = new PostgresDialect({
 	pool: new Pool({

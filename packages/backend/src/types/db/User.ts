@@ -5,7 +5,6 @@ import type {
 	Selectable,
 	Updateable,
 } from 'kysely';
-import type {Timestamp} from '@/types/db/database.js';
 
 export type UserTable = {
 	created_at: Generated<Date>;

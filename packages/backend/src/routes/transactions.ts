@@ -18,7 +18,7 @@ import {createRouter} from '@/lib/create-router.js';
 const transactions = createRouter();
 transactions.use('/transactions/*', requireAuth);
 
-transactions.get('/transactions/:id', validateIdParameter, async c => {
+transactions.get('/transactions/:id', validateIdParameter, async (c) => {
 	const user_id = c.get('user').id;
 	const {id} = c.req.param();
 
@@ -33,7 +33,7 @@ transactions.get('/transactions/:id', validateIdParameter, async c => {
 	return success(c, transactionMapper.fromDb(transaction));
 });
 
-transactions.get('/transactions', async c => {
+transactions.get('/transactions', async (c) => {
 	const user_id = c.get('user').id;
 
 	try {
@@ -47,7 +47,7 @@ transactions.get('/transactions', async c => {
 transactions.post(
 	'/transactions',
 	validateBody(NewTransactionDto),
-	async c => {
+	async (c) => {
 		const body = c.req.valid('json');
 		const user_id = c.get('user').id;
 		const categoryId = body.category_id;
@@ -88,7 +88,7 @@ transactions.put(
 	'/transactions/:id',
 	validateIdParameter,
 	validateBody(UpdateTransactionDto),
-	async c => {
+	async (c) => {
 		const body = c.req.valid('json');
 		const user_id = c.get('user').id;
 		const {id} = c.req.param();
@@ -155,7 +155,7 @@ transactions.put(
 	},
 );
 
-transactions.delete('/transactions/:id', validateIdParameter, async c => {
+transactions.delete('/transactions/:id', validateIdParameter, async (c) => {
 	const user_id = c.get('user').id;
 	const {id} = c.req.param();
 

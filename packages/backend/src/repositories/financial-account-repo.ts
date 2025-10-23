@@ -109,7 +109,8 @@ export async function findTransactionsForTransactionAccount({
 	return db
 		.selectFrom('transaction')
 		.where(({eb, or}) =>
-			or([eb('from_account_id', '=', id), eb('to_account_id', '=', id)]))
+			or([eb('from_account_id', '=', id), eb('to_account_id', '=', id)]),
+		)
 		.where('user_id', '=', user_id)
 		.selectAll()
 		.execute();
@@ -121,7 +122,7 @@ export async function getAccountBalance(id: string): Promise<number> {
 		.where('id', '=', id)
 		.select('balance')
 		.executeTakeFirst()
-		.then(row => Number(row?.balance) || 0);
+		.then((row) => Number(row?.balance) || 0);
 }
 
 type IncrementBalanceParameters = {
@@ -136,7 +137,7 @@ export async function incrementBalance({
 }: IncrementBalanceParameters) {
 	return (trx ?? db)
 		.updateTable('financial_account')
-		.set(eb => ({balance: eb('balance', '+', amount)}))
+		.set((eb) => ({balance: eb('balance', '+', amount)}))
 		.where('id', '=', id)
 		.execute();
 }
@@ -153,7 +154,7 @@ export async function decrementBalance({
 }: DecrementBalanceParameters) {
 	return (trx ?? db)
 		.updateTable('financial_account')
-		.set(eb => ({balance: eb('balance', '-', amount)}))
+		.set((eb) => ({balance: eb('balance', '-', amount)}))
 		.where('id', '=', id)
 		.execute();
 }
