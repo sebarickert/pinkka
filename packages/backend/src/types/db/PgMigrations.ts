@@ -1,8 +1,8 @@
-import type { Timestamp } from "@/types/db/Database.js";
-import type { Generated } from "kysely";
+import type {Generated} from 'kysely';
+import type {Timestamp} from '@/types/db/Database.js';
 
-export interface PgMigrationsTable {
-  id: Generated<number>;
-  name: string;
-  run_on: Timestamp;
-}
+export type PgMigrationsTable = {
+	id: Generated<number>;
+	name: string;
+	run_on: Timestamp;
+};

@@ -1,160 +1,159 @@
-import { db } from "@/lib/db.js";
-import type { Database } from "@/types/db/Database.js";
+import type {Transaction} from 'kysely';
+import {db} from '@/lib/db.js';
+import type {Database} from '@/types/db/Database.js';
 import type {
-  FinancialAccount,
-  FinancialAccountUpdate,
-  NewFinancialAccount,
-} from "@/types/db/FinancialAccount.js";
-import type { Transaction } from "kysely";
+	FinancialAccount,
+	FinancialAccountUpdate,
+	NewFinancialAccount,
+} from '@/types/db/FinancialAccount.js';
 
 // TODO: Move to a shared location
-export interface BaseQueryOptions {
-  sortBy?: string; // default sorting field
-  order?: "asc" | "desc"; // default order
-  limit?: number; // pagination
-  offset?: number; // pagination
-  includeDeleted?: boolean; // whether to include soft-deleted records
-  trx?: Transaction<Database>; // transaction object
-}
+export type BaseQueryOptions = {
+	sortBy?: string; // Default sorting field
+	order?: 'asc' | 'desc'; // Default order
+	limit?: number; // Pagination
+	offset?: number; // Pagination
+	includeDeleted?: boolean; // Whether to include soft-deleted records
+	trx?: Transaction<Database>; // Transaction object
+};
 
-interface CreateFinancialAccountParams extends BaseQueryOptions {
-  data: NewFinancialAccount;
-}
+type CreateFinancialAccountParameters = {
+	data: NewFinancialAccount;
+} & BaseQueryOptions;
 
 export async function create({
-  data,
-}: CreateFinancialAccountParams): Promise<FinancialAccount> {
-  return db
-    .insertInto("financial_account")
-    .values(data)
-    .returningAll()
-    .executeTakeFirstOrThrow();
+	data,
+}: CreateFinancialAccountParameters): Promise<FinancialAccount> {
+	return db
+		.insertInto('financial_account')
+		.values(data)
+		.returningAll()
+		.executeTakeFirstOrThrow();
 }
 
-interface CreateManyFinancialAccountParams extends BaseQueryOptions {
-  data: NewFinancialAccount[];
-}
+type CreateManyFinancialAccountParameters = {
+	data: NewFinancialAccount[];
+} & BaseQueryOptions;
 
 export async function createMany({
-  data,
-}: CreateManyFinancialAccountParams): Promise<FinancialAccount[]> {
-  return db
-    .insertInto("financial_account")
-    .values(data)
-    .returningAll()
-    .execute();
+	data,
+}: CreateManyFinancialAccountParameters): Promise<FinancialAccount[]> {
+	return db
+		.insertInto('financial_account')
+		.values(data)
+		.returningAll()
+		.execute();
 }
 
-interface FindOneFinancialAccountParams extends BaseQueryOptions {
-  id: string;
-  user_id: string;
-}
+type FindOneFinancialAccountParameters = {
+	id: string;
+	user_id: string;
+} & BaseQueryOptions;
 
 export async function findOne({
-  id,
-  user_id,
-}: FindOneFinancialAccountParams): Promise<FinancialAccount | undefined> {
-  return db
-    .selectFrom("financial_account")
-    .where("id", "=", id)
-    .where("user_id", "=", user_id)
-    .selectAll()
-    .executeTakeFirst();
+	id,
+	user_id,
+}: FindOneFinancialAccountParameters): Promise<FinancialAccount | undefined> {
+	return db
+		.selectFrom('financial_account')
+		.where('id', '=', id)
+		.where('user_id', '=', user_id)
+		.selectAll()
+		.executeTakeFirst();
 }
 
-interface FindManyFinancialAccountParams extends BaseQueryOptions {
-  user_id: string;
-}
+type FindManyFinancialAccountParameters = {
+	user_id: string;
+} & BaseQueryOptions;
 
 export async function findMany({
-  user_id,
-}: FindManyFinancialAccountParams): Promise<FinancialAccount[]> {
-  return db
-    .selectFrom("financial_account")
-    .where("user_id", "=", user_id)
-    .where("is_deleted", "=", false)
-    .selectAll()
-    .execute();
+	user_id,
+}: FindManyFinancialAccountParameters): Promise<FinancialAccount[]> {
+	return db
+		.selectFrom('financial_account')
+		.where('user_id', '=', user_id)
+		.where('is_deleted', '=', false)
+		.selectAll()
+		.execute();
 }
 
-interface UpdateFinancialAccountParams extends BaseQueryOptions {
-  id: string;
-  user_id: string;
-  data: FinancialAccountUpdate;
-}
+type UpdateFinancialAccountParameters = {
+	id: string;
+	user_id: string;
+	data: FinancialAccountUpdate;
+} & BaseQueryOptions;
 
 export async function update({
-  id,
-  user_id,
-  data,
-}: UpdateFinancialAccountParams): Promise<FinancialAccount> {
-  return db
-    .updateTable("financial_account")
-    .where("id", "=", id)
-    .where("user_id", "=", user_id)
-    .set(data)
-    .returningAll()
-    .executeTakeFirstOrThrow();
+	id,
+	user_id,
+	data,
+}: UpdateFinancialAccountParameters): Promise<FinancialAccount> {
+	return db
+		.updateTable('financial_account')
+		.where('id', '=', id)
+		.where('user_id', '=', user_id)
+		.set(data)
+		.returningAll()
+		.executeTakeFirstOrThrow();
 }
 
-interface FindTransactionsFinancialAccountParams extends BaseQueryOptions {
-  id: string;
-  user_id: string;
-}
+type FindTransactionsFinancialAccountParameters = {
+	id: string;
+	user_id: string;
+} & BaseQueryOptions;
 
 export async function findTransactionsForTransactionAccount({
-  id,
-  user_id,
-}: FindTransactionsFinancialAccountParams) {
-  return db
-    .selectFrom("transaction")
-    .where(({ eb, or }) =>
-      or([eb("from_account_id", "=", id), eb("to_account_id", "=", id)])
-    )
-    .where("user_id", "=", user_id)
-    .selectAll()
-    .execute();
+	id,
+	user_id,
+}: FindTransactionsFinancialAccountParameters) {
+	return db
+		.selectFrom('transaction')
+		.where(({eb, or}) =>
+			or([eb('from_account_id', '=', id), eb('to_account_id', '=', id)]))
+		.where('user_id', '=', user_id)
+		.selectAll()
+		.execute();
 }
 
 export async function getAccountBalance(id: string): Promise<number> {
-  return db
-    .selectFrom("financial_account")
-    .where("id", "=", id)
-    .select("balance")
-    .executeTakeFirst()
-    .then((row) => Number(row?.balance) || 0);
+	return db
+		.selectFrom('financial_account')
+		.where('id', '=', id)
+		.select('balance')
+		.executeTakeFirst()
+		.then(row => Number(row?.balance) || 0);
 }
 
-interface IncrementBalanceParams extends BaseQueryOptions {
-  id: string;
-  amount: number;
-}
+type IncrementBalanceParameters = {
+	id: string;
+	amount: number;
+} & BaseQueryOptions;
 
 export async function incrementBalance({
-  id,
-  amount,
-  trx,
-}: IncrementBalanceParams) {
-  return (trx ?? db)
-    .updateTable("financial_account")
-    .set((eb) => ({ balance: eb("balance", "+", amount) }))
-    .where("id", "=", id)
-    .execute();
+	id,
+	amount,
+	trx,
+}: IncrementBalanceParameters) {
+	return (trx ?? db)
+		.updateTable('financial_account')
+		.set(eb => ({balance: eb('balance', '+', amount)}))
+		.where('id', '=', id)
+		.execute();
 }
 
-interface DecrementBalanceParams extends BaseQueryOptions {
-  id: string;
-  amount: number;
-}
+type DecrementBalanceParameters = {
+	id: string;
+	amount: number;
+} & BaseQueryOptions;
 
 export async function decrementBalance({
-  id,
-  amount,
-  trx,
-}: DecrementBalanceParams) {
-  return (trx ?? db)
-    .updateTable("financial_account")
-    .set((eb) => ({ balance: eb("balance", "-", amount) }))
-    .where("id", "=", id)
-    .execute();
+	id,
+	amount,
+	trx,
+}: DecrementBalanceParameters) {
+	return (trx ?? db)
+		.updateTable('financial_account')
+		.set(eb => ({balance: eb('balance', '-', amount)}))
+		.where('id', '=', id)
+		.execute();
 }

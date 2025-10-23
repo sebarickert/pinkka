@@ -1,91 +1,91 @@
-import { db } from "@/lib/db.js";
-import type { BaseQueryOptions } from "@/repositories/financial-account-repo.js";
+import {db} from '@/lib/db.js';
+import type {BaseQueryOptions} from '@/repositories/financial-account-repo.js';
 import type {
-  Transaction,
-  TransactionUpdate,
-  NewTransaction,
-} from "@/types/db/Transaction.js";
+	Transaction,
+	TransactionUpdate,
+	NewTransaction,
+} from '@/types/db/Transaction.js';
 
-interface CreateOneTransactionParams extends BaseQueryOptions {
-  data: NewTransaction;
-}
+type CreateOneTransactionParameters = {
+	data: NewTransaction;
+} & BaseQueryOptions;
 
 export async function createOne({
-  data,
-  trx,
-}: CreateOneTransactionParams): Promise<Transaction> {
-  return (trx ?? db)
-    .insertInto("transaction")
-    .values(data)
-    .returningAll()
-    .executeTakeFirstOrThrow();
+	data,
+	trx,
+}: CreateOneTransactionParameters): Promise<Transaction> {
+	return (trx ?? db)
+		.insertInto('transaction')
+		.values(data)
+		.returningAll()
+		.executeTakeFirstOrThrow();
 }
 
-interface FindOneTransactionParams extends BaseQueryOptions {
-  id: string;
-  user_id: string;
-}
+type FindOneTransactionParameters = {
+	id: string;
+	user_id: string;
+} & BaseQueryOptions;
 
 export async function findOne({
-  id,
-  user_id,
-}: FindOneTransactionParams): Promise<Transaction | undefined> {
-  return db
-    .selectFrom("transaction")
-    .where("id", "=", id)
-    .where("user_id", "=", user_id)
-    .selectAll()
-    .executeTakeFirst();
+	id,
+	user_id,
+}: FindOneTransactionParameters): Promise<Transaction | undefined> {
+	return db
+		.selectFrom('transaction')
+		.where('id', '=', id)
+		.where('user_id', '=', user_id)
+		.selectAll()
+		.executeTakeFirst();
 }
 
-interface FindManyTransactionParams extends BaseQueryOptions {
-  user_id: string;
-}
+type FindManyTransactionParameters = {
+	user_id: string;
+} & BaseQueryOptions;
 
 export async function findMany({
-  user_id,
-}: FindManyTransactionParams): Promise<Transaction[]> {
-  return db
-    .selectFrom("transaction")
-    .where("user_id", "=", user_id)
-    .selectAll()
-    .execute();
+	user_id,
+}: FindManyTransactionParameters): Promise<Transaction[]> {
+	return db
+		.selectFrom('transaction')
+		.where('user_id', '=', user_id)
+		.selectAll()
+		.execute();
 }
 
-interface UpdateTransactionParams extends BaseQueryOptions {
-  id: string;
-  user_id: string;
-  data: TransactionUpdate;
-}
+type UpdateTransactionParameters = {
+	id: string;
+	user_id: string;
+	data: TransactionUpdate;
+} & BaseQueryOptions;
 
 export async function update({
-  id,
-  user_id,
-  data,
-  trx,
-}: UpdateTransactionParams): Promise<Transaction> {
-  return (trx ?? db)
-    .updateTable("transaction")
-    .where("id", "=", id)
-    .where("user_id", "=", user_id)
-    .set(data)
-    .returningAll()
-    .executeTakeFirstOrThrow();
+	id,
+	user_id,
+	data,
+	trx,
+}: UpdateTransactionParameters): Promise<Transaction> {
+	return (trx ?? db)
+		.updateTable('transaction')
+		.where('id', '=', id)
+		.where('user_id', '=', user_id)
+		.set(data)
+		.returningAll()
+		.executeTakeFirstOrThrow();
 }
 
-interface DeleteTransactionParams extends BaseQueryOptions {
-  id: string;
-  user_id: string;
-}
+type DeleteTransactionParameters = {
+	id: string;
+	user_id: string;
+} & BaseQueryOptions;
 
 export async function deleteTransaction({
-  id,
-  user_id,
-  trx,
-}: DeleteTransactionParams) {
-  return (trx ?? db)
-    .deleteFrom("transaction")
-    .where("id", "=", id)
-    .where("user_id", "=", user_id)
-    .execute();
+	id,
+	user_id,
+	trx,
+}: DeleteTransactionParameters) {
+	return (trx ?? db)
+		.deleteFrom('transaction')
+		.where('id', '=', id)
+		.where('user_id', '=', user_id)
+		.execute();
 }
