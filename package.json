@@ -16,8 +16,8 @@
     "migrate:up": "npm -w @pinkka/backend run migrate:up",
     "migrate:up:test": "npm -w @pinkka/backend run migrate:up:test",
     "test:backend:integration": "npm -w @pinkka/backend run test:integration",
-    "lint": "npx eslint .",
-    "lint:fix": "npx eslint . --fix"
+    "lint": "npx xo",
+    "lint:fix": "npx xo --fix"
   },
   "type": "commonjs",
   "dependencies": {
@@ -26,9 +26,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@eslint/js": "^9.38.0",
-    "eslint": "^9.38.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.2"
+    "xo": "^1.2.3"
   }
 }
