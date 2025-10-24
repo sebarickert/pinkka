@@ -1,6 +1,7 @@
 import {betterAuth} from 'better-auth';
 import {v4 as uuidv4} from 'uuid';
 import {db} from '@/lib/db.js';
+import {FRONTEND_URL} from '@/lib/env.js';
 
 export type AuthUser = typeof auth.$Infer.Session.user;
 export type AuthSession = typeof auth.$Infer.Session.session;
@@ -12,6 +13,7 @@ export type AuthType = {
 	};
 };
 
+// https://github.com/better-auth/better-auth/issues/4789
 export const auth = betterAuth({
 	database: {db, case: 'snake', type: 'postgres'},
 	advanced: {
@@ -20,7 +22,7 @@ export const auth = betterAuth({
 		},
 	},
 	// Allow requests from the frontend development server
-	trustedOrigins: [process.env.FRONTEND_URL!],
+	trustedOrigins: [FRONTEND_URL ?? ''],
 	emailAndPassword: {
 		enabled: true,
 	},

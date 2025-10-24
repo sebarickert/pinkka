@@ -12,7 +12,6 @@ export type FinancialAccountTable = {
 	user_id: string;
 	name: string;
 	type: 'bank' | 'credit_card' | 'wallet' | 'investment' | 'loan';
-	currency: string;
 	initial_balance: number;
 	balance: number;
 	is_deleted: boolean;

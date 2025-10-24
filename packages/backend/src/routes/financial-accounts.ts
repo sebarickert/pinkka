@@ -3,10 +3,10 @@ import {
 	UpdateFinancialAccountDtoSchema,
 } from '@pinkka/schemas/financial-account-dto.js';
 import {requireAuth} from '@/middlewares/require-auth.js';
-import * as FinancialAccountRepo from '@/repositories/financial-account-repo.js';
+import {FinancialAccountRepo} from '@/repositories/financial-account-repo.js';
 import {error, fail, success} from '@/lib/response.js';
 import {validateBody, validateIdParameter} from '@/lib/validator.js';
-import {financialAccountMapper} from '@/mappers/financial-account-mapper.js';
+import {FinancialAccountMapper} from '@/mappers/financial-account-mapper.js';
 import {createRouter} from '@/lib/create-router.js';
 
 const accounts = createRouter();
@@ -16,9 +16,12 @@ accounts.get('/accounts', async (c) => {
 	const userId = c.get('user').id;
 
 	try {
-		const accounts = await FinancialAccountRepo.findMany({userId});
+		const accounts = await FinancialAccountRepo.getAll({userId});
 
-		return success(c, accounts);
+		return success(
+			c,
+			accounts.map((account) => FinancialAccountMapper.fromDb(account)),
+		);
 	} catch {
 		return error(c, 'Failed to fetch accounts', {data: error});
 	}
@@ -36,7 +39,7 @@ accounts.get('/accounts/:id', validateIdParameter, async (c) => {
 		});
 	}
 
-	return success(c, financialAccountMapper.fromDb(account));
+	return success(c, FinancialAccountMapper.fromDb(account));
 });
 
 accounts.post(
@@ -54,12 +57,12 @@ accounts.post(
 
 		try {
 			const newFinancialAccounts = await FinancialAccountRepo.create({
-				data: financialAccountMapper.newDtoToDb(newFinancialAccount, userId),
+				data: FinancialAccountMapper.newDtoToDb(newFinancialAccount, userId),
 			});
 
 			return success(
 				c,
-				financialAccountMapper.fromDb(newFinancialAccounts),
+				FinancialAccountMapper.fromDb(newFinancialAccounts),
 				201,
 			);
 		} catch (error_) {
@@ -114,10 +117,10 @@ accounts.put(
 			const updatedAccount = await FinancialAccountRepo.update({
 				id,
 				userId,
-				data: financialAccountMapper.updateDtoToDb(updatedFinancialAccountData),
+				data: FinancialAccountMapper.updateDtoToDb(updatedFinancialAccountData),
 			});
 
-			return success(c, financialAccountMapper.fromDb(updatedAccount));
+			return success(c, FinancialAccountMapper.fromDb(updatedAccount));
 		} catch (error_) {
 			return error(c, `Failed to update financial account with id ${id}`, {
 				data: error_,
@@ -139,13 +142,12 @@ accounts.delete('/accounts/:id', validateIdParameter, async (c) => {
 	}
 
 	try {
-		const updatedAccount = await FinancialAccountRepo.update({
+		const deletedAccount = await FinancialAccountRepo.delete({
 			id,
 			userId,
-			data: financialAccountMapper.updateDtoToDb({isDeleted: true}),
 		});
 
-		return success(c, financialAccountMapper.fromDb(updatedAccount));
+		return success(c, FinancialAccountMapper.fromDb(deletedAccount));
 	} catch (error_) {
 		return error(c, `Failed to delete financial account with id ${id}`, {
 			data: error_,

@@ -1,40 +1,49 @@
 import {beforeEach, describe, expect, test} from 'vitest';
 import {cleanDb} from '@test-utils/clean-db.js';
-import {createAccount} from '@test-utils/create-account.js';
-import {createCategory} from '@test-utils/create-category.js';
 import {
 	type UserWithSessionToken,
 	createTestUser,
 } from '@test-utils/create-test-user.js';
 import {fetcher} from '@test-utils/fetcher.js';
-import {getFinancialAccountBalances} from '@test-utils/financial-account.js';
+import {
+	createFinancialAccount,
+	getFinancialAccountBalances,
+} from '@test-utils/financial-account.js';
 import {
 	createTransaction,
 	getTransaction,
 	expectCategoryLink,
 	updateTransaction,
+	getTransactions,
+	deleteTransaction,
 } from '@test-utils/transaction.js';
-import type {Category} from '@/types/db/category.js';
-import type {Transaction} from '@/types/db/transaction.js';
-import type {FinancialAccount} from '@/types/db/financial-account.js';
+import type {FinancialAccountDto} from '@pinkka/schemas/financial-account-dto.js';
+import type {
+	NewTransactionDto,
+	TransactionDto,
+} from '@pinkka/schemas/transaction-dto.js';
+import {createCategory} from '@test-utils/category.js';
+import type {CategoryDto} from '@pinkka/schemas/category-dto.js';
+import type {JsonResponse} from '@pinkka/schemas/json-response.js';
 import {db} from '@/lib/db.js';
 
 describe('Transaction Integration Tests', () => {
 	let user: UserWithSessionToken;
-	let account: FinancialAccount;
+	let account: FinancialAccountDto;
 
 	beforeEach(async () => {
 		await cleanDb();
 		user = await createTestUser();
-		account = await createAccount(
+
+		const {data} = await createFinancialAccount(
 			{
 				name: 'Test Account',
-				initial_balance: 1000,
+				initialBalance: 1000,
 				type: 'bank',
-				currency: 'EUR',
 			},
 			user,
 		);
+		account = data;
 	});
 
 	describe('Authorization', () => {
@@ -48,93 +57,75 @@ describe('Transaction Integration Tests', () => {
 
 		for (const {method, path} of protectedEndpoints) {
 			test(`returns 401 for unauthorized ${method} ${path}`, async () => {
-				const res = await fetcher(path, {method});
-				const body = await res.json();
+				const response = await fetcher(path, {method});
+				const body = (await response.json()) as JsonResponse;
 
-				expect(res.status).toEqual(401);
+				expect(response.status).toEqual(401);
 				expect(body.status).toEqual('error');
-				expect(body.message).toEqual('Unauthorized');
+
+				if ('message' in body) {
+					expect(body.message).toEqual('Unauthorized');
+				}
 			});
 		}
 	});
 
 	describe('GET /transactions/:id', () => {
-		let transaction: Transaction;
+		let transaction: TransactionDto;
 
 		beforeEach(async () => {
 			const newTransactionPayload = {
 				description: 'Grocery Shopping',
 				amount: 50,
-				from_account_id: account.id,
+				fromAccountId: account.id,
 				type: 'expense',
 				date: new Date().toISOString(),
 			} as const;
 
-			transaction = await createTransaction(newTransactionPayload, user);
+			const {data} = await createTransaction(newTransactionPayload, user);
+			transaction = data;
 		});
 
 		test('returns the transaction for given id', async () => {
-			const res = await fetcher(
-				`/api/transactions/${transaction.id}`,
-				{},
-				user.session_token,
-			);
-
-			const body = await res.json();
-
-			expect(res.status).toEqual(200);
+			const {status, body} = await getTransaction(transaction.id, user);
+			expect(status).toEqual(200);
 			expect(body.status).toEqual('success');
-
 			expect(body.data).toMatchObject(transaction);
 		});
 
 		test('returns 404 when transaction does not exist', async () => {
 			const id = 'c2b8f3ee-c9ae-4104-8f89-173e3871ebb9';
-
-			const res = await fetcher(
-				`/api/transactions/${id}`,
-				{},
-				user.session_token,
-			);
-
-			const body = await res.json();
-
-			expect(res.status).toEqual(404);
+			const {status, body} = await getTransaction(id, user);
+			expect(status).toEqual(404);
 			expect(body.status).toEqual('error');
-			expect(body.message).toEqual(`Transaction with id ${id} not found`);
+			if ('message' in body) {
+				expect(body.message).toEqual(`Transaction with id ${id} not found`);
+			}
 		});
 
 		test('returns validation error if id is not a valid uuid', async () => {
-			const res = await fetcher(
-				'/api/transactions/some-non-existing-id',
-				{},
-				user.session_token,
-			);
-
-			const body = await res.json();
-
-			expect(res.status).toEqual(400);
+			const {status, body} = await getTransaction('some-non-existing-id', user);
+			expect(status).toEqual(400);
 			expect(body.status).toEqual('error');
-			expect(body.message).toEqual('Invalid id format');
+			if ('message' in body) {
+				expect(body.message).toEqual('Invalid id format');
+			}
 		});
 	});
 
 	describe('GET /transactions', () => {
 		test('returns empty array when user has no transactions', async () => {
-			const res = await fetcher('/api/transactions', {}, user.session_token);
-
-			const body = await res.json();
-
-			expect(res.status).toEqual(200);
+			const {status, body, data} = await getTransactions(user);
+			expect(status).toEqual(200);
 			expect(body.status).toEqual('success');
-			expect(body.data).toEqual([]);
+			expect(data).toEqual([]);
 		});
 
 		test('returns all transactions for user', async () => {
 			const newTransactionPayload = {
 				description: 'Grocery Shopping',
 				amount: 50,
-				from_account_id: account.id,
+				fromAccountId: account.id,
 				type: 'expense',
 				date: new Date().toISOString(),
 			} as const;
@@ -151,21 +142,18 @@ describe('Transaction Integration Tests', () => {
 				),
 			);
 
-			const res = await fetcher('/api/transactions', {}, user.session_token);
-
-			const body = await res.json();
-
-			expect(res.status).toEqual(200);
+			const {status, body, data} = await getTransactions(user);
+			expect(status).toEqual(200);
 			expect(body.status).toEqual('success');
-			expect(body.data).toHaveLength(5);
-			body.data.forEach((transaction: Transaction) => {
-				expect(transaction.user_id).toEqual(user.id);
-			});
+			expect(data).toHaveLength(5);
+			for (const transaction of data) {
+				expect(transaction.userId).toEqual(user.id);
+			}
 		});
 	});
 
 	describe('POST /transactions', async () => {
-		let categoryExpense: Category;
+		let categoryExpense: CategoryDto;
 
 		beforeEach(async () => {
 			const newExpenseCategoryPayload = {
@@ -173,21 +161,13 @@ describe('Transaction Integration Tests', () => {
 				name: 'Hola!',
 			} as const;
 
-			categoryExpense = await createCategory(newExpenseCategoryPayload, user);
+			const {body} = await createCategory(newExpenseCategoryPayload, user);
+			categoryExpense = body.data as CategoryDto;
 		});
 
 		test('returns validation error for empty body', async () => {
-			const res = await fetcher(
-				'/api/transactions',
-				{
-					method: 'POST',
-				},
-				user.session_token,
-			);
-
-			const body = await res.json();
-
-			expect(res.status).toEqual(400);
+			const {status, body} = await createTransaction(undefined, user);
+			expect(status).toEqual(400);
 			expect(body.status).toEqual('fail');
 			expect(body.data).toHaveProperty('type');
 			expect(body.data).toHaveProperty('amount');
@@ -198,31 +178,25 @@ describe('Transaction Integration Tests', () => {
 		test('returns validation error for invalid data', async () => {
 			const newTransactionPayload = {
 				amount: 50,
-				from_account_id: account.id,
+				fromAccountId: account.id,
 				type: 'expense',
 				date: 'invalid-date',
-			} as const;
+			} as unknown as NewTransactionDto;
 
-			const res = await fetcher(
-				'/api/transactions',
-				{
-					method: 'POST',
-					body: JSON.stringify(newTransactionPayload),
-				},
-				user.session_token,
+			const {status, body} = await createTransaction(
+				newTransactionPayload,
+				user,
 			);
 
-			const body = await res.json();
-
-			expect(res.status).toEqual(400);
+			expect(status).toEqual(400);
 			expect(body.status).toEqual('fail');
 			expect(body.data).toHaveProperty('date');
 			expect(body.data).toHaveProperty('description');
 		});
 
 		test.each([
-			['to_account_id', 'expense'],
-			['from_account_id', 'income'],
+			['toAccountId', 'expense'],
+			['fromAccountId', 'income'],
 		])(
 			'returns validation error when %s is combined with type %s',
 			async (key, type) => {
@@ -232,20 +206,14 @@ describe('Transaction Integration Tests', () => {
 					date: new Date().toISOString(),
 					[key]: account.id,
 					type,
-				} as const;
+				} as unknown as NewTransactionDto;
 
-				const res = await fetcher(
-					'/api/transactions',
-					{
-						method: 'POST',
-						body: JSON.stringify(newTransactionPayload),
-					},
-					user.session_token,
+				const {status, body} = await createTransaction(
+					newTransactionPayload,
+					user,
 				);
 
-				const body = await res.json();
-
-				expect(res.status).toEqual(400);
+				expect(status).toEqual(400);
 				expect(body.status).toEqual('fail');
 				expect(body.data).toHaveProperty(key);
 			},
@@ -255,53 +223,47 @@ describe('Transaction Integration Tests', () => {
 			const newTransactionPayload = {
 				description: 'Grocery Shopping',
 				amount: 50,
-				to_account_id: account.id,
-				from_account_id: account.id,
+				toAccountId: account.id,
+				fromAccountId: account.id,
 				type: 'transfer',
 				date: new Date().toISOString(),
-				category_id: categoryExpense.id,
+				categoryId: categoryExpense.id,
 			} as const;
 
-			const res = await fetcher(
-				'/api/transactions',
-				{
-					method: 'POST',
-					body: JSON.stringify(newTransactionPayload),
-				},
-				user.session_token,
+			const {status, body} = await createTransaction(
+				newTransactionPayload,
+				user,
 			);
 
-			const body = await res.json();
-
-			expect(res.status).toEqual(400);
+			expect(status).toEqual(400);
 			expect(body.status).toEqual('fail');
-			expect(body.data).toHaveProperty('to_account_id');
-			expect(body.data).toHaveProperty('from_account_id');
+			expect(body.data).toHaveProperty('toAccountId');
+			expect(body.data).toHaveProperty('fromAccountId');
 		});
 
 		test('creates transaction with valid data (with category)', async () => {
 			const newTransactionPayload = {
 				description: 'Grocery Shopping',
 				amount: 50,
-				from_account_id: account.id,
+				fromAccountId: account.id,
 				type: 'expense',
 				date: new Date().toISOString(),
-				category_id: categoryExpense.id,
+				categoryId: categoryExpense.id,
 			} as const;
 
-			const transaction = await createTransaction(newTransactionPayload, user);
+			const {data} = await createTransaction(newTransactionPayload, user);
 
-			const {category_id, ...expectedTransaction} = newTransactionPayload;
+			const {categoryId, ...expectedTransaction} = newTransactionPayload;
 
-			expect(transaction).toHaveProperty('id');
-			expect(transaction).toMatchObject({
+			expect(data).toHaveProperty('id');
+			expect(data).toMatchObject({
 				...expectedTransaction,
 				date: expectedTransaction.date,
 			});
 
 			const transactionCategoryLink = await db
 				.selectFrom('transaction_category')
-				.where('transaction_id', '=', transaction.id)
+				.where('transaction_id', '=', data.id)
 				.selectAll()
 				.execute();
 
@@ -312,28 +274,29 @@ describe('Transaction Integration Tests', () => {
 		});
 
 		describe('Account Balance Updates', () => {
-			let account1: FinancialAccount;
-			let account2: FinancialAccount;
+			let account1: FinancialAccountDto;
+			let account2: FinancialAccountDto;
 
 			beforeEach(async () => {
-				account1 = await createAccount(
+				const {body: body1} = await createFinancialAccount(
 					{
 						name: 'Account 1',
-						initial_balance: 1000,
+						initialBalance: 1000,
 						type: 'bank',
-						currency: 'EUR',
 					},
 					user,
 				);
-				account2 = await createAccount(
+				const {body: body2} = await createFinancialAccount(
 					{
 						name: 'Account 2',
-						initial_balance: 1000,
+						initialBalance: 1000,
 						type: 'bank',
-						currency: 'EUR',
 					},
 					user,
 				);
+
+				account1 = body1.data as FinancialAccountDto;
+				account2 = body2.data as FinancialAccountDto;
 			});
 
 			test('updates account balance correctly for income transaction', async () => {
@@ -342,7 +305,7 @@ describe('Transaction Integration Tests', () => {
 				const newTransactionPayload = {
 					description: 'Grocery Shopping',
 					amount: 250,
-					to_account_id: account1.id,
+					toAccountId: account1.id,
 					type: 'income',
 					date: new Date().toISOString(),
 				} as const;
@@ -350,8 +313,8 @@ describe('Transaction Integration Tests', () => {
 				await createTransaction(newTransactionPayload, user);
 				const balancesAfter = await getFinancialAccountBalances(account1.id);
 
-				expect(balancesAfter?.balance).toEqual(
-					balancesBefore?.balance + newTransactionPayload.amount,
+				expect(balancesAfter.balance).toEqual(
+					balancesBefore.balance + newTransactionPayload.amount,
 				);
 			});
 
@@ -361,7 +324,7 @@ describe('Transaction Integration Tests', () => {
 				const newTransactionPayload = {
 					description: 'Grocery Shopping',
 					amount: 250,
-					from_account_id: account1.id,
+					fromAccountId: account1.id,
 					type: 'expense',
 					date: new Date().toISOString(),
 				} as const;
@@ -369,8 +332,8 @@ describe('Transaction Integration Tests', () => {
 				await createTransaction(newTransactionPayload, user);
 				const balancesAfter = await getFinancialAccountBalances(account1.id);
 
-				expect(balancesAfter?.balance).toEqual(
-					balancesBefore?.balance - newTransactionPayload.amount,
+				expect(balancesAfter.balance).toEqual(
+					balancesBefore.balance - newTransactionPayload.amount,
 				);
 			});
 
@@ -381,8 +344,8 @@ describe('Transaction Integration Tests', () => {
 				const newTransactionPayload = {
 					description: 'Grocery Shopping',
 					amount: 99.99,
-					from_account_id: account1.id,
-					to_account_id: account2.id,
+					fromAccountId: account1.id,
+					toAccountId: account2.id,
 					type: 'transfer',
 					date: new Date().toISOString(),
 				} as const;
@@ -392,11 +355,11 @@ describe('Transaction Integration Tests', () => {
 				const fromAfter = await getFinancialAccountBalances(account1.id);
 				const toAfter = await getFinancialAccountBalances(account2.id);
 
-				expect(fromAfter?.balance).toEqual(
-					fromBefore?.balance - newTransactionPayload.amount,
+				expect(fromAfter.balance).toEqual(
+					fromBefore.balance - newTransactionPayload.amount,
 				);
-				expect(toAfter?.balance).toEqual(
-					toBefore?.balance + newTransactionPayload.amount,
+				expect(toAfter.balance).toEqual(
+					toBefore.balance + newTransactionPayload.amount,
 				);
 			});
 
@@ -406,7 +369,7 @@ describe('Transaction Integration Tests', () => {
 				const newTransactionPayload = {
 					description: 'Grocery Shopping',
 					amount: 0,
-					from_account_id: account1.id,
+					fromAccountId: account1.id,
 					type: 'expense',
 					date: new Date().toISOString(),
 				} as const;
@@ -419,11 +382,11 @@ describe('Transaction Integration Tests', () => {
 	});
 
 	describe('PUT /transactions/:id', () => {
-		let transaction1: Transaction;
-		let transaction2: Transaction;
-		let category1: Category;
-		let category2: Category;
-		let category3: Category;
+		let transaction1: TransactionDto;
+		let transaction2: TransactionDto;
+		let category1: CategoryDto;
+		let category2: CategoryDto;
+		let category3: CategoryDto;
 
 		beforeEach(async () => {
 			const newCategoryPayload = {
@@ -431,31 +394,39 @@ describe('Transaction Integration Tests', () => {
 				name: 'Hola!',
 			} as const;
 
-			category1 = await createCategory(newCategoryPayload, user);
-			category2 = await createCategory(newCategoryPayload, user);
-			category3 = await createCategory(
+			const response1 = await createCategory(newCategoryPayload, user);
+			category1 = response1.data;
+			const response2 = await createCategory(newCategoryPayload, user);
+			category2 = response2.data;
+			const response3 = await createCategory(
 				{...newCategoryPayload, type: 'income'},
 				user,
 			);
+			category3 = response3.data;
 
 			const newTransactionPayload = {
 				description: 'Grocery Shopping',
 				amount: 50,
-				from_account_id: account.id,
+				fromAccountId: account.id,
 				type: 'expense',
 				date: new Date().toISOString(),
 			} as const;
 
-			transaction1 = await createTransaction(newTransactionPayload, user);
-			transaction2 = await createTransaction(
-				{...newTransactionPayload, amount: 100, category_id: category1.id},
+			const responseTx1 = await createTransaction(newTransactionPayload, user);
+			transaction1 = responseTx1.data;
+			const responseTx2 = await createTransaction(
+				{...newTransactionPayload, amount: 100, categoryId: category1.id},
 				user,
 			);
+			transaction2 = responseTx2.data;
 		});
 
 		describe('Category Link Management', () => {
 			test('adds category link', async () => {
-				const transactionBefore = await getTransaction(transaction1.id);
+				const {data: transactionBefore} = await getTransaction(
+					transaction1.id,
+					user,
+				);
 				await expectCategoryLink(transaction1.id, null);
 
 				const {status, body} = await updateTransaction(
@@ -463,17 +434,20 @@ describe('Transaction Integration Tests', () => {
 					{
 						amount: 100,
 						description: 'I was just updated!',
-						category_id: category1.id,
+						categoryId: category1.id,
 					},
-					user.session_token,
+					user,
 				);
 
 				expect(status).toEqual(200);
 				expect(body.status).toEqual('success');
 
 				await expectCategoryLink(transaction1.id, category1.id);
-				const transactionAfter = await getTransaction(transaction1.id);
-				expect(transactionAfter).not.toMatchObject(transactionBefore!);
+				const {data: transactionAfter} = await getTransaction(
+					transaction1.id,
+					user,
+				);
+				expect(transactionAfter).not.toMatchObject(transactionBefore);
 			});
 
 			test('updates category link', async () => {
@@ -483,9 +457,9 @@ describe('Transaction Integration Tests', () => {
 					{
 						amount: 100,
 						description: 'I was just updated!',
-						category_id: category2.id,
+						categoryId: category2.id,
 					},
-					user.session_token,
+					user,
 				);
 				expect(status).toEqual(200);
 				expect(body.status).toEqual('success');
@@ -496,8 +470,8 @@ describe('Transaction Integration Tests', () => {
 				await expectCategoryLink(transaction2.id, category1.id);
 				const {status, body} = await updateTransaction(
 					transaction2.id,
-					{category_id: null},
-					user.session_token,
+					{categoryId: null},
+					user,
 				);
 				expect(status).toEqual(200);
 				expect(body.status).toEqual('success');
@@ -505,109 +479,110 @@ describe('Transaction Integration Tests', () => {
 			});
 
 			test('rejects mismatched category type', async () => {
-				const {status, body} = await updateTransaction(
+				const {status, body, data} = await updateTransaction(
 					transaction1.id,
-					{category_id: category3.id},
-					user.session_token,
+					{categoryId: category3.id},
+					user,
 				);
 				expect(status).toEqual(400);
 				expect(body.status).toEqual('fail');
-				expect(body.data).toHaveProperty('category_id');
-				expect(body.data.category_id).toEqual(
-					'Category type does not match transaction type',
-				);
+				expect(data).toHaveProperty('categoryId');
+				if ('categoryId' in data) {
+					expect(data.categoryId).toEqual(
+						'Category type does not match transaction type',
+					);
+				}
+
 				await expectCategoryLink(transaction1.id, null);
 			});
 
-			test('rejects non-existent category_id', async () => {
+			test('rejects non-existent categoryId', async () => {
 				const fakeCategoryId = '00000000-0000-0000-0000-000000000000';
 				const {status, body} = await updateTransaction(
 					transaction1.id,
-					{category_id: fakeCategoryId},
-					user.session_token,
+					{categoryId: fakeCategoryId},
+					user,
 				);
 				expect(status).toEqual(404);
 				expect(body.status).toEqual('error');
-				expect(body.message).toEqual(
-					`Category with id ${fakeCategoryId} not found`,
-				);
+				if ('message' in body) {
+					expect(body.message).toEqual(
+						`Category with id ${fakeCategoryId} not found`,
+					);
+				}
+
 				await expectCategoryLink(transaction1.id, null);
 			});
 		});
 
 		describe('General Update & Validation', () => {
 			test('updates amount and description only (no category)', async () => {
-				// Transaction[0] has no category
-				const transactionBefore = await getTransaction(transaction1.id);
+				const {data: transactionBefore} = await getTransaction(
+					transaction1.id,
+					user,
+				);
 				await expectCategoryLink(transaction1.id, null);
 
 				const {status, body} = await updateTransaction(
 					transaction1.id,
 					{
-						amount: transactionBefore!.amount + 10,
+						amount: transactionBefore.amount + 10,
 						description: 'Updated description only',
 					},
-					user.session_token,
+					user,
 				);
 
 				expect(status).toEqual(200);
 				expect(body.status).toEqual('success');
 
-				const transactionAfter = await getTransaction(transaction1.id);
-				expect(transactionAfter!.amount).toEqual(
-					transactionBefore!.amount + 10,
+				const {data: transactionAfter} = await getTransaction(
+					transaction1.id,
+					user,
 				);
-				expect(transactionAfter!.description).toEqual(
+				expect(transactionAfter.amount).toEqual(transactionBefore.amount + 10);
+				expect(transactionAfter.description).toEqual(
 					'Updated description only',
 				);
-				// Category link should remain absent
 				await expectCategoryLink(transaction1.id, null);
 			});
 
 			test('sending empty body results in no changes', async () => {
-				const transactionBefore = await getTransaction(transaction1.id);
+				const transactionBefore = await getTransaction(transaction1.id, user);
 				const {status, body} = await updateTransaction(
 					transaction1.id,
 					undefined,
-					user.session_token,
+					user,
 				);
 				expect(status).toEqual(200);
 				expect(body.status).toEqual('success');
-				const transactionAfter = await getTransaction(transaction1.id);
-				expect(transactionAfter).toMatchObject(transactionBefore!);
+				const transactionAfter = await getTransaction(transaction1.id, user);
+				expect(transactionAfter).toMatchObject(transactionBefore);
 			});
 
 			test('returns validation error if id is not a valid uuid', async () => {
-				const res = await fetcher(
-					'/api/transactions/some-non-existing-id',
-					{
-						method: 'PUT',
-						body: JSON.stringify({
-							name: 'I do not exist',
-						}),
-					},
-					user.session_token,
+				const {status, body} = await updateTransaction(
+					'some-non-existing-id',
+					{},
+					user,
 				);
-				const body = await res.json();
-				expect(res.status).toEqual(400);
+				expect(status).toEqual(400);
 				expect(body.status).toEqual('error');
-				expect(body.message).toEqual('Invalid id format');
+				if ('message' in body) {
+					expect(body.message).toEqual('Invalid id format');
+				}
 			});
 
 			test('returns validation errors if trying to update with invalid data', async () => {
-				const res = await fetcher(
-					`/api/transactions/${transaction1.id}`,
+				const {status, body} = await updateTransaction(
+					transaction1.id,
 					{
-						method: 'PUT',
-						body: JSON.stringify({
-							amount: -123,
-							description: 123,
-						}),
-					},
-					user.session_token,
+						amount: -123,
+						description: 123,
+					} as unknown as Partial<NewTransactionDto>,
+					user,
 				);
-				const body = await res.json();
-				expect(res.status).toEqual(400);
+
+				expect(status).toEqual(400);
 				expect(body.status).toEqual('fail');
 				expect(body.data).toHaveProperty('amount');
 				expect(body.data).toHaveProperty('description');
@@ -615,50 +590,51 @@ describe('Transaction Integration Tests', () => {
 
 			test('returns 404 when trying to update non-existing transaction', async () => {
 				const id = 'c2b8f3ee-c9ae-4104-8f89-173e3871ebb9';
-				const res = await fetcher(
-					`/api/transactions/${id}`,
+
+				const {status, body} = await updateTransaction(
+					id,
 					{
-						method: 'PUT',
-						body: JSON.stringify({
-							description: 'I do not exist',
-						}),
+						amount: 123,
+						description: 'I do not exist',
 					},
-					user.session_token,
+					user,
 				);
-				const body = await res.json();
-				expect(res.status).toEqual(404);
+
+				expect(status).toEqual(404);
 				expect(body.status).toEqual('error');
-				expect(body.message).toEqual(`Transaction with id ${id} not found`);
+				if ('message' in body) {
+					expect(body.message).toEqual(`Transaction with id ${id} not found`);
+				}
 			});
 		});
 
 		describe('Account Balance Updates', () => {
-			let account1: FinancialAccount;
-			let account2: FinancialAccount;
-			let transactionExpense: Transaction;
-			let transactionIncome: Transaction;
-			let transactionTransfer: Transaction;
+			let account1: FinancialAccountDto;
+			let account2: FinancialAccountDto;
+			let transactionExpense: TransactionDto;
+			let transactionIncome: TransactionDto;
+			let transactionTransfer: TransactionDto;
 
 			beforeEach(async () => {
-				account1 = await createAccount(
+				const responseAcc1 = await createFinancialAccount(
 					{
 						name: 'Account 1',
-						initial_balance: 1000,
+						initialBalance: 1000,
 						type: 'bank',
-						currency: 'EUR',
 					},
 					user,
 				);
+				account1 = responseAcc1.data;
 
-				account2 = await createAccount(
+				const responseAcc2 = await createFinancialAccount(
 					{
 						name: 'Account 1',
-						initial_balance: 1000,
+						initialBalance: 1000,
 						type: 'bank',
-						currency: 'EUR',
 					},
 					user,
 				);
+				account2 = responseAcc2.data;
 
 				const newTransactionPayload = {
 					description: 'Grocery Shopping',
@@ -666,31 +642,36 @@ describe('Transaction Integration Tests', () => {
 					date: new Date().toISOString(),
 				} as const;
 
-				transactionExpense = await createTransaction(
+				const responseExpense = await createTransaction(
 					{
 						...newTransactionPayload,
-						from_account_id: account1.id,
+						fromAccountId: account1.id,
 						type: 'expense',
 					},
 					user,
 				);
-				transactionIncome = await createTransaction(
+				transactionExpense = responseExpense.body.data as TransactionDto;
+
+				const responseIncome = await createTransaction(
 					{
 						...newTransactionPayload,
-						to_account_id: account2.id,
+						toAccountId: account2.id,
 						type: 'income',
 					},
 					user,
 				);
-				transactionTransfer = await createTransaction(
+				transactionIncome = responseIncome.body.data as TransactionDto;
+
+				const responseTransfer = await createTransaction(
 					{
 						...newTransactionPayload,
-						from_account_id: account1.id,
-						to_account_id: account2.id,
+						fromAccountId: account1.id,
+						toAccountId: account2.id,
 						type: 'transfer',
 					},
 					user,
 				);
+				transactionTransfer = responseTransfer.body.data as TransactionDto;
 			});
 
 			test.each([1, 50, 0, -1, -50, -99.99])(
@@ -703,7 +684,7 @@ describe('Transaction Integration Tests', () => {
 					const {status} = await updateTransaction(
 						transactionIncome.id,
 						{amount: transactionIncome.amount + changeAmount},
-						user.session_token,
+						user,
 					);
 
 					expect(status).toEqual(200);
@@ -728,7 +709,7 @@ describe('Transaction Integration Tests', () => {
 					const {status} = await updateTransaction(
 						transactionExpense.id,
 						{amount: transactionExpense.amount + changeAmount},
-						user.session_token,
+						user,
 					);
 
 					expect(status).toEqual(200);
@@ -756,7 +737,7 @@ describe('Transaction Integration Tests', () => {
 					const {status} = await updateTransaction(
 						transactionTransfer.id,
 						{amount: transactionTransfer.amount + changeAmount},
-						user.session_token,
+						user,
 					);
 
 					expect(status).toEqual(200);
@@ -780,18 +761,22 @@ describe('Transaction Integration Tests', () => {
 	});
 
 	describe('DELETE /transactions/:id', () => {
-		let transaction: Transaction;
+		let transaction: TransactionDto;
 
 		beforeEach(async () => {
 			const newTransactionPayload = {
 				description: 'Grocery Shopping',
 				amount: 50,
-				from_account_id: account.id,
+				fromAccountId: account.id,
 				type: 'expense',
 				date: new Date().toISOString(),
 			} as const;
 
-			transaction = await createTransaction(newTransactionPayload, user);
+			const responseTransaction = await createTransaction(
+				newTransactionPayload,
+				user,
+			);
+			transaction = responseTransaction.body.data as TransactionDto;
 		});
 
 		test('deletes category link when transaction is deleted', async () => {
@@ -800,7 +785,7 @@ describe('Transaction Integration Tests', () => {
 				name: 'Hola!',
 			} as const;
 
-			const categoryExpense = await createCategory(
+			const {data: categoryExpense} = await createCategory(
 				newExpenseCategoryPayload,
 				user,
 			);
@@ -808,13 +793,16 @@ describe('Transaction Integration Tests', () => {
 			const newTransactionPayload = {
 				description: 'Grocery Shopping',
 				amount: 50,
-				from_account_id: account.id,
+				fromAccountId: account.id,
 				type: 'expense',
 				date: new Date().toISOString(),
-				category_id: categoryExpense.id,
+				categoryId: categoryExpense.id,
 			} as const;
 
-			const transaction = await createTransaction(newTransactionPayload, user);
+			const {data: transaction} = await createTransaction(
+				newTransactionPayload,
+				user,
+			);
 			const transactionCategoryLinkBefore = await db
 				.selectFrom('transaction_category')
 				.where('transaction_id', '=', transaction.id)
@@ -823,13 +811,7 @@ describe('Transaction Integration Tests', () => {
 
 			expect(transactionCategoryLinkBefore).toHaveLength(1);
 
-			await fetcher(
-				`/api/transactions/${transaction.id}`,
-				{
-					method: 'DELETE',
-				},
-				user.session_token,
-			);
+			await deleteTransaction(transaction.id, user);
 
 			const transactionCategoryLinkAfter = await db
 				.selectFrom('transaction_category')
@@ -841,90 +823,77 @@ describe('Transaction Integration Tests', () => {
 		});
 
 		test('deletes transaction', async () => {
-			const transactionBefore = await getTransaction(transaction.id);
+			const {data: transactionBefore} = await getTransaction(
+				transaction.id,
+				user,
+			);
 			expect(transactionBefore).toBeDefined();
 
-			const res = await fetcher(
-				`/api/transactions/${transaction.id}`,
-				{
-					method: 'DELETE',
-				},
-				user.session_token,
-			);
+			const {status, body} = await deleteTransaction(transaction.id, user);
 
-			const body = await res.json();
-
-			expect(res.status).toEqual(200);
+			expect(status).toEqual(200);
 			expect(body.status).toEqual('success');
 			expect(body.data).toEqual(
 				`Transaction with id ${transaction.id} deleted`,
 			);
 
-			const transactionAfter = await getTransaction(transaction.id);
+			const {data: transactionAfter} = await getTransaction(
+				transaction.id,
+				user,
+			);
 			expect(transactionAfter).toBeUndefined();
 		});
 
 		test('returns 404 when trying to delete non-existing account', async () => {
 			const id = 'c2b8f3ee-c9ae-4104-8f89-173e3871ebb9';
+			const {status, body} = await deleteTransaction(id, user);
 
-			const res = await fetcher(
-				`/api/transactions/${id}`,
-				{
-					method: 'DELETE',
-				},
-				user.session_token,
-			);
-
-			const body = await res.json();
-
-			expect(res.status).toEqual(404);
+			expect(status).toEqual(404);
 			expect(body.status).toEqual('error');
-			expect(body.message).toEqual(`Transaction with id ${id} not found`);
+			if ('message' in body) {
+				expect(body.message).toEqual(`Transaction with id ${id} not found`);
+			}
 		});
 
 		test('returns validation error if id is not a valid uuid', async () => {
-			const res = await fetcher(
-				'/api/transactions/some-non-existing-id',
-				{
-					method: 'DELETE',
-				},
-				user.session_token,
+			const {status, body} = await deleteTransaction(
+				'some-non-existing-id',
+				user,
 			);
-
-			const body = await res.json();
-
-			expect(res.status).toEqual(400);
+			expect(status).toEqual(400);
 			expect(body.status).toEqual('error');
-			expect(body.message).toEqual('Invalid id format');
+			if ('message' in body) {
+				expect(body.message).toEqual('Invalid id format');
+			}
 		});
 
 		describe('Account Balance Updates', () => {
-			let account1: FinancialAccount;
-			let account2: FinancialAccount;
-			let transactionExpense: Transaction;
-			let transactionIncome: Transaction;
-			let transactionTransfer: Transaction;
+			let account1: FinancialAccountDto;
+			let account2: FinancialAccountDto;
+			let transactionExpense: TransactionDto;
+			let transactionIncome: TransactionDto;
+			let transactionTransfer: TransactionDto;
 
 			beforeEach(async () => {
-				account1 = await createAccount(
+				const responseAcc1 = await createFinancialAccount(
 					{
 						name: 'Account 1',
-						initial_balance: 1000,
+						initialBalance: 1000,
 						type: 'bank',
-						currency: 'EUR',
 					},
 					user,
 				);
+				account1 = responseAcc1.data;
 
-				account2 = await createAccount(
+				const responseAcc2 = await createFinancialAccount(
 					{
 						name: 'Account 1',
-						initial_balance: 1000,
+						initialBalance: 1000,
 						type: 'bank',
-						currency: 'EUR',
 					},
 					user,
 				);
+				account2 = responseAcc2.data;
 
 				const newTransactionPayload = {
 					description: 'Grocery Shopping',
@@ -932,31 +901,36 @@ describe('Transaction Integration Tests', () => {
 					date: new Date().toISOString(),
 				} as const;
 
-				transactionExpense = await createTransaction(
+				const responseExpense = await createTransaction(
 					{
 						...newTransactionPayload,
-						from_account_id: account1.id,
+						fromAccountId: account1.id,
 						type: 'expense',
 					},
 					user,
 				);
-				transactionIncome = await createTransaction(
+				transactionExpense = responseExpense.data;
+
+				const responseIncome = await createTransaction(
 					{
 						...newTransactionPayload,
-						to_account_id: account2.id,
+						toAccountId: account2.id,
 						type: 'income',
 					},
 					user,
 				);
-				transactionTransfer = await createTransaction(
+				transactionIncome = responseIncome.data;
+
+				const responseTransfer = await createTransaction(
 					{
 						...newTransactionPayload,
-						from_account_id: account1.id,
-						to_account_id: account2.id,
+						fromAccountId: account1.id,
+						toAccountId: account2.id,
 						type: 'transfer',
 					},
 					user,
 				);
+				transactionTransfer = responseTransfer.data;
 			});
 
 			test('updates account balance correctly for deleted income transaction', async () => {
@@ -964,19 +938,13 @@ describe('Transaction Integration Tests', () => {
 					account2.id,
 				);
 
-				await fetcher(
-					`/api/transactions/${transactionIncome.id}`,
-					{
-						method: 'DELETE',
-					},
-					user.session_token,
-				);
+				await deleteTransaction(transactionIncome.id, user);
 
 				const accountBalanceAfter = await getFinancialAccountBalances(
 					account2.id,
 				);
 
-				expect(accountBalanceAfter?.balance).toEqual(
+				expect(accountBalanceAfter.balance).toEqual(
 					accountBalanceBefore.balance - transactionIncome.amount,
 				);
 			});
@@ -986,13 +954,7 @@ describe('Transaction Integration Tests', () => {
 					account1.id,
 				);
 
-				await fetcher(
-					`/api/transactions/${transactionExpense.id}`,
-					{
-						method: 'DELETE',
-					},
-					user.session_token,
-				);
+				await deleteTransaction(transactionExpense.id, user);
 
 				const accountBalanceAfter = await getFinancialAccountBalances(
 					account1.id,
@@ -1011,13 +973,7 @@ describe('Transaction Integration Tests', () => {
 					account2.id,
 				);
 
-				await fetcher(
-					`/api/transactions/${transactionTransfer.id}`,
-					{
-						method: 'DELETE',
-					},
-					user.session_token,
-				);
+				await deleteTransaction(transactionTransfer.id, user);
 
 				const account1BalanceAfter = await getFinancialAccountBalances(
 					account1.id,

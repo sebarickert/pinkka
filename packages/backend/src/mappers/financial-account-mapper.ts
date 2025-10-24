@@ -9,14 +9,13 @@ import type {
 	NewFinancialAccount,
 } from '@/types/db/financial-account.js';
 
-export const financialAccountMapper = {
+export const FinancialAccountMapper = {
 	fromDb(db: FinancialAccount): FinancialAccountDto {
 		return {
 			id: db.id,
 			userId: db.user_id,
 			type: db.type,
 			name: db.name,
-			currency: db.currency as FinancialAccountDto['currency'],
 			initialBalance: Number(Number(db.initial_balance).toFixed(2)),
 			balance: Number(Number(db.balance).toFixed(2)),
 			isDeleted: db.is_deleted,
@@ -28,7 +27,6 @@ export const financialAccountMapper = {
 		return {
 			type: dto.type,
 			name: dto.name,
-			currency: dto.currency,
 			initial_balance: dto.initialBalance,
 			balance: dto.initialBalance,
 			is_deleted: false,
@@ -41,7 +39,6 @@ export const financialAccountMapper = {
 		return {
 			...(dto.type !== undefined && {type: dto.type}),
 			...(dto.name !== undefined && {name: dto.name}),
-			...(dto.currency !== undefined && {currency: dto.currency}),
 			...(dto.initialBalance !== undefined && {
 				initial_balance: dto.initialBalance,
 			}),

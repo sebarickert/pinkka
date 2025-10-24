@@ -6,14 +6,14 @@ import type {User} from '@/types/db/user.js';
 
 describe('Auth Integration Tests', () => {
 	let user: User;
-	let session_token: string;
+	let sessionToken: string;
 
 	beforeAll(async () => {
 		await cleanDb();
 	});
 
 	test('should register new user by email and create user in database', async () => {
-		const res = await fetcher('/api/auth/sign-up/email', {
+		const response = await fetcher('/api/auth/sign-up/email', {
 			method: 'POST',
 			body: JSON.stringify({
 				email: 'test@example.com',
@@ -22,12 +22,13 @@ describe('Auth Integration Tests', () => {
 			}),
 		});
 
-		expect(res.status).toBe(200);
+		expect(response.status).toBe(200);
 
-		const body = await res.json();
-		const setCookie = res.headers.get('set-cookie');
+		const body = (await response.json()) as {token: string; user: User};
+
+		const setCookie = response.headers.get('set-cookie');
 		const match = setCookie?.match(/better-auth\.session_token=([^;]+)/);
-		session_token = (match ? match[1] : undefined)!;
+		sessionToken = (match ? match[1] : undefined)!;
 		user = body.user;
 
 		expect(body).toHaveProperty('user');
@@ -54,15 +55,15 @@ describe('Auth Integration Tests', () => {
 
 		expect(userSessionBefore).toBeDefined();
 
-		const res = await fetcher(
+		const response = await fetcher(
 			'/api/auth/sign-out',
 			{
 				method: 'POST',
 			},
-			session_token,
+			sessionToken,
 		);
 
-		expect(res.status).toBe(200);
+		expect(response.status).toBe(200);
 
 		const userSessionAfter = await db
 			.selectFrom('session')
@@ -82,7 +83,7 @@ describe('Auth Integration Tests', () => {
 
 		expect(userSessionBefore).toBeUndefined();
 
-		const res = await fetcher('/api/auth/sign-in/email', {
+		const response = await fetcher('/api/auth/sign-in/email', {
 			method: 'POST',
 			body: JSON.stringify({
 				email: 'test@example.com',
@@ -90,7 +91,7 @@ describe('Auth Integration Tests', () => {
 			}),
 		});
 
-		expect(res.status).toBe(200);
+		expect(response.status).toBe(200);
 
 		const userSessionAfter = await db
 			.selectFrom('session')

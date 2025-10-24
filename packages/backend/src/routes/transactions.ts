@@ -3,17 +3,13 @@ import {
 	UpdateTransactionDtoSchema,
 } from '@pinkka/schemas/transaction-dto.js';
 import {requireAuth} from '@/middlewares/require-auth.js';
-import * as TransactionRepo from '@/repositories/transaction-repo.js';
-import * as CategoryRepo from '@/repositories/category-repo.js';
+import {TransactionRepo} from '@/repositories/transaction-repo.js';
+import {CategoryRepo} from '@/repositories/category-repo.js';
 import {error, fail, success} from '@/lib/response.js';
-import {
-	createTransaction,
-	deleteTransaction,
-	updateTransaction,
-} from '@/services/transactions.js';
-import {transactionMapper} from '@/mappers/transaction-mapper.js';
+import {TransactionMapper} from '@/mappers/transaction-mapper.js';
 import {validateBody, validateIdParameter} from '@/lib/validator.js';
 import {createRouter} from '@/lib/create-router.js';
+import {TransactionService} from '@/services/transaction-service.js';
 
 const transactions = createRouter();
 transactions.use('/transactions/*', requireAuth);
@@ -30,17 +26,18 @@ transactions.get('/transactions/:id', validateIdParameter, async (c) => {
 		});
 	}
 
-	return success(c, transactionMapper.fromDb(transaction));
+	return success(c, TransactionMapper.fromDb(transaction));
 });
 
 transactions.get('/transactions', async (c) => {
 	const userId = c.get('user').id;
 
 	try {
-		const transactions = await TransactionRepo.findMany({userId});
+		const transactions = await TransactionRepo.getAll({userId});
+
 		return success(
 			c,
-			transactions.map((transaction) => transactionMapper.fromDb(transaction)),
+			transactions.map((transaction) => TransactionMapper.fromDb(transaction)),
 		);
 	} catch (error_) {
 		return error(c, 'Failed to fetch transactions', {data: error_});
@@ -75,12 +72,12 @@ transactions.post(
 		}
 
 		try {
-			const newTransaction = await createTransaction({
-				data: transactionMapper.newDtoToDb(body, userId),
-				category_id: categoryId,
+			const newTransaction = await TransactionService.create({
+				data: body,
+				userId,
 			});
 
-			return success(c, transactionMapper.fromDb(newTransaction), 201);
+			return success(c, newTransaction, 201);
 		} catch (error_) {
 			return error(c, 'Failed to create transaction', {data: error_});
 		}
@@ -110,10 +107,10 @@ transactions.put(
 			return success(c, transaction);
 		}
 
-		const parsedTransaction = transactionMapper.fromDb(transaction);
+		const parsedTransaction = TransactionMapper.fromDb(transaction);
 		const {categoryId, ...updatedFields} = body;
 
-		const updatedTransaction = {
+		const mergedTransaction = {
 			...parsedTransaction,
 			...updatedFields,
 		};
@@ -134,7 +131,7 @@ transactions.put(
 					});
 				}
 
-				if (category.type !== updatedTransaction.type) {
+				if (category.type !== mergedTransaction.type) {
 					return fail(c, {
 						categoryId: 'Category type does not match transaction type',
 					});
@@ -143,13 +140,12 @@ transactions.put(
 		}
 
 		try {
-			const updatedTransaction = await updateTransaction({
-				data: transactionMapper.updateDtoToDb(updatedFields),
-				category_id: categoryId,
+			const updatedTransaction = await TransactionService.update({
+				data: body,
 				transaction,
 			});
 
-			return success(c, transactionMapper.fromDb(updatedTransaction));
+			return success(c, updatedTransaction);
 		} catch (error_) {
 			return error(c, `Failed to update transaction with id ${id}`, {
 				data: error_,
@@ -171,12 +167,7 @@ transactions.delete('/transactions/:id', validateIdParameter, async (c) => {
 	}
 
 	try {
-		await deleteTransaction({
-			id,
-			user_id: userId,
-			transaction,
-		});
-
+		await TransactionService.delete({id, userId, transaction});
 		return success(c, `Transaction with id ${id} deleted`);
 	} catch (error_) {
 		return error(c, `Failed to delete transaction with id ${id}`, {

@@ -8,15 +8,11 @@ export const financialAccountTypesSchema = z.enum([
 	'loan',
 ]);
 
-export const currencyEnumSchema = z.enum(['EUR', 'USD', 'GBP']);
-export type Currency = z.infer<typeof currencyEnumSchema>;
-
 export const FinancialAccountDtoSchema = z.strictObject({
 	id: z.uuid(),
 	userId: z.uuid(),
 	name: z.string(),
 	type: financialAccountTypesSchema,
-	currency: currencyEnumSchema,
 	initialBalance: z.number(),
 	balance: z.number(),
 	isDeleted: z.boolean().default(false),

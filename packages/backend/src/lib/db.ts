@@ -1,12 +1,12 @@
-import dotenv from 'dotenv';
 import {Pool} from 'pg';
 import {Kysely, PostgresDialect} from 'kysely';
 import type {Database} from '@/types/db/database.js';
-
-dotenv.config({path: '../../.env'});
-
-const {DATABASE_USER, DATABASE_PASSWORD, DATABASE_DB, DATABASE_PORT} =
-	process.env;
+import {
+	DATABASE_DB,
+	DATABASE_PASSWORD,
+	DATABASE_PORT,
+	DATABASE_USER,
+} from '@/lib/env.js';
 
 const dialect = new PostgresDialect({
 	pool: new Pool({

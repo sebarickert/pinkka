@@ -1,17 +1,21 @@
 import type {UserWithSessionToken} from '@test-utils/create-test-user.js';
-
-const BASE_URL = 'http://localhost:3000';
+import {BACKEND_URL, FRONTEND_URL} from '@/lib/env.js';
 
 export async function fetcher(
-	input: string | URL | Request,
+	input: string,
 	init?: RequestInit,
-	session_token?: UserWithSessionToken['session_token'],
+	sessionToken?: UserWithSessionToken['sessionToken'],
 ) {
-	return fetch(`${BASE_URL}${input}`, {
+	if (!FRONTEND_URL || !BACKEND_URL) {
+		throw new Error('FRONTEND_URL and BACKEND_URL must be defined in env');
+	}
+
+	return fetch(`${BACKEND_URL}${input}`, {
 		...init,
 		headers: {
 			...init?.headers,
-			Cookie: `better-auth.session_token=${session_token}`,
+			Origin: FRONTEND_URL,
+			Cookie: `better-auth.session_token=${sessionToken}`,
 			...(init?.body ? {'Content-Type': 'application/json'} : {}),
 		},
 	});

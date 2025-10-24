@@ -1,10 +1,10 @@
 import {fetcher} from '@test-utils/fetcher.js';
 import type {User} from '@/types/db/user.js';
 
-export type UserWithSessionToken = User & {session_token: string};
+export type UserWithSessionToken = User & {sessionToken: string};
 
 export async function createTestUser(): Promise<UserWithSessionToken> {
-	const res = await fetcher('/api/auth/sign-up/email', {
+	const response = await fetcher('/api/auth/sign-up/email', {
 		method: 'POST',
 		body: JSON.stringify({
 			email: `test+${Date.now()}@example.com`,
@@ -13,10 +13,10 @@ export async function createTestUser(): Promise<UserWithSessionToken> {
 		}),
 	});
 
-	const setCookie = res.headers.get('set-cookie');
+	const setCookie = response.headers.get('set-cookie');
 	const match = setCookie?.match(/better-auth\.session_token=([^;]+)/);
-	const session_token = match ? match[1] : undefined;
-	const {user} = await res.json();
+	const sessionToken = match ? match[1] : undefined;
+	const {user} = (await response.json()) as {user: User};
 
-	return {...user, session_token};
+	return {...user, sessionToken: sessionToken!};
 }

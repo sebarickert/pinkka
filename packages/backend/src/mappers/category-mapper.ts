@@ -9,7 +9,7 @@ import type {
 	NewCategory,
 } from '@/types/db/category.js';
 
-export const categoryMapper = {
+export const CategoryMapper = {
 	fromDb(db: Category): CategoryDto {
 		return {
 			id: db.id,

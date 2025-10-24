@@ -1,105 +1,66 @@
 import {db} from '@/lib/db.js';
-import type {BaseQueryOptions} from '@/repositories/financial-account-repo.js';
+import type {Category} from '@/types/db/category.js';
+import type {TransactionCategory} from '@/types/db/transaction-category.js';
 import type {
-	Category,
-	CategoryUpdate,
-	NewCategory,
-} from '@/types/db/category.js';
+	CreateCategoryParameters,
+	DeleteCategoryParameters,
+	FindOneCategoryParameters,
+	FindTransactionLinksCategoryParameters,
+	GetAllCategoryParameters,
+	UpdateCategoryParameters,
+} from '@/types/repo/category.js';
 
-type CreateCategoryParameters = {
-	data: NewCategory;
-} & BaseQueryOptions;
-
-export async function create({
-	data,
-}: CreateCategoryParameters): Promise<Category> {
-	return db
-		.insertInto('category')
-		.values(data)
-		.returningAll()
-		.executeTakeFirstOrThrow();
-}
-
-type FindOneCategoryParameters = {
-	id: string;
-	userId: string;
-} & BaseQueryOptions;
-
-export async function findOne({
-	id,
-	userId,
-}: FindOneCategoryParameters): Promise<Category | undefined> {
-	return db
-		.selectFrom('category')
-		.where('id', '=', id)
-		.where('user_id', '=', userId)
-		.selectAll()
-		.executeTakeFirst();
-}
-
-type FindManyCategoryParameters = {
-	id: string[];
-	userId: string;
-} & BaseQueryOptions;
-
-export async function findMany({
-	id,
-	userId,
-}: FindManyCategoryParameters): Promise<Category[]> {
-	return db
-		.selectFrom('category')
-		.where('user_id', '=', userId)
-		.where('is_deleted', '=', false)
-		.where('id', 'in', id)
-		.selectAll()
-		.execute();
-}
-
-type GetAllCategoryParameters = {
-	userId: string;
-} & BaseQueryOptions;
-
-export async function getAll({
-	userId,
-}: GetAllCategoryParameters): Promise<Category[]> {
-	return db
-		.selectFrom('category')
-		.where('user_id', '=', userId)
-		.where('is_deleted', '=', false)
-		.selectAll()
-		.execute();
-}
-
-type UpdateCategoryParameters = {
-	id: string;
-	userId: string;
-	data: CategoryUpdate;
-} & BaseQueryOptions;
-
-export async function update({
-	id,
-	userId,
-	data,
-}: UpdateCategoryParameters): Promise<Category> {
-	return db
-		.updateTable('category')
-		.where('id', '=', id)
-		.where('user_id', '=', userId)
-		.set(data)
-		.returningAll()
-		.executeTakeFirstOrThrow();
-}
-
-type FindTransactionLinksCategoryParameters = {
-	id: string;
-} & BaseQueryOptions;
-
-export async function findTransactionLinksForCategory({
-	id,
-}: FindTransactionLinksCategoryParameters) {
-	return db
-		.selectFrom('transaction_category')
-		.where('category_id', '=', id)
-		.selectAll()
-		.execute();
-}
+export const CategoryRepo = {
+	async create(parameters: CreateCategoryParameters): Promise<Category> {
+		return (parameters.trx ?? db)
+			.insertInto('category')
+			.values(parameters.data)
+			.returningAll()
+			.executeTakeFirstOrThrow();
+	},
+	async findOne(
+		parameters: FindOneCategoryParameters,
+	): Promise<Category | undefined> {
+		return (parameters.trx ?? db)
+			.selectFrom('category')
+			.where('id', '=', parameters.id)
+			.where('user_id', '=', parameters.userId)
+			.selectAll()
+			.executeTakeFirst();
+	},
+	async getAll(parameters: GetAllCategoryParameters): Promise<Category[]> {
+		return (parameters.trx ?? db)
+			.selectFrom('category')
+			.where('user_id', '=', parameters.userId)
+			.where('is_deleted', '=', false)
+			.selectAll()
+			.execute();
+	},
+	async update(parameters: UpdateCategoryParameters): Promise<Category> {
+		return (parameters.trx ?? db)
+			.updateTable('category')
+			.where('id', '=', parameters.id)
+			.where('user_id', '=', parameters.userId)
+			.set(parameters.data)
+			.returningAll()
+			.executeTakeFirstOrThrow();
+	},
+	async delete(parameters: DeleteCategoryParameters): Promise<Category> {
+		return (parameters.trx ?? db)
+			.updateTable('category')
+			.where('id', '=', parameters.id)
+			.where('user_id', '=', parameters.userId)
+			.set({is_deleted: true})
+			.returningAll()
+			.executeTakeFirstOrThrow();
+	},
+	async findTransactionLinks(
+		parameters: FindTransactionLinksCategoryParameters,
+	): Promise<TransactionCategory[]> {
+		return (parameters.trx ?? db)
+			.selectFrom('transaction_category')
+			.where('category_id', '=', parameters.id)
+			.selectAll()
+			.execute();
+	},
+};

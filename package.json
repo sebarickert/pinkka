@@ -20,11 +20,6 @@
     "lint:fix": "npx xo --fix"
   },
   "type": "commonjs",
-  "dependencies": {
-    "better-auth": "^1.3.24",
-    "dotenv": "^17.2.3",
-    "zod": "^4.1.12"
-  },
   "devDependencies": {
     "eslint-plugin-zod-x": "^1.7.0",
     "typescript": "^5.9.3",

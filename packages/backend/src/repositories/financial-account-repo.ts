@@ -1,161 +1,97 @@
-import type {Transaction} from 'kysely';
 import {db} from '@/lib/db.js';
-import type {Database} from '@/types/db/database.js';
+import type {FinancialAccount} from '@/types/db/financial-account.js';
 import type {
-	FinancialAccount,
-	FinancialAccountUpdate,
-	NewFinancialAccount,
-} from '@/types/db/financial-account.js';
+	CreateFinancialAccountRepoParameters,
+	FindOneFinancialAccountRepoParameters,
+	UpdateFinancialAccountRepoParameters,
+	GetAllFinancialAccountRepoParameters,
+	DeleteFinancialAccountRepoParameters,
+	FindTransactionsFinancialAccountRepoParameters,
+	IncrementBalanceRepoParameters,
+	DecrementBalanceRepoParameters,
+} from '@/types/repo/financial-account.js';
 
-// TODO: Move to a shared location
-export type BaseQueryOptions = {
-	sortBy?: string; // Default sorting field
-	order?: 'asc' | 'desc'; // Default order
-	limit?: number; // Pagination
-	offset?: number; // Pagination
-	includeDeleted?: boolean; // Whether to include soft-deleted records
-	trx?: Transaction<Database>; // Transaction object
+export const FinancialAccountRepo = {
+	async create(
+		parameters: CreateFinancialAccountRepoParameters,
+	): Promise<FinancialAccount> {
+		return (parameters.trx ?? db)
+			.insertInto('financial_account')
+			.values(parameters.data)
+			.returningAll()
+			.executeTakeFirstOrThrow();
+	},
+	async findOne(
+		parameters: FindOneFinancialAccountRepoParameters,
+	): Promise<FinancialAccount | undefined> {
+		return (parameters.trx ?? db)
+			.selectFrom('financial_account')
+			.where('id', '=', parameters.id)
+			.where('user_id', '=', parameters.userId)
+			.selectAll()
+			.executeTakeFirst();
+	},
+	async getAll(
+		parameters: GetAllFinancialAccountRepoParameters,
+	): Promise<FinancialAccount[]> {
+		return (parameters.trx ?? db)
+			.selectFrom('financial_account')
+			.where('user_id', '=', parameters.userId)
+			.where('is_deleted', '=', false)
+			.selectAll()
+			.execute();
+	},
+	async update(
+		parameters: UpdateFinancialAccountRepoParameters,
+	): Promise<FinancialAccount> {
+		return (parameters.trx ?? db)
+			.updateTable('financial_account')
+			.where('id', '=', parameters.id)
+			.where('user_id', '=', parameters.userId)
+			.set(parameters.data)
+			.returningAll()
+			.executeTakeFirstOrThrow();
+	},
+	async delete(
+		parameters: DeleteFinancialAccountRepoParameters,
+	): Promise<FinancialAccount> {
+		return (parameters.trx ?? db)
+			.updateTable('financial_account')
+			.where('id', '=', parameters.id)
+			.where('user_id', '=', parameters.userId)
+			.set({is_deleted: true})
+			.returningAll()
+			.executeTakeFirstOrThrow();
+	},
+	async findTransactionsForTransactionAccount(
+		parameters: FindTransactionsFinancialAccountRepoParameters,
+	) {
+		return (parameters.trx ?? db)
+			.selectFrom('transaction')
+			.where(({eb, or}) =>
+				or([
+					eb('from_account_id', '=', parameters.id),
+					eb('to_account_id', '=', parameters.id),
+				]),
+			)
+			.where('user_id', '=', parameters.userId)
+			.selectAll()
+			.execute();
+	},
+	async incrementBalance(parameters: IncrementBalanceRepoParameters) {
+		return (parameters.trx ?? db)
+			.updateTable('financial_account')
+			.set((eb) => ({balance: eb('balance', '+', parameters.amount)}))
+			.where('user_id', '=', parameters.userId)
+			.where('id', '=', parameters.id)
+			.execute();
+	},
+	async decrementBalance(parameters: DecrementBalanceRepoParameters) {
+		return (parameters.trx ?? db)
+			.updateTable('financial_account')
+			.set((eb) => ({balance: eb('balance', '-', parameters.amount)}))
+			.where('user_id', '=', parameters.userId)
+			.where('id', '=', parameters.id)
+			.execute();
+	},
 };
-
-type CreateFinancialAccountParameters = {
-	data: NewFinancialAccount;
-} & BaseQueryOptions;
-
-export async function create({
-	data,
-}: CreateFinancialAccountParameters): Promise<FinancialAccount> {
-	return db
-		.insertInto('financial_account')
-		.values(data)
-		.returningAll()
-		.executeTakeFirstOrThrow();
-}
-
-type CreateManyFinancialAccountParameters = {
-	data: NewFinancialAccount[];
-} & BaseQueryOptions;
-
-export async function createMany({
-	data,
-}: CreateManyFinancialAccountParameters): Promise<FinancialAccount[]> {
-	return db
-		.insertInto('financial_account')
-		.values(data)
-		.returningAll()
-		.execute();
-}
-
-type FindOneFinancialAccountParameters = {
-	id: string;
-	userId: string;
-} & BaseQueryOptions;
-
-export async function findOne({
-	id,
-	userId,
-}: FindOneFinancialAccountParameters): Promise<FinancialAccount | undefined> {
-	return db
-		.selectFrom('financial_account')
-		.where('id', '=', id)
-		.where('user_id', '=', userId)
-		.selectAll()
-		.executeTakeFirst();
-}
-
-type FindManyFinancialAccountParameters = {
-	userId: string;
-} & BaseQueryOptions;
-
-export async function findMany({
-	userId,
-}: FindManyFinancialAccountParameters): Promise<FinancialAccount[]> {
-	return db
-		.selectFrom('financial_account')
-		.where('user_id', '=', userId)
-		.where('is_deleted', '=', false)
-		.selectAll()
-		.execute();
-}
-
-type UpdateFinancialAccountParameters = {
-	id: string;
-	userId: string;
-	data: FinancialAccountUpdate;
-} & BaseQueryOptions;
-
-export async function update({
-	id,
-	userId,
-	data,
-}: UpdateFinancialAccountParameters): Promise<FinancialAccount> {
-	return db
-		.updateTable('financial_account')
-		.where('id', '=', id)
-		.where('user_id', '=', userId)
-		.set(data)
-		.returningAll()
-		.executeTakeFirstOrThrow();
-}
-
-type FindTransactionsFinancialAccountParameters = {
-	id: string;
-	userId: string;
-} & BaseQueryOptions;
-
-export async function findTransactionsForTransactionAccount({
-	id,
-	userId,
-}: FindTransactionsFinancialAccountParameters) {
-	return db
-		.selectFrom('transaction')
-		.where(({eb, or}) =>
-			or([eb('from_account_id', '=', id), eb('to_account_id', '=', id)]),
-		)
-		.where('user_id', '=', userId)
-		.selectAll()
-		.execute();
-}
-
-export async function getAccountBalance(id: string): Promise<number> {
-	const result = await db
-		.selectFrom('financial_account')
-		.where('id', '=', id)
-		.select('balance')
-		.executeTakeFirst();
-
-	return Number(result?.balance) || 0;
-}
-
-type IncrementBalanceParameters = {
-	id: string;
-	amount: number;
-} & BaseQueryOptions;
-
-export async function incrementBalance({
-	id,
-	amount,
-	trx,
-}: IncrementBalanceParameters) {
-	return (trx ?? db)
-		.updateTable('financial_account')
-		.set((eb) => ({balance: eb('balance', '+', amount)}))
-		.where('id', '=', id)
-		.execute();
-}
-
-type DecrementBalanceParameters = {
-	id: string;
-	amount: number;
-} & BaseQueryOptions;
-
-export async function decrementBalance({
-	id,
-	amount,
-	trx,
-}: DecrementBalanceParameters) {
-	return (trx ?? db)
-		.updateTable('financial_account')
-		.set((eb) => ({balance: eb('balance', '-', amount)}))
-		.where('id', '=', id)
-		.execute();
-}

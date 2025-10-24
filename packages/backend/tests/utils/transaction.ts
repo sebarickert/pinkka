@@ -1,29 +1,61 @@
-import {type NewTransactionDto} from '@pinkka/schemas/transaction-dto.js';
+import {
+	type NewTransactionDto,
+	type TransactionDto,
+	type UpdateTransactionDto,
+} from '@pinkka/schemas/transaction-dto.js';
 import type {UserWithSessionToken} from '@test-utils/create-test-user.js';
 import {fetcher} from '@test-utils/fetcher.js';
 import {expect} from 'vitest';
-import type {Transaction} from '@/types/db/transaction.js';
+import type {JsonResponse} from '@pinkka/schemas/json-response.js';
 import {db} from '@/lib/db.js';
 
-export async function createTransaction(
-	newTransactionPayload: NewTransactionDto,
+export async function getTransaction(
+	id: string,
 	user: UserWithSessionToken,
-): Promise<Transaction> {
-	const res = await fetcher(
+): Promise<{
+	status: number;
+	body: JsonResponse<TransactionDto>;
+	data: TransactionDto;
+}> {
+	const response = await fetcher(
+		`/api/transactions/${id}`,
+		{},
+		user.sessionToken,
+	);
+
+	const body = (await response.json()) as JsonResponse<TransactionDto>;
+
+	return {status: response.status, body, data: body.data as TransactionDto};
+}
+
+export async function getTransactions(user: UserWithSessionToken): Promise<{
+	status: number;
+	body: JsonResponse<TransactionDto[]>;
+	data: TransactionDto[];
+}> {
+	const response = await fetcher(`/api/transactions`, {}, user.sessionToken);
+
+	const body = (await response.json()) as JsonResponse<TransactionDto[]>;
+
+	return {status: response.status, body, data: body.data as TransactionDto[]};
+}
+
+export async function createTransaction(
+	newTransactionPayload: NewTransactionDto | undefined,
+	user: UserWithSessionToken,
+): Promise<{status: number; body: JsonResponse; data: TransactionDto}> {
+	const response = await fetcher(
 		'/api/transactions',
 		{
 			method: 'POST',
 			body: JSON.stringify(newTransactionPayload),
 		},
-		user.session_token,
+		user.sessionToken,
 	);
 
-	const body = await res.json();
+	const body = (await response.json()) as JsonResponse<TransactionDto>;
 
-	expect(res.status).toEqual(201);
-	expect(body.status).toEqual('success');
-
-	return body.data;
+	return {status: response.status, body, data: body.data as TransactionDto};
 }
 
 export async function getTransactionCategoryLinks(transactionId: string) {
@@ -34,25 +66,48 @@ export async function getTransactionCategoryLinks(transactionId: string) {
 		.execute();
 }
 
-export async function updateTransaction(id: string, body: any, token: string) {
-	const res = await fetcher(
+export async function updateTransaction(
+	id: string,
+	updateTransactionPayload: Partial<UpdateTransactionDto> | undefined,
+	user: UserWithSessionToken,
+): Promise<{
+	status: number;
+	body: JsonResponse<TransactionDto>;
+	data: TransactionDto;
+}> {
+	const response = await fetcher(
 		`/api/transactions/${id}`,
 		{
 			method: 'PUT',
-			body: body ? JSON.stringify(body) : undefined,
+			body: JSON.stringify(updateTransactionPayload),
 		},
-		token,
+		user.sessionToken,
 	);
-	const json = await res.json();
-	return {status: res.status, body: json};
+
+	const body = (await response.json()) as JsonResponse<TransactionDto>;
+
+	return {status: response.status, body, data: body.data as TransactionDto};
 }
 
-export async function getTransaction(id: string) {
-	return db
-		.selectFrom('transaction')
-		.where('id', '=', id)
-		.selectAll()
-		.executeTakeFirst();
+export async function deleteTransaction(
+	id: string,
+	user: UserWithSessionToken,
+): Promise<{
+	status: number;
+	body: JsonResponse;
+	data: TransactionDto;
+}> {
+	const response = await fetcher(
+		`/api/transactions/${id}`,
+		{
+			method: 'DELETE',
+		},
+		user.sessionToken,
+	);
+
+	const body = (await response.json()) as JsonResponse<TransactionDto>;
+
+	return {status: response.status, body, data: body.data as TransactionDto};
 }
 
 export async function expectCategoryLink(

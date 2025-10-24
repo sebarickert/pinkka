@@ -4,8 +4,8 @@ import {
 } from '@pinkka/schemas/category-dto.js';
 import {error, fail, success} from '@/lib/response.js';
 import {requireAuth} from '@/middlewares/require-auth.js';
-import * as CategoryRepo from '@/repositories/category-repo.js';
-import {categoryMapper} from '@/mappers/category-mapper.js';
+import {CategoryRepo} from '@/repositories/category-repo.js';
+import {CategoryMapper} from '@/mappers/category-mapper.js';
 import {validateBody, validateIdParameter} from '@/lib/validator.js';
 import {createRouter} from '@/lib/create-router.js';
 
@@ -20,10 +20,10 @@ categories.get('/categories', async (c) => {
 
 		return success(
 			c,
-			categories.map((category) => categoryMapper.fromDb(category)),
+			categories.map((category) => CategoryMapper.fromDb(category)),
 		);
-	} catch {
-		return error(c, 'Failed to fetch categories', {data: error});
+	} catch (error_) {
+		return error(c, 'Failed to fetch categories', {data: error_});
 	}
 });
 
@@ -39,7 +39,7 @@ categories.get('/categories/:id', validateIdParameter, async (c) => {
 		});
 	}
 
-	return success(c, categoryMapper.fromDb(category));
+	return success(c, CategoryMapper.fromDb(category));
 });
 
 categories.post(
@@ -51,10 +51,10 @@ categories.post(
 
 		try {
 			const newCategory = await CategoryRepo.create({
-				data: categoryMapper.newDtoToDb(body, userId),
+				data: CategoryMapper.newDtoToDb(body, userId),
 			});
 
-			return success(c, categoryMapper.fromDb(newCategory), 201);
+			return success(c, CategoryMapper.fromDb(newCategory), 201);
 		} catch (error_) {
 			return error(c, 'Failed to create category', {data: error_});
 		}
@@ -79,7 +79,7 @@ categories.put(
 		}
 
 		// Check if category has transactions
-		const transactions = await CategoryRepo.findTransactionLinksForCategory({
+		const transactions = await CategoryRepo.findTransactionLinks({
 			id,
 		});
 		const hasTransactions = transactions.length > 0;
@@ -95,10 +95,10 @@ categories.put(
 			const updatedCategory = await CategoryRepo.update({
 				id,
 				userId,
-				data: categoryMapper.updateDtoToDb(body),
+				data: CategoryMapper.updateDtoToDb(body),
 			});
 
-			return success(c, categoryMapper.fromDb(updatedCategory));
+			return success(c, CategoryMapper.fromDb(updatedCategory));
 		} catch (error_) {
 			return error(c, `Failed to update category with id ${id}`, {
 				data: error_,
@@ -120,13 +120,12 @@ categories.delete('/categories/:id', validateIdParameter, async (c) => {
 	}
 
 	try {
-		const updatedCategory = await CategoryRepo.update({
+		const deletedCategory = await CategoryRepo.delete({
 			id,
 			userId,
-			data: categoryMapper.updateDtoToDb({isDeleted: true}),
 		});
 
-		return success(c, categoryMapper.fromDb(updatedCategory));
+		return success(c, CategoryMapper.fromDb(deletedCategory));
 	} catch (error_) {
 		return error(c, `Failed to delete category with id ${id}`, {
 			data: error_,

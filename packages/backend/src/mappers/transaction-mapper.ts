@@ -1,6 +1,7 @@
 import type {
 	NewTransactionDto,
 	TransactionDto,
+	UpdateTransactionDto,
 } from '@pinkka/schemas/transaction-dto.js';
 import type {
 	NewTransaction,
@@ -8,7 +9,7 @@ import type {
 	TransactionUpdate,
 } from '@/types/db/transaction.js';
 
-export const transactionMapper = {
+export const TransactionMapper = {
 	fromDb(db: Transaction): TransactionDto {
 		return {
 			id: db.id,
@@ -34,9 +35,10 @@ export const transactionMapper = {
 			user_id,
 		};
 	},
-	updateDtoToDb(dto: Partial<NewTransactionDto>): Partial<TransactionUpdate> {
+	updateDtoToDb(
+		dto: Partial<UpdateTransactionDto>,
+	): Partial<TransactionUpdate> {
 		return {
-			...(dto.type !== undefined && {type: dto.type}),
 			...(dto.amount !== undefined && {amount: dto.amount}),
 			...(dto.description !== undefined && {description: dto.description}),
 			...(dto.date !== undefined && {date: new Date(dto.date)}),
