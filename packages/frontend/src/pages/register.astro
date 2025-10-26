@@ -1,9 +1,14 @@
 ---
+import { Heading } from "@/components/elements/heading";
+import { RegisterForm } from "@/components/features/register-form";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 ---
 
 <BaseLayout title="Register">
-  <h1>Register</h1>
+  <div class="w-full max-w-md mx-auto grid gap-8">
+    <Heading level="h1">Create account</Heading>
+    <RegisterForm />
+  </div>
 </BaseLayout>
 
 <!-- <html lang="en">

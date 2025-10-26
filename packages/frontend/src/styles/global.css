@@ -2,3 +2,82 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* --font-*: initial;
+  --font-display: "InterVariable", "sans-serif"; */
+
+  --color-*: initial;
+  --color-white: hsl(0 0% 100%);
+  --color-black: hsl(0 0% 0%);
+  --color-blue: hsl(219 99% 53%);
+
+  --color-foreground-light: hsl(0 0% 9%);
+  --color-muted-foreground-light: hsl(0 0% 36%);
+  --color-background-light: hsl(0 0% 100%);
+  --color-layer-light: hsl(0 0% 96%);
+  --color-accent-light: hsl(0 0% 91%);
+
+  --color-foreground-dark: hsl(0 0% 96%);
+  --color-muted-foreground-dark: hsl(0 0% 65%);
+  --color-background-dark: hsl(0 0% 3%);
+  --color-layer-dark: hsl(0 0% 11%);
+  --color-accent-dark: hsl(0 0% 16%);
+
+  --color-foreground: var(--color-foreground-dark);
+  --color-muted-foreground: var(--color-muted-foreground-dark);
+  --color-background: var(--color-background-dark);
+  --color-layer: var(--color-layer-dark);
+  --color-accent: var(--color-accent-dark);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply text-foreground;
+}
+
+*,
+*::before,
+*::after {
+  @apply border-accent;
+}
+
+body {
+  @apply text-foreground bg-background;
+}
+
+@utility focus-highlight {
+  @apply outline-hidden ring-2 ring-blue dark:ring-white;
+}
+
+@utility theme-field {
+  @apply appearance-none focus-visible:focus-highlight text-foreground bg-layer disabled:pointer-events-none disabled:opacity-50 [&::placeholder]:text-muted-foreground;
+}
+
+@utility button-primary {
+  --button-primary: hsl(219 99% 53%);
+  --button-primary-hover: hsl(219 99% 40%);
+  --button-primary-active: hsl(219 99% 22%);
+
+  @apply text-white! bg-(--button-primary) hover:bg-(--button-primary-hover) active:bg-(--button-primary-active) ring-offset-2 dark:ring-offset-0;
+}
+
+@utility button-secondary {
+  @apply text-foreground! border bg-transparent hover:bg-accent active:bg-accent;
+}
+
+@utility button-danger {
+  --button-danger: hsl(357 76% 49%);
+  --button-danger-hover: hsl(357 76% 37%);
+  --button-danger-active: hsl(357 76% 26%);
+
+  @apply text-white! bg-(--button-danger) hover:bg-(--button-danger-hover) active:bg-(--button-danger-active) ring-offset-2 dark:ring-offset-0;
+}
+
+@utility button-ghost {
+  @apply text-foreground! bg-transparent hover:bg-accent active:bg-accent;
+}
