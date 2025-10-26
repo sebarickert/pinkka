@@ -1,33 +1,25 @@
 ---
+import { Button } from "@/components/elements/button";
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import { actions } from "astro:actions";
 ---
 
-<BaseLayout title="Welcome"> <h1>Welcome to Pinkka!</h1></BaseLayout>
-<!-- <button id="sign-up-button">Sign out</button> -->
+<BaseLayout title="Welcome">
+  <h1>Welcome to Pinkka!</h1>
+  <button id="sign-up-button">Sign out</button>
+</BaseLayout>
 
-<!-- <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Astro</title>
-  </head>
-  <body>
-    <h1 class="text-4xl font-bold">This is PINKKA landing page</h1>
-    <!-- <button id="sign-up-button">Sign out</button> -->
+<script>
+  import { actions } from "astro:actions";
+  import { authClient } from "../lib/auth-client.js";
 
-<!-- <script>
-    import { authClient } from "../lib/auth-client.js";
-
-    const signUpButton = document.getElementById("sign-up-button");
-    signUpButton?.addEventListener("click", async () => {
-      try {
-        await authClient.signOut();
-      } catch (error) {
-        console.log("111", error);
-        alert(error.message || "Sign out error");
-      }
-    });
-  </script> -->
--->
+  const signUpButton = document.getElementById("sign-up-button");
+  signUpButton?.addEventListener("click", async () => {
+    try {
+      await authClient.signOut();
+    } catch (error) {
+      console.log("111", error);
+      alert(error.message || "Sign out error");
+    }
+  });
+</script>

@@ -1,0 +1,13 @@
+---
+import { Heading } from "@/components/elements/heading";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { authClient } from "@/lib/auth-client";
+
+const { data: session, error } = await authClient.getSession();
+
+console.log(session);
+---
+
+<BaseLayout title="Welcome">
+  <Heading>Hello loggedi in user!</Heading>
+</BaseLayout>
