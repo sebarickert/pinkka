@@ -1,4 +1,4 @@
-import type {UserWithSessionToken} from '@test-utils/create-test-user.js';
+import type {UserWithSessionToken} from '@/test-utils/create-test-user.js';
 import {BACKEND_URL, FRONTEND_URL} from '@/lib/env.js';
 
 export async function fetcher(

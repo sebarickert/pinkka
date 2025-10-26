@@ -8,6 +8,7 @@ import {error, fail, success} from '@/lib/response.js';
 import {validateBody, validateIdParameter} from '@/lib/validator.js';
 import {FinancialAccountMapper} from '@/mappers/financial-account-mapper.js';
 import {createRouter} from '@/lib/create-router.js';
+import {FinancialAccountService} from '@/services/financial-account-service.js';
 
 const accounts = createRouter();
 accounts.use('/accounts/*', requireAuth);
@@ -49,22 +50,13 @@ accounts.post(
 		const body = c.req.valid('json');
 		const userId = c.get('user').id;
 
-		const newFinancialAccount = {
-			...body,
-			userId,
-			balance: body.initialBalance,
-		};
-
 		try {
-			const newFinancialAccounts = await FinancialAccountRepo.create({
-				data: FinancialAccountMapper.newDtoToDb(newFinancialAccount, userId),
+			const newFinancialAccount = await FinancialAccountService.create({
+				data: body,
+				userId,
 			});
 
-			return success(
-				c,
-				FinancialAccountMapper.fromDb(newFinancialAccounts),
-				201,
-			);
+			return success(c, newFinancialAccount, 201);
 		} catch (error_) {
 			return error(c, 'Failed to create financial account', {data: error_});
 		}
@@ -142,12 +134,12 @@ accounts.delete('/accounts/:id', validateIdParameter, async (c) => {
 	}
 
 	try {
-		const deletedAccount = await FinancialAccountRepo.delete({
+		const deletedAccount = await FinancialAccountService.delete({
 			id,
 			userId,
 		});
 
-		return success(c, FinancialAccountMapper.fromDb(deletedAccount));
+		return success(c, deletedAccount);
 	} catch (error_) {
 		return error(c, `Failed to delete financial account with id ${id}`, {
 			data: error_,

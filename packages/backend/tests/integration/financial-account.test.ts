@@ -1,23 +1,23 @@
 import {beforeEach, describe, expect, test} from 'vitest';
 import {cleanDb} from 'tests/utils/clean-db.js';
-import {
-	type UserWithSessionToken,
-	createTestUser,
-} from '@test-utils/create-test-user.js';
-import {fetcher} from '@test-utils/fetcher.js';
-import {createTransaction} from '@test-utils/transaction.js';
 import type {
 	FinancialAccountDto,
 	UpdateFinancialAccountDto,
 } from '@pinkka/schemas/financial-account-dto.js';
+import type {JsonResponse} from '@pinkka/schemas/json-response.js';
+import {
+	type UserWithSessionToken,
+	createTestUser,
+} from '@/test-utils/create-test-user.js';
+import {fetcher} from '@/test-utils/fetcher.js';
+import {createTransaction} from '@/test-utils/transaction.js';
 import {
 	createFinancialAccount,
 	deleteFinancialAccount,
 	getFinancialAccount,
 	getFinancialAccounts,
 	updateFinancialAccount,
-} from '@test-utils/financial-account.js';
-import type {JsonResponse} from '@pinkka/schemas/json-response.js';
+} from '@/test-utils/financial-account.js';
 import {db} from '@/lib/db.js';
 import {FinancialAccountMapper} from '@/mappers/financial-account-mapper.js';
 

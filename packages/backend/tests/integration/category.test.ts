@@ -1,25 +1,25 @@
-import {cleanDb} from '@test-utils/clean-db.js';
+import {beforeEach, describe, expect, test} from 'vitest';
+import type {
+	CategoryDto,
+	UpdateCategoryDto,
+} from '@pinkka/schemas/category-dto.js';
+import type {FinancialAccountDto} from '@pinkka/schemas/financial-account-dto.js';
+import type {JsonResponse} from '@pinkka/schemas/json-response.js';
+import {cleanDb} from '@/test-utils/clean-db.js';
 import {
 	type UserWithSessionToken,
 	createTestUser,
-} from '@test-utils/create-test-user.js';
-import {fetcher} from '@test-utils/fetcher.js';
-import {createTransaction} from '@test-utils/transaction.js';
-import {beforeEach, describe, expect, test} from 'vitest';
+} from '@/test-utils/create-test-user.js';
+import {fetcher} from '@/test-utils/fetcher.js';
+import {createTransaction} from '@/test-utils/transaction.js';
 import {
 	createCategory,
 	deleteCategory,
 	getCategories,
 	getCategory,
 	updateCategory,
-} from '@test-utils/category.js';
-import type {
-	CategoryDto,
-	UpdateCategoryDto,
-} from '@pinkka/schemas/category-dto.js';
-import type {FinancialAccountDto} from '@pinkka/schemas/financial-account-dto.js';
-import {createFinancialAccount} from '@test-utils/financial-account.js';
-import type {JsonResponse} from '@pinkka/schemas/json-response.js';
+} from '@/test-utils/category.js';
+import {createFinancialAccount} from '@/test-utils/financial-account.js';
 import {db} from '@/lib/db.js';
 
 describe('Category Integration Tests', () => {

@@ -5,9 +5,16 @@ import authRoute from '@/routes/auth.js';
 import categories from '@/routes/categories.js';
 import transactions from '@/routes/transactions.js';
 import {FRONTEND_URL} from '@/lib/env.js';
+import migrations from '@/routes/migrations.js';
 
 const app = createRouter();
-const routes = [authRoute, accounts, categories, transactions] as const;
+const routes = [
+	authRoute,
+	accounts,
+	categories,
+	transactions,
+	migrations,
+] as const;
 
 if (FRONTEND_URL) {
 	app.use(

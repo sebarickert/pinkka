@@ -2,9 +2,9 @@ import type {
 	FinancialAccountDto,
 	NewFinancialAccountDto,
 } from '@pinkka/schemas/financial-account-dto.js';
-import type {UserWithSessionToken} from '@test-utils/create-test-user.js';
 import type {JsonResponse} from '@pinkka/schemas/json-response.js';
-import {fetcher} from '@test-utils/fetcher.js';
+import type {UserWithSessionToken} from '@/test-utils/create-test-user.js';
+import {fetcher} from '@/test-utils/fetcher.js';
 import {db} from '@/lib/db.js';
 
 export async function getFinancialAccounts(

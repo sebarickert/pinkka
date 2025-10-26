@@ -3,9 +3,9 @@ import {
 	type CategoryDto,
 	type UpdateCategoryDto,
 } from '@pinkka/schemas/category-dto.js';
-import type {UserWithSessionToken} from '@test-utils/create-test-user.js';
-import {fetcher} from '@test-utils/fetcher.js';
 import type {JsonResponse} from '@pinkka/schemas/json-response.js';
+import type {UserWithSessionToken} from '@/test-utils/create-test-user.js';
+import {fetcher} from '@/test-utils/fetcher.js';
 
 export async function getCategories(
 	user: UserWithSessionToken,

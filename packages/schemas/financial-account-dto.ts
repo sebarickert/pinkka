@@ -8,6 +8,8 @@ export const financialAccountTypesSchema = z.enum([
 	'loan',
 ]);
 
+export type FinancialAccountType = z.infer<typeof financialAccountTypesSchema>;
+
 export const FinancialAccountDtoSchema = z.strictObject({
 	id: z.uuid(),
 	userId: z.uuid(),

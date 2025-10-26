@@ -3,10 +3,10 @@ import {
 	type TransactionDto,
 	type UpdateTransactionDto,
 } from '@pinkka/schemas/transaction-dto.js';
-import type {UserWithSessionToken} from '@test-utils/create-test-user.js';
-import {fetcher} from '@test-utils/fetcher.js';
 import {expect} from 'vitest';
 import type {JsonResponse} from '@pinkka/schemas/json-response.js';
+import type {UserWithSessionToken} from '@/test-utils/create-test-user.js';
+import {fetcher} from '@/test-utils/fetcher.js';
 import {db} from '@/lib/db.js';
 
 export async function getTransaction(

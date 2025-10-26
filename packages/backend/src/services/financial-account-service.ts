@@ -1,7 +1,35 @@
+import type {FinancialAccountDto} from '@pinkka/schemas/financial-account-dto.js';
+import {FinancialAccountMapper} from '@/mappers/financial-account-mapper.js';
 import {FinancialAccountRepo} from '@/repositories/financial-account-repo.js';
-import type {UpdateAccountBalancesForTransactionServiceParameters} from '@/types/service/financial-account.js';
+import type {
+	CreateFinancialAccountServiceParameters,
+	DeleteFinancialAccountServiceParameters,
+	UpdateAccountBalancesForTransactionServiceParameters,
+} from '@/types/service/financial-account.js';
 
 export const FinancialAccountService = {
+	async create(
+		parameters: CreateFinancialAccountServiceParameters,
+	): Promise<FinancialAccountDto> {
+		const financialAccount = await FinancialAccountRepo.create({
+			data: FinancialAccountMapper.newDtoToDb(
+				parameters.data,
+				parameters.userId,
+			),
+		});
+
+		return FinancialAccountMapper.fromDb(financialAccount);
+	},
+	async delete(
+		parameters: DeleteFinancialAccountServiceParameters,
+	): Promise<FinancialAccountDto> {
+		const financialAccount = await FinancialAccountRepo.delete({
+			id: parameters.id,
+			userId: parameters.userId,
+		});
+
+		return FinancialAccountMapper.fromDb(financialAccount);
+	},
 	async updateAccountBalancesForTransaction(
 		parameters: UpdateAccountBalancesForTransactionServiceParameters,
 	) {
