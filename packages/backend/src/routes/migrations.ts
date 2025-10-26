@@ -14,6 +14,7 @@ import {createRouter} from '@/lib/create-router.js';
 import {FinancialAccountService} from '@/services/financial-account-service.js';
 import {TransactionService} from '@/services/transaction-service.js';
 import {db} from '@/lib/db.js';
+import {requireAdminRole} from '@/middlewares/require-admin.js';
 
 function mapAccountType(type: AccountTypeEnum): FinancialAccountType {
 	switch (type) {
@@ -40,7 +41,7 @@ function mapAccountType(type: AccountTypeEnum): FinancialAccountType {
 }
 
 const migrations = createRouter();
-migrations.use('/migrations/*', requireAuth);
+migrations.use('/migrations/*', requireAuth, requireAdminRole);
 
 migrations.post('/migrations/financer', async (c) => {
 	const userId = c.get('user').id;

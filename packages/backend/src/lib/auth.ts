@@ -1,5 +1,6 @@
 import {betterAuth} from 'better-auth';
 import {v4 as uuidv4} from 'uuid';
+import {admin} from 'better-auth/plugins/admin';
 import {db} from '@/lib/db.js';
 import {FRONTEND_URL} from '@/lib/env.js';
 
@@ -16,6 +17,7 @@ export type AuthType = {
 // https://github.com/better-auth/better-auth/issues/4789
 export const auth = betterAuth({
 	database: {db, case: 'snake', type: 'postgres'},
+	plugins: [admin()],
 	advanced: {
 		database: {
 			generateId: () => uuidv4(),
@@ -31,6 +33,8 @@ export const auth = betterAuth({
 			emailVerified: 'email_verified',
 			createdAt: 'created_at',
 			updatedAt: 'updated_at',
+			banReason: 'ban_reason',
+			banExpires: 'ban_expires',
 		},
 	},
 	session: {
@@ -41,6 +45,7 @@ export const auth = betterAuth({
 			updatedAt: 'updated_at',
 			ipAddress: 'ip_address',
 			userAgent: 'user_agent',
+			impersonatedBy: 'impersonated_by',
 		},
 	},
 	account: {

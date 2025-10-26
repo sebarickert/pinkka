@@ -14,6 +14,10 @@ export type UserTable = {
 	image: string | null;
 	name: string;
 	updated_at: Generated<Date>;
+	role?: string;
+	banned?: boolean;
+	ban_reason?: string | null;
+	ban_expires?: Date | null;
 };
 
 export type User = Selectable<UserTable>;

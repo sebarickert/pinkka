@@ -19,6 +19,10 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			notNull: true,
 			default: pgm.func('CURRENT_TIMESTAMP'),
 		},
+		role: {type: 'text', notNull: true, default: 'user'},
+		banned: {type: 'boolean', notNull: true, default: false},
+		ban_reason: {type: 'text'},
+		ban_expires: {type: 'timestamptz'},
 	});
 
 	pgm.createTable('session', {
@@ -43,6 +47,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			references: 'user',
 			onDelete: 'CASCADE',
 		},
+		impersonated_by: {type: 'uuid', references: 'user'},
 	});
 
 	pgm.createTable('account', {

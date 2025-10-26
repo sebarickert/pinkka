@@ -16,7 +16,25 @@ describe('Migration Tests', () => {
 		user = await createTestUser();
 	});
 
+	test('should have admin role to perform migration', async () => {
+		const response = await fetch(`${BACKEND_URL}/api/migrations/financer`, {
+			method: 'POST',
+			headers: {
+				Origin: FRONTEND_URL!,
+				Cookie: `better-auth.session_token=${user.sessionToken}`,
+			},
+		});
+
+		expect(response.status).toEqual(401);
+	});
+
 	test('should migrate data from Financer app', async () => {
+		await db
+			.updateTable('user')
+			.set({role: 'admin'})
+			.where('id', '=', user.id)
+			.execute();
+
 		const blob = new Blob([JSON.stringify(financerFixture)], {
 			type: 'application/json',
 		});

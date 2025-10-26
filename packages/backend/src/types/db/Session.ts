@@ -10,6 +10,7 @@ export type SessionTable = {
 	updated_at: Generated<Date>;
 	user_agent: string | null;
 	user_id: string;
+	impersonated_by?: string | null;
 };
 
 export type Session = Selectable<SessionTable>;
