@@ -1,13 +1,11 @@
 ---
-import { Button } from "@/components/elements/button";
-import BaseLayout from "@/layouts/BaseLayout.astro";
-import { actions } from "astro:actions";
+import RootLayout from "@/layouts/RootLayout.astro";
 ---
 
-<BaseLayout title="Welcome">
+<RootLayout title="Welcome">
   <h1>Welcome to Pinkka!</h1>
   <button id="sign-up-button">Sign out</button>
-</BaseLayout>
+</RootLayout>
 
 <script>
   import { actions } from "astro:actions";

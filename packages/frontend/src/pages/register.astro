@@ -1,20 +1,43 @@
 ---
-export const prerender = false;
-
 import { Heading } from "@/components/elements/heading";
-import BaseLayout from "@/layouts/BaseLayout.astro";
 import { Button } from "@/components/elements/button";
 import { Input } from "@/components/elements/input";
 import { Separator } from "@/components/elements/separator";
-import { actions } from "astro:actions";
 
-const result = Astro.getActionResult(actions.register);
-if (result && !result.error) {
-  return Astro.redirect(`/app/home`);
-}
+import RootLayout from "@/layouts/RootLayout.astro";
+
+// if (Astro.request.method === "POST") {
+//   try {
+//     const data = await Astro.request.formData();
+//     const name = data.get("name") as string;
+//     const email = data.get("email") as string;
+//     const password = data.get("password") as string;
+
+//     await authClient.signUp.email(
+//       { email, password, name },
+//       {
+//         onSuccess: () => {
+//           Astro.redirect("/app/home");
+//           // window.location.href = "/";
+//         },
+//         onError: (error) => {
+//           console.log(error);
+//         },
+//       }
+//     );
+//   } catch (error) {
+//     if (error instanceof Error) {
+//       console.error(error.message);
+//     }
+//   }
+// }
 ---
 
-<BaseLayout title="Register">
+<script>
+  import { authClient } from "@/lib/auth-client";
+</script>
+
+<RootLayout title="Register">
   <div class="w-full max-w-md mx-auto grid gap-8">
     <Heading level="h1">Create account</Heading>
     <div class="grid gap-8">
@@ -41,8 +64,9 @@ if (result && !result.error) {
         </Button>
       </div>
       <Separator>OR</Separator>
-      <form method="POST" action={actions.register}>
+      <form id="register/form">
         <div class="grid gap-6">
+          <Input type="text" id="name" name="name" required>Name</Input>
           <Input type="email" id="email" name="email" required>Email</Input>
           <Input type="password" id="password" name="password" required>
             Password
@@ -67,7 +91,7 @@ if (result && !result.error) {
       </p>
     </div>
   </div>
-</BaseLayout>
+</RootLayout>
 
 <!-- <html lang="en">
   <head>

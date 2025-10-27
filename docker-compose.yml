@@ -1,6 +1,6 @@
 services:
   database:
-    image: postgres:latest
+    image: postgres:18
     environment:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
@@ -8,7 +8,7 @@ services:
     ports:
       - "${DATABASE_PORT}:${DATABASE_PORT}"
     volumes:
-      - pinkka_db:/var/lib/postgresql/data
+      - pinkka_db:/var/lib/postgresql
       - ./scripts/init-test-db.sh:/docker-entrypoint-initdb.d/init-test-db.sh
 
 volumes:

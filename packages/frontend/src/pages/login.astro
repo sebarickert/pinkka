@@ -1,20 +1,34 @@
 ---
-export const prerender = false;
-
 import { Heading } from "@/components/elements/heading";
-import BaseLayout from "@/layouts/BaseLayout.astro";
-import { actions, isInputError } from "astro:actions";
 import { Button } from "@/components/elements/button";
 import { Input } from "@/components/elements/input";
 import { Separator } from "@/components/elements/separator";
-
-const result = Astro.getActionResult(actions.login);
-// const inputErrors = isInputError(result?.error) ? result.error.fields : {};
-
-// console.log(result, inputErrors, Object.values(inputErrors).flat());
+import RootLayout from "@/layouts/RootLayout.astro";
 ---
 
-<BaseLayout title="Login">
+<script>
+  import { authClient } from "@/lib/auth-client";
+
+  const form = document.getElementById("login/form") as HTMLFormElement;
+  form.onsubmit = async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(form);
+
+    const credentials = {
+      email: formData.get("email"),
+      password: formData.get("password"),
+    };
+
+    await authClient.signIn.email(credentials, {
+      onSuccess: () => {
+        window.location.href = "/app/home";
+      },
+    });
+  };
+</script>
+
+<RootLayout title="Login">
   <div class="w-full max-w-md mx-auto grid gap-8">
     <Heading level="h1">Login</Heading>
     <div class="grid gap-8">
@@ -41,15 +55,9 @@ const result = Astro.getActionResult(actions.login);
         </Button>
       </div>
       <Separator>OR</Separator>
-      <form method="POST" action={actions.login}>
+      <form method="POST" id="login/form">
         <div class="grid gap-6">
-          <Input
-            transition:persist
-            type="email"
-            id="email"
-            name="email"
-            required>Email</Input
-          >
+          <Input type="email" id="email" name="email" required>Email</Input>
           <Input type="password" id="password" name="password" required
             >Password</Input
           >
@@ -73,4 +81,4 @@ const result = Astro.getActionResult(actions.login);
       </form>
     </div>
   </div>
-</BaseLayout>
+</RootLayout>
