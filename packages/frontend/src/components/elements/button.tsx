@@ -22,7 +22,7 @@ export const Button: FC<Props> = ({
 			'text-sm/6 text-center transition-colors',
 			'focus-visible:focus-highlight whitespace-nowrap cursor-pointer',
 			'inline-flex items-center justify-center',
-			'[&:has(svg)]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:size-4',
+			'[&:has(svg)]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0',
 			'disabled:pointer-events-none disabled:opacity-50',
 		),
 		default: cn('py-1 px-4 h-11'),

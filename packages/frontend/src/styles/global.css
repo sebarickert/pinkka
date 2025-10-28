@@ -11,6 +11,7 @@
   --color-white: hsl(0 0% 100%);
   --color-black: hsl(0 0% 0%);
   --color-blue: hsl(219 99% 53%);
+  --color-green: hsl(146 70% 40%);
 
   --color-foreground-light: hsl(0 0% 9%);
   --color-muted-foreground-light: hsl(0 0% 36%);

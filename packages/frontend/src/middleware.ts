@@ -30,12 +30,16 @@ const auth = defineMiddleware(async (context, next) => {
 
 const routeGuard = defineMiddleware(async (context, next) => {
 	const {pathname} = context.url;
+	const {user, session} = context.locals;
+
+	// Redirect authenticated users away from login/register pages
+	if (user && ['/login', '/register'].includes(pathname)) {
+		return context.redirect('/app/home');
+	}
 
 	if (isSafeRoute(pathname)) {
 		return next();
 	}
-
-	const {user, session} = context.locals;
 
 	if (!user || !session) {
 		return context.redirect('/login');
