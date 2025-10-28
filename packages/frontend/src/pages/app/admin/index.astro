@@ -1,0 +1,30 @@
+---
+import RootAuthenticatedLayout from "@/layouts/RootAuthenticatedLayout.astro";
+import { authClient } from "@/lib/auth-client";
+
+const { data: users, error } = await authClient.admin.listUsers({
+  fetchOptions: { headers: Astro.request.headers },
+});
+---
+
+<RootAuthenticatedLayout title="Admin">
+  <h1>Users</h1>
+  {
+    users?.users.map((user) => (
+      <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+        <p>
+          <strong>ID:</strong> {user.id}
+        </p>
+        <p>
+          <strong>Name:</strong> {user.name}
+        </p>
+        <p>
+          <strong>Email:</strong> {user.email}
+        </p>
+        <p>
+          <strong>Role:</strong> {user.role}
+        </p>
+      </div>
+    ))
+  }
+</RootAuthenticatedLayout>

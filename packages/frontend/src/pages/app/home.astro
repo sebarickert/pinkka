@@ -1,8 +1,33 @@
 ---
 import { Heading } from "@/components/elements/heading";
 import RootAuthenticatedLayout from "@/layouts/RootAuthenticatedLayout.astro";
+
+const user = Astro.locals.user;
+
+const response = await fetch("http://localhost:3000/api/accounts", {
+  headers: {
+    Cookie: Astro.request.headers.get("cookie") || "",
+  },
+});
+
+const { data: accounts } = await response.json();
 ---
 
 <RootAuthenticatedLayout title="Welcome">
-  <Heading>Hello loggedi in user!</Heading>
+  <Heading>{`Hello logged in ${user?.name}`}</Heading>
+  {
+    accounts?.map((account) => (
+      <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+        <p>
+          <strong>Account ID:</strong> {account.id}
+        </p>
+        <p>
+          <strong>Account Name:</strong> {account.name}
+        </p>
+        <p>
+          <strong>Balance:</strong> {account.balance}
+        </p>
+      </div>
+    ))
+  }
 </RootAuthenticatedLayout>

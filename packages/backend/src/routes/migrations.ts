@@ -1,6 +1,5 @@
 // Disabled rules for this file due to the nature of data migration tasks
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 /* eslint-disable no-await-in-loop */
 import {
 	FinancerMigrationDataSchema,
@@ -64,6 +63,16 @@ migrations.post('/migrations/financer', async (c) => {
 		const {accounts, transactions} = validation.data;
 
 		await db.transaction().execute(async (trx) => {
+			await trx.deleteFrom('category').where('user_id', '=', userId).execute();
+			await trx
+				.deleteFrom('transaction')
+				.where('user_id', '=', userId)
+				.execute();
+			await trx
+				.deleteFrom('financial_account')
+				.where('user_id', '=', userId)
+				.execute();
+
 			// Calculate initial balances for each account
 			const accountInitialBalances: Record<string, number> = {};
 			for (const account of accounts) {
