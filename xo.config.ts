@@ -1,8 +1,10 @@
 import eslintPluginZodX from 'eslint-plugin-zod-x';
 import {type FlatXoConfig} from 'xo';
+import pluginQuery from '@tanstack/eslint-plugin-query';
 
 const xoConfig: FlatXoConfig = [
 	eslintPluginZodX.configs.recommended,
+	...pluginQuery.configs['flat/recommended'],
 	{
 		prettier: true,
 		rules: {

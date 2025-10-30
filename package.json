@@ -21,6 +21,7 @@
   },
   "type": "commonjs",
   "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^5.91.2",
     "eslint-plugin-zod-x": "^1.7.0",
     "typescript": "^5.9.3",
     "xo": "^1.2.3"

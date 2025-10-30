@@ -1,14 +1,14 @@
-type SuccessResponse<T> = {
+export type SuccessResponse<T> = {
 	status: 'success';
 	data: T;
 };
 
-type FailResponse = {
+export type FailResponse = {
 	status: 'fail';
 	data: Record<string, unknown>;
 };
 
-type ErrorResponse = {
+export type ErrorResponse = {
 	status: 'error';
 	message: string;
 	code?: string | number;
