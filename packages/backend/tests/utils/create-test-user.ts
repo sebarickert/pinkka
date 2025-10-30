@@ -1,5 +1,5 @@
 import { fetcher } from "@/test-utils/fetcher.js";
-import type { User } from "@/types/db/user.js";
+import type { User } from "@/types/db/user1.js";
 
 export type UserWithSessionToken = User & { sessionToken: string };
 

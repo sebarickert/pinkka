@@ -7,7 +7,7 @@ import type {
   NewTransaction,
   Transaction,
   TransactionUpdate,
-} from "@/types/db/transaction.js";
+} from "@/types/db/transaction1.js";
 
 export const TransactionMapper = {
   fromDb(db: Transaction): TransactionDto {
@@ -36,7 +36,7 @@ export const TransactionMapper = {
     };
   },
   updateDtoToDb(
-    dto: Partial<UpdateTransactionDto>,
+    dto: Partial<UpdateTransactionDto>
   ): Partial<TransactionUpdate> {
     return {
       ...(dto.amount !== undefined && { amount: dto.amount }),

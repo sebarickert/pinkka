@@ -1,5 +1,5 @@
 import { db } from "@/lib/db.js";
-import type { TransactionCategory } from "@/types/db/transaction-category.js";
+import type { TransactionCategory } from "@/types/db/transaction-category1.js";
 import type {
   CreateTransactionCategoryParameters,
   DeleteTransactionCategoryParameters,
@@ -8,7 +8,7 @@ import type {
 
 export const TransactionCategoryRepo = {
   async create(
-    parameters: CreateTransactionCategoryParameters,
+    parameters: CreateTransactionCategoryParameters
   ): Promise<TransactionCategory> {
     return (parameters.trx ?? db)
       .insertInto("transaction_category")
@@ -17,7 +17,7 @@ export const TransactionCategoryRepo = {
       .executeTakeFirstOrThrow();
   },
   async upsert(
-    parameters: UpsertTransactionCategoryParameters,
+    parameters: UpsertTransactionCategoryParameters
   ): Promise<TransactionCategory> {
     await (parameters.trx ?? db)
       .deleteFrom("transaction_category")

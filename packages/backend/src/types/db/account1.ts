@@ -5,7 +5,7 @@ import type {
   Selectable,
   Updateable,
 } from "kysely";
-import type { Timestamp } from "@/types/db/database.js";
+import type { Timestamp } from "@/types/db/database1.js";
 
 export type AccountTable = {
   access_token: string | null;

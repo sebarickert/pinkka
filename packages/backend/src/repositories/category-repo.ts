@@ -1,6 +1,6 @@
 import { db } from "@/lib/db.js";
-import type { Category } from "@/types/db/category.js";
-import type { TransactionCategory } from "@/types/db/transaction-category.js";
+import type { Category } from "@/types/db/category1.js";
+import type { TransactionCategory } from "@/types/db/transaction-category1.js";
 import type {
   CreateCategoryParameters,
   DeleteCategoryParameters,
@@ -19,7 +19,7 @@ export const CategoryRepo = {
       .executeTakeFirstOrThrow();
   },
   async findOne(
-    parameters: FindOneCategoryParameters,
+    parameters: FindOneCategoryParameters
   ): Promise<Category | undefined> {
     return (parameters.trx ?? db)
       .selectFrom("category")
@@ -55,7 +55,7 @@ export const CategoryRepo = {
       .executeTakeFirstOrThrow();
   },
   async findTransactionLinks(
-    parameters: FindTransactionLinksCategoryParameters,
+    parameters: FindTransactionLinksCategoryParameters
   ): Promise<TransactionCategory[]> {
     return (parameters.trx ?? db)
       .selectFrom("transaction_category")

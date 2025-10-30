@@ -7,7 +7,7 @@ import type {
   Category,
   CategoryUpdate,
   NewCategory,
-} from "@/types/db/category.js";
+} from "@/types/db/category1.js";
 
 export const CategoryMapper = {
   fromDb(db: Category): CategoryDto {

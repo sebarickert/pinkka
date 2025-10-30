@@ -1,5 +1,5 @@
 import type { Generated, Insertable, Selectable, Updateable } from "kysely";
-import type { Timestamp } from "@/types/db/database.js";
+import type { Timestamp } from "@/types/db/database1.js";
 
 export type SessionTable = {
   created_at: Generated<Date>;

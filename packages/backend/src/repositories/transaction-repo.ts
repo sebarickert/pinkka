@@ -1,5 +1,5 @@
 import { db } from "@/lib/db.js";
-import type { Transaction } from "@/types/db/transaction.js";
+import type { Transaction } from "@/types/db/transaction1.js";
 import type {
   FindOneTransactionRepoParameters,
   UpdateTransactionRepoParameters,
@@ -10,7 +10,7 @@ import type {
 
 export const TransactionRepo = {
   async create(
-    parameters: CreateTransactionRepoParameters,
+    parameters: CreateTransactionRepoParameters
   ): Promise<Transaction> {
     return (parameters.trx ?? db)
       .insertInto("transaction")
@@ -19,7 +19,7 @@ export const TransactionRepo = {
       .executeTakeFirstOrThrow();
   },
   async findOne(
-    parameters: FindOneTransactionRepoParameters,
+    parameters: FindOneTransactionRepoParameters
   ): Promise<Transaction | undefined> {
     return (parameters.trx ?? db)
       .selectFrom("transaction")
@@ -29,7 +29,7 @@ export const TransactionRepo = {
       .executeTakeFirst();
   },
   async getAll(
-    parameters: GetAllTransactionRepoParameters,
+    parameters: GetAllTransactionRepoParameters
   ): Promise<Transaction[]> {
     return (parameters.trx ?? db)
       .selectFrom("transaction")
@@ -38,7 +38,7 @@ export const TransactionRepo = {
       .execute();
   },
   async update(
-    parameters: UpdateTransactionRepoParameters,
+    parameters: UpdateTransactionRepoParameters
   ): Promise<Transaction> {
     return (parameters.trx ?? db)
       .updateTable("transaction")
