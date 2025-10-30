@@ -1,6 +1,3 @@
-// Disabled rules for this file due to the nature of data migration tasks
-
-/* eslint-disable no-await-in-loop */
 import {
   FinancerMigrationDataSchema,
   type AccountTypeEnum,
@@ -126,10 +123,10 @@ migrations.post("/migrations/financer", async (c) => {
       const newTransactions = [];
       for (const transaction of transactions) {
         const isIncome = Boolean(
-          transaction.toAccount && !transaction.fromAccount,
+          transaction.toAccount && !transaction.fromAccount
         );
         const isExpense = Boolean(
-          transaction.fromAccount && !transaction.toAccount,
+          transaction.fromAccount && !transaction.toAccount
         );
 
         const type = isIncome ? "income" : isExpense ? "expense" : "transfer";
