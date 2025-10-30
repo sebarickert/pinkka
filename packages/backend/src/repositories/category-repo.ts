@@ -1,6 +1,6 @@
 import { db } from "@/lib/db.js";
-import type { Category } from "@/types/db/category1.js";
-import type { TransactionCategory } from "@/types/db/transaction-category1.js";
+import type { Category } from "@/types/db/category.js";
+import type { TransactionCategory } from "@/types/db/transaction-category.js";
 import type {
   CreateCategoryParameters,
   DeleteCategoryParameters,

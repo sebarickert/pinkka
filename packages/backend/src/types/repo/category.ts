@@ -1,5 +1,5 @@
 import type { BaseRepoOptions } from "@/types/db/base-repo-options.js";
-import type { CategoryUpdate, NewCategory } from "@/types/db/category1.js";
+import type { CategoryUpdate, NewCategory } from "@/types/db/category.js";
 
 export type CreateCategoryParameters = {
   data: NewCategory;

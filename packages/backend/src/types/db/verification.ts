@@ -5,7 +5,7 @@ import type {
   Selectable,
   Updateable,
 } from "kysely";
-import type { Timestamp } from "@/types/db/database1.js";
+import type { Timestamp } from "@/types/db/database.js";
 
 export type VerificationTable = {
   created_at: Generated<Date>;

@@ -1,5 +1,5 @@
 import { db } from "@/lib/db.js";
-import type { Transaction } from "@/types/db/transaction1.js";
+import type { Transaction } from "@/types/db/transaction.js";
 import type {
   FindOneTransactionRepoParameters,
   UpdateTransactionRepoParameters,

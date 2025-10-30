@@ -1,4 +1,4 @@
-import type { Insertable, Selectable, Updateable } from "kysely";
+import type { Insertable, Selectable } from "kysely";
 
 export type TransactionCategoryTable = {
   category_id: string;

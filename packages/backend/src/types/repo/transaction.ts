@@ -2,7 +2,7 @@ import type { BaseRepoOptions } from "@/types/db/base-repo-options.js";
 import type {
   NewTransaction,
   TransactionUpdate,
-} from "@/types/db/transaction1.js";
+} from "@/types/db/transaction.js";
 
 export type CreateTransactionRepoParameters = {
   data: NewTransaction;

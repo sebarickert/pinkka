@@ -7,7 +7,7 @@ import type {
   NewTransaction,
   Transaction,
   TransactionUpdate,
-} from "@/types/db/transaction1.js";
+} from "@/types/db/transaction.js";
 
 export const TransactionMapper = {
   fromDb(db: Transaction): TransactionDto {

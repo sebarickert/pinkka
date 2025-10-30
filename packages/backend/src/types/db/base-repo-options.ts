@@ -1,5 +1,5 @@
 import type { Transaction } from "kysely";
-import type { Database } from "@/types/db/database1.js";
+import type { Database } from "@/types/db/database.js";
 
 export type BaseRepoOptions = {
   sortBy?: string; // Default sorting field
