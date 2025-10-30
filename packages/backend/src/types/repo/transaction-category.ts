@@ -1,17 +1,17 @@
-import type {BaseRepoOptions} from '@/types/db/base-repo-options.js';
+import type { BaseRepoOptions } from "@/types/db/base-repo-options.js";
 import type {
-	NewTransactionCategory,
-	TransactionCategory,
-} from '@/types/db/transaction-category.js';
+  NewTransactionCategory,
+  TransactionCategory,
+} from "@/types/db/transaction-category.js";
 
 export type CreateTransactionCategoryParameters = {
-	data: NewTransactionCategory;
+  data: NewTransactionCategory;
 } & BaseRepoOptions;
 
 export type UpsertTransactionCategoryParameters = {
-	data: TransactionCategory;
+  data: TransactionCategory;
 } & BaseRepoOptions;
 
 export type DeleteTransactionCategoryParameters = {
-	transaction_id: string;
+  transaction_id: string;
 } & BaseRepoOptions;

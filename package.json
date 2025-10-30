@@ -17,7 +17,8 @@
     "migrate:up:test": "npm -w @pinkka/backend run migrate:up:test",
     "test:backend:integration": "npm -w @pinkka/backend run test:integration",
     "lint": "npx eslint .",
-    "lint:fix": "npx eslint . --fix"
+    "lint:fix": "npx eslint . --fix",
+    "prettify": "npx prettier --write ."
   },
   "type": "commonjs",
   "devDependencies": {

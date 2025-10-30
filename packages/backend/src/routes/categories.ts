@@ -1,136 +1,136 @@
 import {
-	NewCategoryDtoSchema,
-	UpdateCategoryDtoSchema,
-} from '@pinkka/schemas/category-dto.js';
-import {error, fail, success} from '@/lib/response.js';
-import {requireAuth} from '@/middlewares/require-auth.js';
-import {CategoryRepo} from '@/repositories/category-repo.js';
-import {CategoryMapper} from '@/mappers/category-mapper.js';
-import {validateBody, validateIdParameter} from '@/lib/validator.js';
-import {createRouter} from '@/lib/create-router.js';
+  NewCategoryDtoSchema,
+  UpdateCategoryDtoSchema,
+} from "@pinkka/schemas/category-dto.js";
+import { error, fail, success } from "@/lib/response.js";
+import { requireAuth } from "@/middlewares/require-auth.js";
+import { CategoryRepo } from "@/repositories/category-repo.js";
+import { CategoryMapper } from "@/mappers/category-mapper.js";
+import { validateBody, validateIdParameter } from "@/lib/validator.js";
+import { createRouter } from "@/lib/create-router.js";
 
 const categories = createRouter();
-categories.use('/categories/*', requireAuth);
+categories.use("/categories/*", requireAuth);
 
-categories.get('/categories', async (c) => {
-	const userId = c.get('user').id;
+categories.get("/categories", async (c) => {
+  const userId = c.get("user").id;
 
-	try {
-		const categories = await CategoryRepo.getAll({userId});
+  try {
+    const categories = await CategoryRepo.getAll({ userId });
 
-		return success(
-			c,
-			categories.map((category) => CategoryMapper.fromDb(category)),
-		);
-	} catch (error_) {
-		return error(c, 'Failed to fetch categories', {data: error_});
-	}
+    return success(
+      c,
+      categories.map((category) => CategoryMapper.fromDb(category)),
+    );
+  } catch (error_) {
+    return error(c, "Failed to fetch categories", { data: error_ });
+  }
 });
 
-categories.get('/categories/:id', validateIdParameter, async (c) => {
-	const userId = c.get('user').id;
-	const {id} = c.req.param();
+categories.get("/categories/:id", validateIdParameter, async (c) => {
+  const userId = c.get("user").id;
+  const { id } = c.req.param();
 
-	const category = await CategoryRepo.findOne({id, userId});
+  const category = await CategoryRepo.findOne({ id, userId });
 
-	if (!category || category.is_deleted) {
-		return error(c, `Category with id ${id} not found`, {
-			status: 404,
-		});
-	}
+  if (!category || category.is_deleted) {
+    return error(c, `Category with id ${id} not found`, {
+      status: 404,
+    });
+  }
 
-	return success(c, CategoryMapper.fromDb(category));
+  return success(c, CategoryMapper.fromDb(category));
 });
 
 categories.post(
-	'/categories',
-	validateBody(NewCategoryDtoSchema),
-	async (c) => {
-		const body = c.req.valid('json');
-		const userId = c.get('user').id;
+  "/categories",
+  validateBody(NewCategoryDtoSchema),
+  async (c) => {
+    const body = c.req.valid("json");
+    const userId = c.get("user").id;
 
-		try {
-			const newCategory = await CategoryRepo.create({
-				data: CategoryMapper.newDtoToDb(body, userId),
-			});
+    try {
+      const newCategory = await CategoryRepo.create({
+        data: CategoryMapper.newDtoToDb(body, userId),
+      });
 
-			return success(c, CategoryMapper.fromDb(newCategory), 201);
-		} catch (error_) {
-			return error(c, 'Failed to create category', {data: error_});
-		}
-	},
+      return success(c, CategoryMapper.fromDb(newCategory), 201);
+    } catch (error_) {
+      return error(c, "Failed to create category", { data: error_ });
+    }
+  },
 );
 
 categories.put(
-	'/categories/:id',
-	validateIdParameter,
-	validateBody(UpdateCategoryDtoSchema),
-	async (c) => {
-		const body = c.req.valid('json');
-		const userId = c.get('user').id;
-		const {id} = c.req.param();
+  "/categories/:id",
+  validateIdParameter,
+  validateBody(UpdateCategoryDtoSchema),
+  async (c) => {
+    const body = c.req.valid("json");
+    const userId = c.get("user").id;
+    const { id } = c.req.param();
 
-		const category = await CategoryRepo.findOne({id, userId});
+    const category = await CategoryRepo.findOne({ id, userId });
 
-		if (!category || category.is_deleted) {
-			return error(c, `Category with id ${id} not found`, {
-				status: 404,
-			});
-		}
+    if (!category || category.is_deleted) {
+      return error(c, `Category with id ${id} not found`, {
+        status: 404,
+      });
+    }
 
-		// Check if category has transactions
-		const transactions = await CategoryRepo.findTransactionLinks({
-			id,
-		});
-		const hasTransactions = transactions.length > 0;
+    // Check if category has transactions
+    const transactions = await CategoryRepo.findTransactionLinks({
+      id,
+    });
+    const hasTransactions = transactions.length > 0;
 
-		// If there are transactions, prevent updating type
-		if (hasTransactions && 'type' in body) {
-			return fail(c, {
-				type: 'Cannot update type for category with transactions',
-			});
-		}
+    // If there are transactions, prevent updating type
+    if (hasTransactions && "type" in body) {
+      return fail(c, {
+        type: "Cannot update type for category with transactions",
+      });
+    }
 
-		try {
-			const updatedCategory = await CategoryRepo.update({
-				id,
-				userId,
-				data: CategoryMapper.updateDtoToDb(body),
-			});
+    try {
+      const updatedCategory = await CategoryRepo.update({
+        id,
+        userId,
+        data: CategoryMapper.updateDtoToDb(body),
+      });
 
-			return success(c, CategoryMapper.fromDb(updatedCategory));
-		} catch (error_) {
-			return error(c, `Failed to update category with id ${id}`, {
-				data: error_,
-			});
-		}
-	},
+      return success(c, CategoryMapper.fromDb(updatedCategory));
+    } catch (error_) {
+      return error(c, `Failed to update category with id ${id}`, {
+        data: error_,
+      });
+    }
+  },
 );
 
-categories.delete('/categories/:id', validateIdParameter, async (c) => {
-	const userId = c.get('user').id;
-	const {id} = c.req.param();
+categories.delete("/categories/:id", validateIdParameter, async (c) => {
+  const userId = c.get("user").id;
+  const { id } = c.req.param();
 
-	const category = await CategoryRepo.findOne({id, userId});
+  const category = await CategoryRepo.findOne({ id, userId });
 
-	if (!category || category.is_deleted) {
-		return error(c, `Category with id ${id} not found`, {
-			status: 404,
-		});
-	}
+  if (!category || category.is_deleted) {
+    return error(c, `Category with id ${id} not found`, {
+      status: 404,
+    });
+  }
 
-	try {
-		const deletedCategory = await CategoryRepo.delete({
-			id,
-			userId,
-		});
+  try {
+    const deletedCategory = await CategoryRepo.delete({
+      id,
+      userId,
+    });
 
-		return success(c, CategoryMapper.fromDb(deletedCategory));
-	} catch (error_) {
-		return error(c, `Failed to delete category with id ${id}`, {
-			data: error_,
-		});
-	}
+    return success(c, CategoryMapper.fromDb(deletedCategory));
+  } catch (error_) {
+    return error(c, `Failed to delete category with id ${id}`, {
+      data: error_,
+    });
+  }
 });
 
 export default categories;

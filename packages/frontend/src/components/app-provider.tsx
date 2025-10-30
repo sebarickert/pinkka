@@ -1,25 +1,25 @@
-import {useState, type FC} from 'react';
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import { useState, type FC } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 type Props = {
-	children: React.ReactNode;
+  children: React.ReactNode;
 };
 
 const defaultOptions = {
-	queries: {
-		staleTime: 60 * 100,
-	},
+  queries: {
+    staleTime: 60 * 100,
+  },
 };
 
-export const AppProvider: FC<Props> = ({children}) => {
-	const [queryClient] = useState(
-		() =>
-			new QueryClient({
-				defaultOptions,
-			}),
-	);
+export const AppProvider: FC<Props> = ({ children }) => {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions,
+      }),
+  );
 
-	return (
-		<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-	);
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
 };
