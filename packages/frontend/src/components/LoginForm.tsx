@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useForm, useStore } from '@tanstack/react-form'
 import * as z from 'zod'
 import { CircleX, Loader2 } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 import type { FC } from 'react'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
@@ -21,6 +22,7 @@ const defaultValues = {
 }
 
 export const LoginForm: FC = () => {
+  const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined,
   )
@@ -40,7 +42,7 @@ export const LoginForm: FC = () => {
         return
       }
 
-      globalThis.location.href = '/app/home'
+      navigate({ to: '/app/home' })
     },
   })
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useForm, useStore } from '@tanstack/react-form'
 import * as z from 'zod'
 import { Check, CircleX, Loader2 } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 import type { FC } from 'react'
 import { Button } from '@/components/Button'
 import { cn } from '@/lib/utils'
@@ -27,6 +28,7 @@ const defaultValues = {
 }
 
 export const RegisterForm: FC = () => {
+  const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined,
   )
@@ -46,7 +48,7 @@ export const RegisterForm: FC = () => {
         return
       }
 
-      globalThis.location.href = '/app/home'
+      navigate({ to: '/app/home' })
     },
   })
 

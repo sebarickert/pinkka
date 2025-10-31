@@ -1,8 +1,18 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute, redirect } from '@tanstack/react-router'
 import { Heading } from '@/components/Heading'
 import { RegisterForm } from '@/components/RegisterForm'
+import { authClient } from '@/lib/auth-client'
 
 export const Route = createFileRoute('/register')({
+  beforeLoad: async () => {
+    const { data } = await authClient.getSession()
+
+    if (data?.user) {
+      throw redirect({
+        to: '/app/home',
+      })
+    }
+  },
   component: RouteComponent,
 })
 

@@ -1,8 +1,24 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute, redirect } from '@tanstack/react-router'
+import * as z from 'zod'
 import { LoginForm } from '@/components/LoginForm'
 import { Heading } from '@/components/Heading'
+import { authClient } from '@/lib/auth-client'
+
+const fallback = '/app/home' as const
 
 export const Route = createFileRoute('/login')({
+  validateSearch: z.object({
+    redirect: z.string().optional().catch(''),
+  }),
+  beforeLoad: async ({ search }) => {
+    const { data } = await authClient.getSession()
+
+    if (data?.user) {
+      throw redirect({
+        to: search.redirect ?? fallback,
+      })
+    }
+  },
   component: RouteComponent,
 })
 
