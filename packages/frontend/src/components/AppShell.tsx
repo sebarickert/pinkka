@@ -1,7 +1,7 @@
-import { Fragment } from 'react'
 import type { FC } from 'react'
 import { Header } from '@/components/Header'
 import { Container } from '@/components/Container'
+import { Navigation } from '@/components/Navigation'
 
 interface Props {
   children: React.ReactNode
@@ -9,11 +9,12 @@ interface Props {
 
 export const AppShell: FC<Props> = ({ children }) => {
   return (
-    <Fragment>
+    <div className="max-lg:pb-(--gutter-bottom)">
       <Header />
+      <Navigation />
       <Container as="main" className="py-12">
         {children}
       </Container>
-    </Fragment>
+    </div>
   )
 }

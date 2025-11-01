@@ -33,6 +33,15 @@
   --color-background: var(--color-background-dark);
   --color-layer: var(--color-layer-dark);
   --color-accent: var(--color-accent-dark);
+
+  /* --header-height: 48px; */
+  --navigation-height: 56px;
+  /* --content-header-height: 56px; */
+  /* --gutter-top: var(--header-height); */
+  --gutter-bottom: var(--navigation-height);
+
+  /* --z-header: 100; */
+  --z-navigation: 99;
 }
 
 *,
@@ -46,7 +55,7 @@ body {
 }
 
 @utility focus-highlight {
-  @apply outline-hidden ring-2 ring-blue dark:ring-white;
+  @apply outline-hidden ring-2 ring-blue dark:ring-white ring-inset;
 }
 
 @utility theme-field {

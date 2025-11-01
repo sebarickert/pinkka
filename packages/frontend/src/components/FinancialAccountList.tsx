@@ -61,7 +61,7 @@ const FinancialAccountListItem: FC<{ account: FinancialAccountDto }> = ({
 }) => {
   return (
     <div className="p-4 gap-4 bg-layer flex items-center">
-      {getFinancialAccountIcon(account.type)}
+      <span className="shrink-0">{getFinancialAccountIcon(account.type)}</span>
       <span>
         <span className="sr-only">Account name</span>
         {account.name}
