@@ -7,6 +7,7 @@ import type {
   CreateTransactionRepoParameters,
   GetAllTransactionRepoParameters,
 } from "@/types/repo/transaction.js";
+import { sql } from "kysely";
 
 export const TransactionRepo = {
   async create(
@@ -31,11 +32,29 @@ export const TransactionRepo = {
   async getAll(
     parameters: GetAllTransactionRepoParameters
   ): Promise<Transaction[]> {
-    return (parameters.trx ?? db)
+    let query = (parameters.trx ?? db)
       .selectFrom("transaction")
-      .where("user_id", "=", parameters.userId)
       .selectAll()
-      .execute();
+      .where("user_id", "=", parameters.userId);
+
+    if (parameters.month && parameters.year) {
+      const startDate = new Date(parameters.year, parameters.month - 1, 1);
+      const endDate = new Date(
+        parameters.month === 12 ? parameters.year + 1 : parameters.year,
+        parameters.month === 12 ? 0 : parameters.month,
+        1
+      );
+
+      query = query.where("date", ">=", startDate).where("date", "<", endDate);
+    }
+
+    query = query.orderBy("date", "desc");
+
+    if (parameters.limit) {
+      query = query.limit(parameters.limit);
+    }
+
+    return query.execute();
   },
   async update(
     parameters: UpdateTransactionRepoParameters

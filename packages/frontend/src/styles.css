@@ -1,17 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap');
+
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  /* --font-*: initial;
-  --font-display: "InterVariable", "sans-serif"; */
+  --font-*: initial;
+  --font-display: 'Inter', 'sans-serif';
 
   --color-*: initial;
   --color-white: hsl(0 0% 100%);
   --color-black: hsl(0 0% 0%);
   --color-blue: hsl(219 99% 53%);
   --color-green: hsl(146 70% 40%);
+  --color-red: hsl(357 76% 49%);
 
   --color-foreground-light: hsl(0 0% 9%);
   --color-muted-foreground-light: hsl(0 0% 36%);
@@ -32,15 +35,6 @@
   --color-accent: var(--color-accent-dark);
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  @apply text-foreground;
-}
-
 *,
 *::before,
 *::after {
@@ -48,7 +42,7 @@ h6 {
 }
 
 body {
-  @apply text-foreground bg-background;
+  @apply text-foreground bg-background font-display;
 }
 
 @utility focus-highlight {

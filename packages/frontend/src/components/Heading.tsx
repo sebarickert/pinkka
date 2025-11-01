@@ -12,6 +12,7 @@ export const Heading: FC<Props> = ({
   level = 'h2',
   children,
   className = '',
+  ...rest
 }) => {
   const HeadingType = level
 
@@ -21,6 +22,7 @@ export const Heading: FC<Props> = ({
         'text-lg': level !== 'h1',
         'text-3xl/tight': level === 'h1',
       })}
+      {...rest}
     >
       {children}
     </HeadingType>

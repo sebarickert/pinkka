@@ -4,8 +4,6 @@ import { LoginForm } from '@/components/LoginForm'
 import { Heading } from '@/components/Heading'
 import { authClient } from '@/lib/auth-client'
 
-const fallback = '/app/home' as const
-
 export const Route = createFileRoute('/login')({
   validateSearch: z.object({
     redirect: z.string().optional().catch(''),
@@ -15,7 +13,7 @@ export const Route = createFileRoute('/login')({
 
     if (data?.user) {
       throw redirect({
-        to: search.redirect ?? fallback,
+        to: search.redirect || '/app/home',
       })
     }
   },

@@ -1,5 +1,6 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 import { authClient } from '@/lib/auth-client'
+import { AppShell } from '@/components/AppShell'
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ location }) => {
@@ -15,5 +16,9 @@ export const Route = createFileRoute('/_authenticated')({
       })
     }
   },
-  component: () => <Outlet />,
+  component: () => (
+    <AppShell>
+      <Outlet />
+    </AppShell>
+  ),
 })

@@ -31,13 +31,19 @@ transactions.get("/transactions/:id", validateIdParameter, async (c) => {
 
 transactions.get("/transactions", async (c) => {
   const userId = c.get("user").id;
+  const { limit, year, month } = c.req.query();
 
   try {
-    const transactions = await TransactionRepo.getAll({ userId });
+    const transactions = await TransactionRepo.getAll({
+      userId,
+      limit: limit ? Number(limit) : undefined,
+      year: year ? Number(year) : undefined,
+      month: month ? Number(month) : undefined,
+    });
 
     return success(
       c,
-      transactions.map((transaction) => TransactionMapper.fromDb(transaction)),
+      transactions.map((transaction) => TransactionMapper.fromDb(transaction))
     );
   } catch (error_) {
     return error(c, "Failed to fetch transactions", { data: error_ });
@@ -81,7 +87,7 @@ transactions.post(
     } catch (error_) {
       return error(c, "Failed to create transaction", { data: error_ });
     }
-  },
+  }
 );
 
 transactions.put(
@@ -151,7 +157,7 @@ transactions.put(
         data: error_,
       });
     }
-  },
+  }
 );
 
 transactions.delete("/transactions/:id", validateIdParameter, async (c) => {
