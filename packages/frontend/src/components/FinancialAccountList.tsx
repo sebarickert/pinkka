@@ -5,14 +5,12 @@ import {
   Landmark,
   Wallet,
 } from 'lucide-react'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import type { FinancialAccountDto } from '@pinkka/schemas/financial-account-dto'
 import type { FC } from 'react'
 import { formatCurrency } from '@/utils/format-currency'
 import { List } from '@/components/List'
-
-type Props = {
-  accounts: Array<FinancialAccountDto>
-}
+import { financialAccountsQueryOptions } from '@/queries/financial-accounts'
 
 const ACCOUNT_TYPE_ORDER: Array<FinancialAccountDto['type']> = [
   'bank',
@@ -22,7 +20,8 @@ const ACCOUNT_TYPE_ORDER: Array<FinancialAccountDto['type']> = [
   'investment',
 ]
 
-export const FinancialAccountList: FC<Props> = ({ accounts }) => {
+export const FinancialAccountList: FC = () => {
+  const { data: accounts } = useSuspenseQuery(financialAccountsQueryOptions)
   const accountsByType = Object.groupBy(accounts, (account) => account.type)
 
   return (

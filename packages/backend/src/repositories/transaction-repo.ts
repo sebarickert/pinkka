@@ -7,7 +7,6 @@ import type {
   CreateTransactionRepoParameters,
   GetAllTransactionRepoParameters,
 } from "@/types/repo/transaction.js";
-import { sql } from "kysely";
 
 export const TransactionRepo = {
   async create(
