@@ -3,6 +3,7 @@ import {
   CreditCard,
   HandCoins,
   Landmark,
+  Plus,
   Wallet,
 } from 'lucide-react'
 import { useSuspenseQuery } from '@tanstack/react-query'
@@ -11,6 +12,7 @@ import type { FC } from 'react'
 import { formatCurrency } from '@/utils/format-currency'
 import { List } from '@/components/List'
 import { financialAccountsQueryOptions } from '@/queries/financial-accounts'
+import { Button } from '@/components/Button'
 
 const ACCOUNT_TYPE_ORDER: Array<FinancialAccountDto['type']> = [
   'bank',
@@ -35,6 +37,14 @@ export const FinancialAccountList: FC = () => {
             )),
         )}
       </List>
+      <Button
+        type="button"
+        size="large"
+        accentColor="secondary"
+        className="w-full mt-3"
+      >
+        <Plus /> Add account
+      </Button>
     </div>
   )
 }

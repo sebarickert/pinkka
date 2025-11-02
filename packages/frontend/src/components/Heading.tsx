@@ -5,7 +5,7 @@ type HeadingLevel = 'h1' | 'h2' | 'h3' | 'h4'
 
 type Props = HTMLAttributes<HTMLHeadingElement> & {
   level?: HeadingLevel
-  children: string
+  children: string | React.ReactNode
 }
 
 export const Heading: FC<Props> = ({

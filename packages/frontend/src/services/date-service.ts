@@ -5,7 +5,7 @@ const DATE_FORMAT = {
   LONG: 'dd.MM.yyyy, HH:mm',
   //   INPUT: "yyyy-MM-dd'T'HH:mm",
   //   MONTH: 'LLL',
-  //   MONTH_LONG: 'LLLL yyyy',
+  MONTH_LONG: 'LLLL yyyy',
   //   MONTH_WITH_DATE_LONG: 'LLLL d',
   //   MONTH_WITH_YEAR_LONG: 'LLLL yyyy',
   //   MONTH_WITH_DATE_SHORT: 'LLL d',
@@ -14,10 +14,17 @@ const DATE_FORMAT = {
 } as const
 
 export const DateService = {
-  formatDate(
-    date: string,
-    format: keyof typeof DATE_FORMAT = 'DEFAULT',
-  ): string {
-    return DateTime.fromISO(date).toFormat(DATE_FORMAT[format])
+  formatDate({
+    date,
+    format = 'DEFAULT',
+  }: {
+    date?: string
+    format?: keyof typeof DATE_FORMAT
+  }): string {
+    const dt = date ? DateTime.fromISO(date) : DateTime.local()
+    return dt.toLocal().toFormat(DATE_FORMAT[format])
+  },
+  now(): DateTime {
+    return DateTime.local()
   },
 }

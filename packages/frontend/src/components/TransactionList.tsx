@@ -65,13 +65,13 @@ const TransactionListItem: FC<{ transaction: TransactionDto }> = ({
         />
       </div>
       <span className="sr-only">{`Transaction type ${transaction.type}`}</span>
-      <div className="grid">
+      <div className="grid text-sm">
         <span className="truncate">{transaction.description}</span>
         <time
           dateTime={transaction.date}
-          className="text-sm text-muted-foreground truncate"
+          className="text-muted-foreground truncate"
         >
-          {DateService.formatDate(transaction.date, 'LONG')}
+          {DateService.formatDate({ date: transaction.date, format: 'LONG' })}
         </time>
       </div>
       <span className="ml-auto font-medium">

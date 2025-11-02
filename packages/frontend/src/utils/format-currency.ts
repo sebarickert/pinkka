@@ -3,8 +3,19 @@ const formatter = new Intl.NumberFormat('fi-FI', {
   currency: 'EUR',
 })
 
-export const formatCurrency = (number: number): string => {
-  return formatter.format(number)
+export const formatCurrency = (
+  number: number,
+  hasAbbreviation?: boolean,
+): string => {
+  const validatedNumber = isNaN(number) ? 0 : number
+
+  if (hasAbbreviation) {
+    const isNumberPositive = validatedNumber > 0 ? '+' : ''
+
+    return `${isNumberPositive}${formatter.format(validatedNumber)}`
+  }
+
+  return formatter.format(validatedNumber)
 }
 
 export const formatCurrencyAbbreviation = (num: number): string => {
