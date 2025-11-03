@@ -23,7 +23,7 @@ export const Route = createFileRoute('/login')({
 function RouteComponent() {
   return (
     <div className="w-full max-w-md mx-auto grid gap-8">
-      <Heading level="h1">Login</Heading>
+      <Heading as="h1">Login</Heading>
       <div className="grid gap-8">
         <p className="text-muted-foreground">
           Don't have an account?{' '}

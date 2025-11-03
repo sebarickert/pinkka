@@ -1,7 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Suspense } from 'react'
-import * as TanStackQueryProvider from '@/integrations/tanstack-query/root-provider'
 
 import { FinancialAccountList } from '@/components/FinancialAccountList'
 import { TransactionList } from '@/components/TransactionList'
@@ -11,26 +9,23 @@ import {
   latestTransactionsQueryOptions,
 } from '@/queries/transactions'
 import { financialAccountsQueryOptions } from '@/queries/financial-accounts'
+import { TwoColumnLayout } from '@/components/TwoColumnLayout'
 
 export const Route = createFileRoute('/_authenticated/app/home')({
-  loader: async () => {
-    const queryClient = TanStackQueryProvider.getContext().queryClient
+  loader: async ({ context }) => {
+    const queryClient = context.queryClient
     await Promise.all([
       queryClient.ensureQueryData(financialAccountsQueryOptions),
-      queryClient.ensureQueryData(currentMonthTransactionsQueryOptions),
+      queryClient.ensureQueryData(currentMonthTransactionsQueryOptions()),
       queryClient.ensureQueryData(latestTransactionsQueryOptions),
     ])
-  },
-  component: SuspendedRouteComponent,
-})
 
-export default function SuspendedRouteComponent() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <RouteComponent />
-    </Suspense>
-  )
-}
+    return { crumb: 'Home' }
+  },
+  wrapInSuspense: true,
+  pendingComponent: () => <div>Loading...</div>,
+  component: RouteComponent,
+})
 
 function RouteComponent() {
   const { data: latestTransactions } = useSuspenseQuery(
@@ -38,10 +33,17 @@ function RouteComponent() {
   )
 
   return (
-    <div className="grid gap-8">
-      <BalanceSummary />
-      <FinancialAccountList />
-      <TransactionList transactions={latestTransactions} />
-    </div>
+    <TwoColumnLayout
+      main={
+        <div className="grid gap-8">
+          <BalanceSummary />
+          <FinancialAccountList />
+          <TransactionList
+            label="Latest activity"
+            transactions={latestTransactions}
+          />
+        </div>
+      }
+    />
   )
 }

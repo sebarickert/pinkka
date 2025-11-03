@@ -1,0 +1,22 @@
+import type { FC } from 'react'
+import { cn } from '@/lib/utils'
+
+type Props = {
+  main: React.ReactNode
+  sidebar?: React.ReactNode
+}
+
+export const TwoColumnLayout: FC<Props> = ({ main, sidebar }) => {
+  return (
+    <div
+      className={cn(
+        'grid gap-20',
+        'max-xl:max-w-[780px] max-xl:mx-auto',
+        'xl:grid-cols-[1fr_360px]',
+      )}
+    >
+      {main}
+      {sidebar && sidebar}
+    </div>
+  )
+}

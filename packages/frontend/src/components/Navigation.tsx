@@ -53,7 +53,7 @@ const NavigationItem: FC<{ href: string; title: string; icon: LucideIcon }> = ({
     <Link
       to={href}
       className={cn(
-        'focus-visible:focus-highlight text-muted-foreground',
+        'text-muted-foreground',
         'aria-[current=page]:text-foreground transition-colors',
       )}
       title={title}

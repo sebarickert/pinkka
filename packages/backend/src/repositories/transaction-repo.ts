@@ -36,6 +36,16 @@ export const TransactionRepo = {
       .selectAll()
       .where("user_id", "=", parameters.userId);
 
+    if (parameters.accountId) {
+      const accountId = parameters.accountId;
+      query = query.where((eb) =>
+        eb.or([
+          eb("to_account_id", "=", accountId),
+          eb("from_account_id", "=", accountId),
+        ])
+      );
+    }
+
     if (parameters.month && parameters.year) {
       const startDate = new Date(parameters.year, parameters.month - 1, 1);
       const endDate = new Date(

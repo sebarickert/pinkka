@@ -34,7 +34,7 @@ const getIncomeExpenseTotals = (
 export const BalanceSummary: FC = () => {
   const { data: accounts } = useSuspenseQuery(financialAccountsQueryOptions)
   const { data: currentMonthTransactions } = useSuspenseQuery(
-    currentMonthTransactionsQueryOptions,
+    currentMonthTransactionsQueryOptions(),
   )
 
   const currentMonthTotals = getIncomeExpenseTotals(currentMonthTransactions)

@@ -1,18 +1,13 @@
-import {
-  ChartNoAxesCombined,
-  CreditCard,
-  HandCoins,
-  Landmark,
-  Plus,
-  Wallet,
-} from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import type { FinancialAccountDto } from '@pinkka/schemas/financial-account-dto'
 import type { FC } from 'react'
 import { formatCurrency } from '@/utils/format-currency'
 import { List } from '@/components/List'
 import { financialAccountsQueryOptions } from '@/queries/financial-accounts'
 import { Button } from '@/components/Button'
+import { getFinancialAccountIcon } from '@/utils/financial-account'
 
 const ACCOUNT_TYPE_ORDER: Array<FinancialAccountDto['type']> = [
   'bank',
@@ -49,27 +44,15 @@ export const FinancialAccountList: FC = () => {
   )
 }
 
-const getFinancialAccountIcon = (type: FinancialAccountDto['type']) => {
-  switch (type) {
-    case 'credit_card':
-      return <CreditCard />
-    case 'bank':
-      return <Landmark />
-    case 'wallet':
-      return <Wallet />
-    case 'investment':
-      return <ChartNoAxesCombined />
-    case 'loan':
-    default:
-      return <HandCoins />
-  }
-}
-
 const FinancialAccountListItem: FC<{ account: FinancialAccountDto }> = ({
   account,
 }) => {
   return (
-    <div className="p-4 gap-4 bg-layer flex items-center">
+    <Link
+      to="/app/accounts/$accountId"
+      params={{ accountId: account.id }}
+      className="p-4 gap-4 bg-layer flex items-center hover:bg-accent"
+    >
       <span className="shrink-0">{getFinancialAccountIcon(account.type)}</span>
       <span>
         <span className="sr-only">Account name</span>
@@ -79,6 +62,6 @@ const FinancialAccountListItem: FC<{ account: FinancialAccountDto }> = ({
         <span className="sr-only">Account balance</span>
         <span>{formatCurrency(account.balance)}</span>
       </span>
-    </div>
+    </Link>
   )
 }

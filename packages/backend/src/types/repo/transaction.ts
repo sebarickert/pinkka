@@ -15,6 +15,7 @@ export type FindOneTransactionRepoParameters = {
 
 export type GetAllTransactionRepoParameters = {
   userId: string;
+  accountId?: string;
 } & BaseRepoOptions;
 
 export type UpdateTransactionRepoParameters = {

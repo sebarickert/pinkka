@@ -7,18 +7,17 @@ import { DateService } from '@/services/date-service'
 import { cn } from '@/lib/utils'
 
 type Props = {
+  label?: string
   transactions: Array<TransactionDto>
 }
 
-export const TransactionList: FC<Props> = ({ transactions }) => {
+export const TransactionList: FC<Props> = ({ label, transactions }) => {
   return (
-    <div>
-      <List label="Latest activity">
-        {transactions.map((transaction) => (
-          <TransactionListItem transaction={transaction} />
-        ))}
-      </List>
-    </div>
+    <List label={label}>
+      {transactions.map((transaction) => (
+        <TransactionListItem transaction={transaction} />
+      ))}
+    </List>
   )
 }
 

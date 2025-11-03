@@ -15,6 +15,9 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedAppHomeRouteImport } from './routes/_authenticated/app/home'
 import { Route as AuthenticatedAppActivityRouteImport } from './routes/_authenticated/app/activity'
+import { Route as AuthenticatedAppAccountsRouteRouteImport } from './routes/_authenticated/app/accounts/route'
+import { Route as AuthenticatedAppAccountsIndexRouteImport } from './routes/_authenticated/app/accounts/index'
+import { Route as AuthenticatedAppAccountsAccountIdRouteImport } from './routes/_authenticated/app/accounts/$accountId'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -46,13 +49,34 @@ const AuthenticatedAppActivityRoute =
     path: '/app/activity',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAppAccountsRouteRoute =
+  AuthenticatedAppAccountsRouteRouteImport.update({
+    id: '/app/accounts',
+    path: '/app/accounts',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAppAccountsIndexRoute =
+  AuthenticatedAppAccountsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAppAccountsRouteRoute,
+  } as any)
+const AuthenticatedAppAccountsAccountIdRoute =
+  AuthenticatedAppAccountsAccountIdRouteImport.update({
+    id: '/$accountId',
+    path: '/$accountId',
+    getParentRoute: () => AuthenticatedAppAccountsRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/app/accounts': typeof AuthenticatedAppAccountsRouteRouteWithChildren
   '/app/activity': typeof AuthenticatedAppActivityRoute
   '/app/home': typeof AuthenticatedAppHomeRoute
+  '/app/accounts/$accountId': typeof AuthenticatedAppAccountsAccountIdRoute
+  '/app/accounts/': typeof AuthenticatedAppAccountsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -60,6 +84,8 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/app/activity': typeof AuthenticatedAppActivityRoute
   '/app/home': typeof AuthenticatedAppHomeRoute
+  '/app/accounts/$accountId': typeof AuthenticatedAppAccountsAccountIdRoute
+  '/app/accounts': typeof AuthenticatedAppAccountsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -67,22 +93,43 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/_authenticated/app/accounts': typeof AuthenticatedAppAccountsRouteRouteWithChildren
   '/_authenticated/app/activity': typeof AuthenticatedAppActivityRoute
   '/_authenticated/app/home': typeof AuthenticatedAppHomeRoute
+  '/_authenticated/app/accounts/$accountId': typeof AuthenticatedAppAccountsAccountIdRoute
+  '/_authenticated/app/accounts/': typeof AuthenticatedAppAccountsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register' | '/app/activity' | '/app/home'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/app/accounts'
+    | '/app/activity'
+    | '/app/home'
+    | '/app/accounts/$accountId'
+    | '/app/accounts/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register' | '/app/activity' | '/app/home'
+  to:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/app/activity'
+    | '/app/home'
+    | '/app/accounts/$accountId'
+    | '/app/accounts'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/login'
     | '/register'
+    | '/_authenticated/app/accounts'
     | '/_authenticated/app/activity'
     | '/_authenticated/app/home'
+    | '/_authenticated/app/accounts/$accountId'
+    | '/_authenticated/app/accounts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -136,15 +183,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppActivityRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/app/accounts': {
+      id: '/_authenticated/app/accounts'
+      path: '/app/accounts'
+      fullPath: '/app/accounts'
+      preLoaderRoute: typeof AuthenticatedAppAccountsRouteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app/accounts/': {
+      id: '/_authenticated/app/accounts/'
+      path: '/'
+      fullPath: '/app/accounts/'
+      preLoaderRoute: typeof AuthenticatedAppAccountsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppAccountsRouteRoute
+    }
+    '/_authenticated/app/accounts/$accountId': {
+      id: '/_authenticated/app/accounts/$accountId'
+      path: '/$accountId'
+      fullPath: '/app/accounts/$accountId'
+      preLoaderRoute: typeof AuthenticatedAppAccountsAccountIdRouteImport
+      parentRoute: typeof AuthenticatedAppAccountsRouteRoute
+    }
   }
 }
 
+interface AuthenticatedAppAccountsRouteRouteChildren {
+  AuthenticatedAppAccountsAccountIdRoute: typeof AuthenticatedAppAccountsAccountIdRoute
+  AuthenticatedAppAccountsIndexRoute: typeof AuthenticatedAppAccountsIndexRoute
+}
+
+const AuthenticatedAppAccountsRouteRouteChildren: AuthenticatedAppAccountsRouteRouteChildren =
+  {
+    AuthenticatedAppAccountsAccountIdRoute:
+      AuthenticatedAppAccountsAccountIdRoute,
+    AuthenticatedAppAccountsIndexRoute: AuthenticatedAppAccountsIndexRoute,
+  }
+
+const AuthenticatedAppAccountsRouteRouteWithChildren =
+  AuthenticatedAppAccountsRouteRoute._addFileChildren(
+    AuthenticatedAppAccountsRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
+  AuthenticatedAppAccountsRouteRoute: typeof AuthenticatedAppAccountsRouteRouteWithChildren
   AuthenticatedAppActivityRoute: typeof AuthenticatedAppActivityRoute
   AuthenticatedAppHomeRoute: typeof AuthenticatedAppHomeRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAppAccountsRouteRoute:
+    AuthenticatedAppAccountsRouteRouteWithChildren,
   AuthenticatedAppActivityRoute: AuthenticatedAppActivityRoute,
   AuthenticatedAppHomeRoute: AuthenticatedAppHomeRoute,
 }

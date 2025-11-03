@@ -31,7 +31,7 @@ transactions.get("/transactions/:id", validateIdParameter, async (c) => {
 
 transactions.get("/transactions", async (c) => {
   const userId = c.get("user").id;
-  const { limit, year, month } = c.req.query();
+  const { limit, year, month, accountId } = c.req.query();
 
   try {
     const transactions = await TransactionRepo.getAll({
@@ -39,6 +39,7 @@ transactions.get("/transactions", async (c) => {
       limit: limit ? Number(limit) : undefined,
       year: year ? Number(year) : undefined,
       month: month ? Number(month) : undefined,
+      accountId,
     });
 
     return success(

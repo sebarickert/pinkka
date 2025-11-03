@@ -14,4 +14,17 @@ export const FinancialAccountService = {
 
     return accounts
   },
+  async getById(id: string): Promise<FinancialAccountDto | null> {
+    const response = await fetch(`http://localhost:3000/api/accounts/${id}`, {
+      credentials: 'include',
+    })
+
+    if (!response.ok) {
+      return null
+    }
+
+    const { data: account } = await response.json()
+
+    return account
+  },
 }
