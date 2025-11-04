@@ -1,22 +1,17 @@
 import { DateTime } from 'luxon'
 
 const DATE_FORMAT = {
-  DEFAULT: 'dd.MM.yyyy',
-  LONG: 'dd.MM.yyyy, HH:mm',
-  //   INPUT: "yyyy-MM-dd'T'HH:mm",
-  //   MONTH: 'LLL',
-  MONTH_LONG: 'LLLL yyyy',
-  //   MONTH_WITH_DATE_LONG: 'LLLL d',
-  //   MONTH_WITH_YEAR_LONG: 'LLLL yyyy',
-  //   MONTH_WITH_DATE_SHORT: 'LLL d',
-  //   MONTH_WITH_DATE_SHORT_WITH_YEAR: 'LLL d, yyyy',
-  //   YEAR_MONTH: 'yyyy-MM',
+  DAY_MONTH_YEAR: 'dd.MM.yyyy', // 25.05.2025
+  DAY_MONTH_YEAR_LONG: 'dd.MM.yyyy, HH:mm', // 25.05.2025, 14:30
+  MONTH_YEAR_LONG: 'LLLL yyyy', // May 2025
+  DAY_MONTH_YEAR_PRETTY: 'd LLL, yyyy', // 5 May, 2025
+  INPUT: "yyyy-MM-dd'T'HH:mm", // 2025-05-25T14:30
 } as const
 
 export const DateService = {
   formatDate({
     date,
-    format = 'DEFAULT',
+    format = 'DAY_MONTH_YEAR',
   }: {
     date?: string
     format?: keyof typeof DATE_FORMAT

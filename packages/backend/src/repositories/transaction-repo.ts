@@ -57,6 +57,13 @@ export const TransactionRepo = {
       query = query.where("date", ">=", startDate).where("date", "<", endDate);
     }
 
+    if (!parameters.month && parameters.year) {
+      const startDate = new Date(parameters.year, 0, 1);
+      const endDate = new Date(parameters.year + 1, 0, 1);
+
+      query = query.where("date", ">=", startDate).where("date", "<", endDate);
+    }
+
     query = query.orderBy("date", "desc");
 
     if (parameters.limit) {

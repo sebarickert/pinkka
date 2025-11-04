@@ -2,12 +2,17 @@ import { createFileRoute, useParams } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
-import { accountMonthTransactionsQueryOptions } from '@/queries/transactions'
+import {
+  accountMonthTransactionsQueryOptions,
+  accountYearTransactionsQueryOptions,
+} from '@/queries/transactions'
 import { DateService } from '@/services/date-service'
 import { financialAccountByIdQueryOptions } from '@/queries/financial-accounts'
 import { Heading } from '@/components/Heading'
 import { TwoColumnLayout } from '@/components/TwoColumnLayout'
 import { TransactionList } from '@/components/TransactionList'
+import { AccountBalanceHistoryChart } from '@/components/AccountBalanceHistoryChart'
+import { constructBalanceChartData } from '@/utils/financial-account'
 
 export const Route = createFileRoute('/_authenticated/app/accounts/$accountId')(
   {
@@ -21,6 +26,12 @@ export const Route = createFileRoute('/_authenticated/app/accounts/$accountId')(
             accountId: params.accountId,
             year,
             month,
+          }),
+        ),
+        queryClient.ensureQueryData(
+          accountYearTransactionsQueryOptions({
+            accountId: params.accountId,
+            year,
           }),
         ),
       ])
@@ -57,24 +68,38 @@ function RouteComponent() {
       month,
     }),
   )
+  const { data: balanceChartData } = useSuspenseQuery(
+    accountYearTransactionsQueryOptions({
+      accountId: params.accountId,
+      year,
+    }),
+  )
 
   if (!account) {
     return <div>Account not found</div>
   }
 
+  const plaa = constructBalanceChartData({
+    data: balanceChartData,
+    accountId: params.accountId,
+    currentBalance: account.balance,
+  })
+
   return (
-    <article className="grid gap-8">
-      <Breadcrumbs />
+    <article>
       <TwoColumnLayout
         main={
-          <section className="grid gap-12">
-            <div className="grid gap-6">
-              <Heading as="h1">{account.name}</Heading>
-              <div className="bg-layer aspect-video" />
-            </div>
-            <section className="grid gap-4">
-              <Heading className="text-2xl font-medium">Transactions</Heading>
-              <TransactionList transactions={transactions} />
+          <section className="grid gap-8">
+            <Breadcrumbs />
+            <section className="grid gap-12">
+              <div className="grid gap-6">
+                <Heading as="h1">{account.name}</Heading>
+                <AccountBalanceHistoryChart data={plaa} />
+              </div>
+              <section className="grid gap-4">
+                <Heading className="text-2xl font-medium">Transactions</Heading>
+                <TransactionList transactions={transactions} />
+              </section>
             </section>
           </section>
         }

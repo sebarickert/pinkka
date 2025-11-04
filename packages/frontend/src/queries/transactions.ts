@@ -5,10 +5,12 @@ import { DateService } from '@/services/date-service'
 const transactionKeys = {
   all: ['transactions'] as const,
   lists: () => [...transactionKeys.all, 'list'] as const,
-  byMonthAndYear: (year: number, month: number) =>
-    [...transactionKeys.lists(), { year, month }] as const,
   latest: (limit: number) =>
     [...transactionKeys.lists(), 'latest', { limit }] as const,
+  byMonthAndYear: (year: number, month: number) =>
+    [...transactionKeys.lists(), { year, month }] as const,
+  byAccountAndYear: (accountId: string, year: number) =>
+    [...transactionKeys.lists(), { accountId, year }] as const,
   byAccountAndMonthAndYear: (accountId: string, year: number, month: number) =>
     [...transactionKeys.lists(), { accountId, year, month }] as const,
   byAccount: (accountId: string) =>
@@ -43,13 +45,14 @@ export const accountMonthTransactionsQueryOptions = ({
     queryFn: async () => TransactionService.getAll({ accountId, year, month }),
   })
 
-// const startDate = DateService.now().minus({ days: 30 }).toISODate()
-// const endDate = DateService.now().toISODate()
-
-// export const accountTransactionsQueryOptions = (accountId: string) => {
-//   return queryOptions({
-//     queryKey: transactionKeys.byAccount(accountId),
-//     queryFn: async () =>
-//       TransactionService.getAll({ accountId, from: startDate, to: endDate }),
-//   })
-// }
+export const accountYearTransactionsQueryOptions = ({
+  accountId,
+  year,
+}: {
+  accountId: string
+  year: number
+}) =>
+  queryOptions({
+    queryKey: transactionKeys.byAccountAndYear(accountId, year),
+    queryFn: async () => TransactionService.getAll({ accountId, year }),
+  })

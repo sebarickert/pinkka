@@ -71,7 +71,7 @@ export const BalanceSummary: FC = () => {
         items={list}
         label={
           <span className="inline-flex items-center gap-1">
-            {DateService.formatDate({ format: 'MONTH_LONG' })}
+            {DateService.formatDate({ format: 'MONTH_YEAR_LONG' })}
             <span
               className={cn(
                 'text-muted-foreground',

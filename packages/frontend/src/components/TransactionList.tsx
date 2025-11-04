@@ -70,7 +70,10 @@ const TransactionListItem: FC<{ transaction: TransactionDto }> = ({
           dateTime={transaction.date}
           className="text-muted-foreground truncate"
         >
-          {DateService.formatDate({ date: transaction.date, format: 'LONG' })}
+          {DateService.formatDate({
+            date: transaction.date,
+            format: 'DAY_MONTH_YEAR_LONG',
+          })}
         </time>
       </div>
       <span className="ml-auto font-medium">
