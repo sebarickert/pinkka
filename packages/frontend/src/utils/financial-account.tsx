@@ -45,65 +45,59 @@ export function constructBalanceChartData({
   accountId: string
   currentBalance: number
 }) {
-  const months = data.map((tx) => {
-    const dt = DateTime.fromISO(tx.date)
-    return { year: dt.year, month: dt.month }
-  })
-  const uniqueMonths = Array.from(
-    new Set(months.map((m) => `${m.year}-${m.month}`)),
-  ).map((str) => {
-    const [year, month] = str.split('-').map(Number)
-    return { year, month }
-  })
-  uniqueMonths.sort((a, b) =>
-    a.year === b.year ? a.month - b.month : a.year - b.year,
-  )
+  const groupedTransactionsByYearMonth = Object.groupBy(data, ({ date }) => {
+    const { year, month } = DateTime.fromISO(date)
+    return `${year}-${month}`
+  }) as Record<string, Array<TransactionDto>>
 
-  // Group transactions by year-month
-  const transactionsByYearMonth = new Map<string, Array<TransactionDto>>()
-  for (const tx of data) {
-    const dt = DateTime.fromISO(tx.date)
-    const key = `${dt.year}-${dt.month}`
-    if (!transactionsByYearMonth.has(key)) transactionsByYearMonth.set(key, [])
-    transactionsByYearMonth.get(key)!.push(tx)
-  }
+  const sortedUniqueMonthsAsc = Object.keys(groupedTransactionsByYearMonth)
+    .map((str) => {
+      const [year, month] = str.split('-').map(Number)
+      return { year, month }
+    })
+    .toSorted((a, b) =>
+      a.year === b.year ? a.month - b.month : a.year - b.year,
+    )
 
   let balance = currentBalance
   const result: Array<{ time: string; value: number }> = []
 
   // Start from latest month, go back to earliest
-  for (let i = uniqueMonths.length - 1; i >= 0; i--) {
-    const { year, month } = uniqueMonths[i]
+  for (let i = sortedUniqueMonthsAsc.length - 1; i >= 0; i--) {
+    const { year, month } = sortedUniqueMonthsAsc[i]
     const key = `${year}-${month}`
-    const txs = (transactionsByYearMonth.get(key) ?? []).sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-    )
+    const transactions = groupedTransactionsByYearMonth[key]
 
     // Reverse the effect of each transaction in this month
-    for (const tx of txs) {
-      if (tx.type === 'income' && tx.toAccountId === accountId)
-        balance -= tx.amount
-      if (tx.type === 'expense' && tx.fromAccountId === accountId)
-        balance += tx.amount
-      if (tx.type === 'transfer') {
-        if (tx.toAccountId === accountId) balance -= tx.amount
-        if (tx.fromAccountId === accountId) balance += tx.amount
+    for (const { type, toAccountId, fromAccountId, amount } of transactions) {
+      if (type === 'income' && toAccountId === accountId) {
+        balance -= amount
+      }
+
+      if (type === 'expense' && fromAccountId === accountId) {
+        balance += amount
+      }
+
+      if (type === 'transfer') {
+        if (toAccountId === accountId) balance -= amount
+        if (fromAccountId === accountId) {
+          balance += amount
+        }
       }
     }
 
     // Use last transaction date of the month, or last day of month if none
     let time: string
-    if (txs.length > 0) {
-      time = DateTime.fromISO(txs[0].date).toISODate()
-    } else {
-      time = DateTime.local(year, month).endOf('month').toISODate()
-    }
 
-    result.push({ time, value: balance })
+    if (transactions.length > 0) {
+      time =
+        DateTime.fromISO(transactions[0].date).endOf('month').toISODate() ?? ''
+      result.push({ time, value: balance })
+    }
   }
 
-  // Sort result oldest to newest
-  return result.sort(
-    (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime(),
+  return result.toSorted(
+    (a, b) =>
+      DateTime.fromISO(a.time).toMillis() - DateTime.fromISO(b.time).toMillis(),
   )
 }

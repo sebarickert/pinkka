@@ -12,7 +12,6 @@ import { Heading } from '@/components/Heading'
 import { TwoColumnLayout } from '@/components/TwoColumnLayout'
 import { TransactionList } from '@/components/TransactionList'
 import { AccountBalanceHistoryChart } from '@/components/AccountBalanceHistoryChart'
-import { constructBalanceChartData } from '@/utils/financial-account'
 
 export const Route = createFileRoute('/_authenticated/app/accounts/$accountId')(
   {
@@ -68,22 +67,10 @@ function RouteComponent() {
       month,
     }),
   )
-  const { data: balanceChartData } = useSuspenseQuery(
-    accountYearTransactionsQueryOptions({
-      accountId: params.accountId,
-      year,
-    }),
-  )
 
   if (!account) {
     return <div>Account not found</div>
   }
-
-  const plaa = constructBalanceChartData({
-    data: balanceChartData,
-    accountId: params.accountId,
-    currentBalance: account.balance,
-  })
 
   return (
     <article>
@@ -94,7 +81,10 @@ function RouteComponent() {
             <section className="grid gap-12">
               <div className="grid gap-6">
                 <Heading as="h1">{account.name}</Heading>
-                <AccountBalanceHistoryChart data={plaa} />
+                <AccountBalanceHistoryChart
+                  accountId={account.id}
+                  currentBalance={account.balance}
+                />
               </div>
               <section className="grid gap-4">
                 <Heading className="text-2xl font-medium">Transactions</Heading>
