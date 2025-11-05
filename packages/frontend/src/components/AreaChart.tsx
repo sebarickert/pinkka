@@ -17,6 +17,7 @@ export const AreaChart: FC<Props> = ({ data }) => {
 
     const container = chartContainerRef.current
 
+    const initialWidth = container.clientWidth
     const chart = createChart(container, {
       layout: {
         textColor: 'hsl(0 0% 65%)',
@@ -45,13 +46,14 @@ export const AreaChart: FC<Props> = ({ data }) => {
       },
       rightPriceScale: {
         borderVisible: false,
+        visible: initialWidth >= 700,
       },
       timeScale: {
         borderVisible: false,
         fixLeftEdge: true,
         fixRightEdge: true,
       },
-      width: container.clientWidth,
+      width: initialWidth,
       height: container.clientHeight,
     })
 
@@ -78,35 +80,58 @@ export const AreaChart: FC<Props> = ({ data }) => {
     const setTooltipHtml = ({
       date,
       price,
+      change,
     }: {
       date: string
       price: string
+      change?: number
     }) => {
       legend.innerHTML = `
         <span class="text-3xl/tight font-semibold">${price}</span>
-        <span class="text-muted-foreground text-sm">${date}</span>`
+        <span class="text-sm inline-flex items-center gap-1">
+          <span class="text-muted-foreground">${date}</span>
+          ${change ? `<span class="text-muted-foreground font-medium ${change && change > 0 ? 'text-green!' : 'text-red!'}">(${formatCurrency(change, true)})</span>` : ''}
+        </span>
+      `
     }
 
     const updateLegend = (param?: MouseEventParams) => {
-      const validCrosshairPoint =
+      const isHovering =
         param &&
         param.time !== undefined &&
         param.point &&
         param.point.x >= 0 &&
         param.point.y >= 0
 
-      const { time, value } = (
-        validCrosshairPoint
-          ? param.seriesData.get(areaSeries)
-          : areaSeries.dataByIndex(Number.MAX_SAFE_INTEGER, -1)
-      ) as { time: Time; value: number }
+      let hoveredIndex: number
+      let hoveredPoint: { time: Time; value: number }
+      if (isHovering) {
+        hoveredIndex = data.findIndex((entry) => entry.time === param.time)
+        hoveredPoint = param.seriesData.get(areaSeries) as {
+          time: Time
+          value: number
+        }
+      } else {
+        hoveredIndex = data.length - 1
+        hoveredPoint = areaSeries.dataByIndex(Number.MAX_SAFE_INTEGER, -1) as {
+          time: Time
+          value: number
+        }
+      }
+
+      // Calculate change from previous point
+      let monthChange: number | undefined = undefined
+      if (hoveredIndex > 0) {
+        monthChange = hoveredPoint.value - data[hoveredIndex - 1].value
+      }
 
       setTooltipHtml({
         date: DateService.formatDate({
-          date: time.toString(),
+          date: hoveredPoint.time.toString(),
           format: 'DAY_MONTH_YEAR_PRETTY',
         }),
-        price: formatCurrency(value),
+        price: formatCurrency(hoveredPoint.value),
+        change: monthChange,
       })
     }
 

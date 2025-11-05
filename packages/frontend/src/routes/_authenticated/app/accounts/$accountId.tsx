@@ -79,7 +79,7 @@ function RouteComponent() {
           <section className="grid gap-8">
             <Breadcrumbs />
             <section className="grid gap-12">
-              <div className="grid gap-6">
+              <div className="grid gap-4">
                 <Heading as="h1">{account.name}</Heading>
                 <AccountBalanceHistoryChart
                   accountId={account.id}

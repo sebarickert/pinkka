@@ -28,8 +28,8 @@ export const getAllTransactionsByAccountOptions = ({
   })
 
 export const latestTransactionsQueryOptions = queryOptions({
-  queryKey: transactionKeys.latest(10),
-  queryFn: async () => TransactionService.getAll({ limit: 10 }),
+  queryKey: transactionKeys.latest(5),
+  queryFn: async () => TransactionService.getAll({ limit: 5 }),
 })
 
 export const currentMonthTransactionsQueryOptions = () => {

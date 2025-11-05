@@ -21,7 +21,7 @@ export const Heading: FC<Props> = ({
       className={cn(
         {
           'text-lg': as !== 'h1',
-          'text-3xl/tight': as === 'h1',
+          'text-3xl font-medium': as === 'h1',
         },
         className,
       )}
