@@ -15,7 +15,9 @@ export const AreaChart: FC<Props> = ({ data }) => {
   useEffect(() => {
     if (!chartContainerRef.current) return
 
-    const chart = createChart(chartContainerRef.current, {
+    const container = chartContainerRef.current
+
+    const chart = createChart(container, {
       layout: {
         textColor: 'hsl(0 0% 65%)',
         background: { type: ColorType.Solid, color: 'transparent' },
@@ -49,6 +51,8 @@ export const AreaChart: FC<Props> = ({ data }) => {
         fixLeftEdge: true,
         fixRightEdge: true,
       },
+      width: container.clientWidth,
+      height: container.clientHeight,
     })
 
     const areaSeries = chart.addSeries(AreaSeries, {
@@ -69,7 +73,7 @@ export const AreaChart: FC<Props> = ({ data }) => {
     const legend = document.createElement('div')
     legend.classList.add('grid', 'absolute', 'left-0', 'top-0', 'z-10')
     legend.style.color = 'white'
-    chartContainerRef.current.appendChild(legend)
+    container.appendChild(legend)
 
     const setTooltipHtml = ({
       date,
@@ -110,15 +114,23 @@ export const AreaChart: FC<Props> = ({ data }) => {
     updateLegend(undefined)
     chart.timeScale().fitContent()
 
-    const handleResize = () => {
-      if (!chartContainerRef.current) return
-      chart.applyOptions({ width: chartContainerRef.current.clientWidth })
-    }
+    // Use ResizeObserver for more reliable resizing
+    const resizeObserver = new window.ResizeObserver(() => {
+      const width = container.clientWidth
 
-    window.addEventListener('resize', handleResize)
+      chart.applyOptions({
+        width,
+        height: container.clientHeight,
+        rightPriceScale: {
+          visible: width >= 700,
+        },
+      })
+    })
+
+    resizeObserver.observe(container)
 
     return () => {
-      window.removeEventListener('resize', handleResize)
+      resizeObserver.disconnect()
       chart.remove()
       legend.remove()
     }
@@ -128,7 +140,7 @@ export const AreaChart: FC<Props> = ({ data }) => {
     <div
       ref={chartContainerRef}
       data-slot="chart"
-      className="relative aspect-video w-full"
+      className="relative h-[400px] w-full overflow-hidden"
     />
   )
 }

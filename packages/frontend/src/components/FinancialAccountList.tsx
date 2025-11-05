@@ -32,14 +32,14 @@ export const FinancialAccountList: FC = () => {
             )),
         )}
       </List>
-      <Button
+      {/* <Button
         type="button"
         size="large"
         accentColor="secondary"
         className="w-full mt-3"
       >
         <Plus /> Add account
-      </Button>
+      </Button> */}
     </div>
   )
 }

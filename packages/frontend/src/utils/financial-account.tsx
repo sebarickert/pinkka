@@ -8,6 +8,7 @@ import {
 import { DateTime } from 'luxon'
 import type { FinancialAccountDto } from '@pinkka/schemas/financial-account-dto'
 import type { TransactionDto } from '@pinkka/schemas/transaction-dto'
+import { DateService } from '@/services/date-service'
 
 export const ACCOUNT_TYPE_LABEL_MAPPING: Record<
   FinancialAccountDto['type'],
@@ -86,7 +87,6 @@ export function constructBalanceChartData({
       }
     }
 
-    // Use last transaction date of the month, or last day of month if none
     let time: string
 
     if (transactions.length > 0) {
@@ -94,6 +94,17 @@ export function constructBalanceChartData({
         DateTime.fromISO(transactions[0].date).endOf('month').toISODate() ?? ''
       result.push({ time, value: balance })
     }
+  }
+
+  // Ensure last data point matches current balance
+  if (
+    result.length === 0 ||
+    result[result.length - 1].value !== currentBalance
+  ) {
+    result.push({
+      time: DateService.now().toISODate() || '',
+      value: currentBalance,
+    })
   }
 
   return result.toSorted(

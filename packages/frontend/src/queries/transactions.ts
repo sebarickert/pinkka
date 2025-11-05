@@ -17,6 +17,16 @@ const transactionKeys = {
     [...transactionKeys.lists(), { accountId }] as const,
 }
 
+export const getAllTransactionsByAccountOptions = ({
+  accountId,
+}: {
+  accountId: string
+}) =>
+  queryOptions({
+    queryKey: transactionKeys.byAccount(accountId),
+    queryFn: async () => TransactionService.getAll({ accountId }),
+  })
+
 export const latestTransactionsQueryOptions = queryOptions({
   queryKey: transactionKeys.latest(10),
   queryFn: async () => TransactionService.getAll({ limit: 10 }),
