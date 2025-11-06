@@ -6,7 +6,7 @@ const DATE_FORMAT = {
   MONTH_YEAR_LONG: 'LLLL yyyy', // May 2025
   DAY_MONTH_YEAR_PRETTY: 'd LLL, yyyy', // 5 May, 2025
   INPUT: "yyyy-MM-dd'T'HH:mm", // 2025-05-25T14:30
-  MONTH_DAY_LONG: 'd LLLL', // 31 October
+  MONTH_DAY_LONG: 'LLLL d', // October 31
   MONTH_DAY_YEAR_LONG: 'LLLL d, yyyy', // October 31, 2025
 } as const
 

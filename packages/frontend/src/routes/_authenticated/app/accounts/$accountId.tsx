@@ -1,7 +1,13 @@
 import { createFileRoute, useParams } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { useState } from 'react'
-import { Settings2 } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronLeft,
+  ChevronRight,
+  Settings2,
+} from 'lucide-react'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import {
   accountMonthTransactionsQueryOptions,
@@ -14,6 +20,8 @@ import { TwoColumnLayout } from '@/components/TwoColumnLayout'
 import { AccountBalanceHistoryChart } from '@/components/AccountBalanceHistoryChart'
 import { GroupedTransactionList } from '@/components/GroupedTransactionList'
 import { Button } from '@/components/Button'
+import { DetailsList } from '@/components/DetailsList'
+import { formatCurrency } from '@/utils/format-currency'
 
 export const Route = createFileRoute('/_authenticated/app/accounts/$accountId')(
   {
@@ -69,6 +77,32 @@ function RouteComponent() {
     return <div>Account not found</div>
   }
 
+  const incomeAmount = useMemo(() => {
+    return transactions
+      .filter(({ type }) => type === 'income')
+      .reduce((sum, txn) => sum + txn.amount, 0)
+  }, [transactions])
+  const expenseAmount = useMemo(() => {
+    return transactions
+      .filter(({ type }) => type === 'expense')
+      .reduce((sum, txn) => sum + txn.amount, 0)
+  }, [transactions])
+
+  const details = useMemo(() => {
+    return [
+      {
+        Icon: ArrowDown,
+        label: 'Incomes',
+        description: formatCurrency(incomeAmount),
+      },
+      {
+        Icon: ArrowUp,
+        label: 'Expenses',
+        description: formatCurrency(expenseAmount),
+      },
+    ]
+  }, [])
+
   return (
     <article>
       <TwoColumnLayout
@@ -88,19 +122,38 @@ function RouteComponent() {
                   <Heading className="text-2xl font-medium">
                     Transactions
                   </Heading>
-                  <Button
-                    type="button"
-                    accentColor="ghost"
-                    size="icon"
-                    className="-mb-2"
-                  >
-                    <Settings2 />
-                  </Button>
+                  <div>
+                    <Button
+                      type="button"
+                      accentColor="ghost"
+                      size="icon"
+                      className="-mb-2"
+                    >
+                      <ChevronLeft />
+                    </Button>
+                    <Button
+                      type="button"
+                      accentColor="ghost"
+                      size="icon"
+                      className="-mb-2"
+                    >
+                      <ChevronRight />
+                    </Button>
+                    <Button
+                      type="button"
+                      accentColor="ghost"
+                      size="icon"
+                      className="-mb-2"
+                    >
+                      <Settings2 />
+                    </Button>
+                  </div>
                 </div>
-                <div className="bg-layer rounded-md p-4 h-[200px]">
-                  Box with data some data of that monhts transactions?? amount,
-                  income, expense plaaplaaplaa
-                </div>
+                <DetailsList
+                  className="border-y pt-4 pb-6"
+                  label={DateService.formatDate({ format: 'MONTH_YEAR_LONG' })}
+                  items={details}
+                />
                 <GroupedTransactionList transactions={transactions} />
               </section>
             </section>

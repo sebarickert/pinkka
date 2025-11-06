@@ -29,7 +29,7 @@ export const GroupedTransactionList: FC<Props> = ({ transactions }) => {
             ? 'Yesterday'
             : DateService.formatDate({
                 date,
-                format: 'MONTH_DAY_YEAR_LONG',
+                format: 'MONTH_DAY_LONG',
               })
 
         return <TransactionList label={label} transactions={trxs!} />
