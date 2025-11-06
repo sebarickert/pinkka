@@ -63,49 +63,43 @@ export function constructBalanceChartData({
   let balance = currentBalance
   const result: Array<{ time: string; value: number }> = []
 
-  // Start from latest month, go back to earliest
+  const now = DateService.now()
+  const today = now.toISODate() || ''
+
+  // For each month, reverse only that month's transactions and add end-of-month point
   for (let i = sortedUniqueMonthsAsc.length - 1; i >= 0; i--) {
     const { year, month } = sortedUniqueMonthsAsc[i]
     const key = `${year}-${month}`
     const transactions = groupedTransactionsByYearMonth[key]
+
+    // If this is the current month, skip adding end-of-month point
+    if (year === now.year && month === now.month) {
+      continue
+    }
 
     // Reverse the effect of each transaction in this month
     for (const { type, toAccountId, fromAccountId, amount } of transactions) {
       if (type === 'income' && toAccountId === accountId) {
         balance -= amount
       }
-
       if (type === 'expense' && fromAccountId === accountId) {
         balance += amount
       }
-
       if (type === 'transfer') {
         if (toAccountId === accountId) balance -= amount
-        if (fromAccountId === accountId) {
-          balance += amount
-        }
+        if (fromAccountId === accountId) balance += amount
       }
     }
-
-    let time: string
-
+    // Add end-of-month point for this month
     if (transactions.length > 0) {
-      time =
+      const time =
         DateTime.fromISO(transactions[0].date).endOf('month').toISODate() ?? ''
       result.push({ time, value: balance })
     }
   }
 
-  // Ensure last data point matches current balance
-  if (
-    result.length === 0 ||
-    result[result.length - 1].value !== currentBalance
-  ) {
-    result.push({
-      time: DateService.now().toISODate() || '',
-      value: currentBalance,
-    })
-  }
+  // After reversing all current month transactions, add today/currentBalance
+  result.push({ time: today, value: currentBalance })
 
   return result.toSorted(
     (a, b) =>
