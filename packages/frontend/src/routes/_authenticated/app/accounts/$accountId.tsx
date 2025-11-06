@@ -1,6 +1,7 @@
 import { createFileRoute, useParams } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
+import { Settings2 } from 'lucide-react'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import {
   accountMonthTransactionsQueryOptions,
@@ -10,8 +11,9 @@ import { DateService } from '@/services/date-service'
 import { financialAccountByIdQueryOptions } from '@/queries/financial-accounts'
 import { Heading } from '@/components/Heading'
 import { TwoColumnLayout } from '@/components/TwoColumnLayout'
-import { TransactionList } from '@/components/TransactionList'
 import { AccountBalanceHistoryChart } from '@/components/AccountBalanceHistoryChart'
+import { GroupedTransactionList } from '@/components/GroupedTransactionList'
+import { Button } from '@/components/Button'
 
 export const Route = createFileRoute('/_authenticated/app/accounts/$accountId')(
   {
@@ -55,12 +57,7 @@ function RouteComponent() {
   const { data: account } = useSuspenseQuery(
     financialAccountByIdQueryOptions(params.accountId),
   )
-  const {
-    data: transactions,
-    isFetching,
-    isLoading,
-    isRefetching,
-  } = useSuspenseQuery(
+  const { data: transactions } = useSuspenseQuery(
     accountMonthTransactionsQueryOptions({
       accountId: params.accountId,
       year,
@@ -87,8 +84,24 @@ function RouteComponent() {
                 />
               </div>
               <section className="grid gap-4">
-                <Heading className="text-2xl font-medium">Transactions</Heading>
-                <TransactionList transactions={transactions} />
+                <div className="flex items-end justify-between flex-wrap">
+                  <Heading className="text-2xl font-medium">
+                    Transactions
+                  </Heading>
+                  <Button
+                    type="button"
+                    accentColor="ghost"
+                    size="icon"
+                    className="-mb-2"
+                  >
+                    <Settings2 />
+                  </Button>
+                </div>
+                <div className="bg-layer rounded-md p-4 h-[200px]">
+                  Box with data some data of that monhts transactions?? amount,
+                  income, expense plaaplaaplaa
+                </div>
+                <GroupedTransactionList transactions={transactions} />
               </section>
             </section>
           </section>
