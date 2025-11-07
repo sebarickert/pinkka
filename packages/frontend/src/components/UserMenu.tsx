@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { LogOut, UserRound } from 'lucide-react'
+import { LogOut, TextAlignJustify } from 'lucide-react'
 import { useId, useState } from 'react'
 import { useClickAway } from '@uidotdev/usehooks'
 import type { FC } from 'react'
@@ -44,7 +44,7 @@ export const UserMenu = () => {
         type="button"
         className="size-14 inline-flex items-center justify-center"
       > */}
-        <UserRound />
+        <TextAlignJustify />
       </button>
       <div
         aria-hidden={!isOpen}

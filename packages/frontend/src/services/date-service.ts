@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 
-const DATE_FORMAT = {
+export const DATE_FORMAT = {
   DAY_MONTH_YEAR: 'dd.MM.yyyy', // 25.05.2025
   DAY_MONTH_YEAR_LONG: 'dd.MM.yyyy, HH:mm', // 25.05.2025, 14:30
   MONTH_YEAR_LONG: 'LLLL yyyy', // May 2025
