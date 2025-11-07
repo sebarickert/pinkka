@@ -6,7 +6,16 @@ import {
 } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
-import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowUp,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Pen,
+  Pencil,
+  SquarePen,
+} from 'lucide-react'
 import * as z from 'zod'
 import { DateTime } from 'luxon'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
@@ -23,6 +32,8 @@ import { GroupedTransactionList } from '@/components/GroupedTransactionList'
 import { DetailsList } from '@/components/DetailsList'
 import { formatCurrency } from '@/utils/format-currency'
 import { cn } from '@/lib/utils'
+import { ACCOUNT_TYPE_LABEL_MAPPING } from '@/utils/financial-account'
+import { Button } from '@/components/Button'
 
 export const Route = createFileRoute('/_authenticated/app/accounts/$accountId')(
   {
@@ -88,6 +99,8 @@ function RouteComponent() {
     }),
   )
 
+  console.log(account)
+
   if (!account) {
     return <div>Account not found</div>
   }
@@ -103,7 +116,20 @@ function RouteComponent() {
       .reduce((sum, txn) => sum + txn.amount, 0)
   }, [transactions])
 
-  const details = useMemo(() => {
+  const accountDetails = useMemo(() => {
+    return [
+      {
+        label: 'Type',
+        description: ACCOUNT_TYPE_LABEL_MAPPING[account.type],
+      },
+      {
+        label: 'Balance',
+        description: formatCurrency(account.balance),
+      },
+    ]
+  }, [account])
+
+  const transactionsDetails = useMemo(() => {
     return [
       {
         Icon: ArrowDown,
@@ -139,6 +165,41 @@ function RouteComponent() {
             </section>
           </section>
         }
+        sidebar={
+          <aside>
+            <div className="grid gap-8">
+              <DetailsList label="Account Details" items={accountDetails} />
+              <div className="grid gap-4">
+                <Button
+                  type="button"
+                  accentColor="secondary"
+                  className="w-full"
+                  size="large"
+                >
+                  Edit
+                </Button>
+                {account.type === 'investment' && (
+                  <Button
+                    type="button"
+                    accentColor="secondary"
+                    className="w-full"
+                    size="large"
+                  >
+                    Update Market Value
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  accentColor="danger"
+                  className="w-full"
+                  size="large"
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          </aside>
+        }
       />
       <TwoColumnLayout
         main={
@@ -151,7 +212,7 @@ function RouteComponent() {
               <DetailsList
                 className="border-y pt-4 pb-6"
                 label={label}
-                items={details}
+                items={transactionsDetails}
               />
               <GroupedTransactionList transactions={transactions} />
             </section>
@@ -192,6 +253,18 @@ const Filters = () => {
       >
         <span className="sr-only">Previous month</span>
         <ChevronLeft />
+      </Link>
+      <Link
+        to="/app/accounts/$accountId"
+        params={{ accountId: params.accountId }}
+        search={{
+          month: DateService.now().month,
+          year: DateService.now().year,
+        }}
+        resetScroll={false}
+      >
+        <span className="sr-only">Current month</span>
+        <Calendar />
       </Link>
       <Link
         to="/app/accounts/$accountId"

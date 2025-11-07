@@ -17,6 +17,8 @@ export const GroupedTransactionList: FC<Props> = ({ transactions }) => {
   return (
     <div className="grid gap-4">
       {Object.entries(groupedTransactions).map(([date, trxs]) => {
+        if (!trxs || trxs.length === 0) return null
+
         const isToday = DateTime.fromISO(date).hasSame(DateTime.local(), 'day')
         const isYesterday = DateTime.fromISO(date).hasSame(
           DateTime.local().minus({ days: 1 }),
@@ -32,7 +34,7 @@ export const GroupedTransactionList: FC<Props> = ({ transactions }) => {
                 format: 'MONTH_DAY_LONG',
               })
 
-        return <TransactionList label={label} transactions={trxs!} />
+        return <TransactionList key={label} label={label} transactions={trxs} />
       })}
     </div>
   )

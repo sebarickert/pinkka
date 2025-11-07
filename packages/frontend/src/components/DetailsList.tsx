@@ -20,9 +20,9 @@ export const DetailsList: FC<Props> = ({ className, items, label }) => {
   const headingId = useId()
 
   return (
-    <div className={cn('grid', className)}>
+    <div className={cn('grid gap-3', className)}>
       {label && (
-        <Heading id={headingId} className="mb-3 font-medium">
+        <Heading id={headingId} className="font-medium">
           {label}
         </Heading>
       )}
