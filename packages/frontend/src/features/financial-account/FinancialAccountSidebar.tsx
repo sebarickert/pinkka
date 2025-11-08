@@ -6,6 +6,7 @@ import { ACCOUNT_TYPE_LABEL_MAPPING } from '@/utils/financial-account'
 import { formatCurrency } from '@/utils/format-currency'
 import { DetailsList } from '@/components/DetailsList'
 import { EditAccountDialog } from '@/features/financial-account/EditAccountDialog'
+import { DeleteAccountDialog } from '@/features/financial-account/DeleteAccountDialog'
 
 type Props = {
   account: FinancialAccountDto
@@ -41,14 +42,7 @@ export const FinancialAccountSidebar: FC<Props> = ({ account }) => {
               Update Market Value
             </Button>
           )}
-          <Button
-            type="button"
-            accentColor="secondary"
-            className="w-full"
-            size="large"
-          >
-            Delete
-          </Button>
+          <DeleteAccountDialog account={account} />
         </div>
       </div>
     </aside>

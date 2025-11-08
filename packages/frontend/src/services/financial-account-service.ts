@@ -74,4 +74,25 @@ export const FinancialAccountService = {
       return null
     }
   },
+  async delete(id: string): Promise<FinancialAccountDto | null> {
+    try {
+      const response = await fetch(`http://localhost:3000/api/accounts/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        return null
+      }
+
+      const { data: deletedAccount } = await response.json()
+
+      return deletedAccount
+    } catch (error) {
+      return null
+    }
+  },
 }
