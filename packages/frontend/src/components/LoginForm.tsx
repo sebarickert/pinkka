@@ -68,9 +68,8 @@ export const LoginForm: FC = () => {
           )}
         </div>
         <fieldset className="grid gap-6" disabled={isSubmitting}>
-          <form.Field
-            name="email"
-            children={(field) => {
+          <form.Field name="email">
+            {(field) => {
               return (
                 <Input
                   id={field.name}
@@ -87,10 +86,9 @@ export const LoginForm: FC = () => {
                 </Input>
               )
             }}
-          />
-          <form.Field
-            name="password"
-            children={(field) => {
+          </form.Field>
+          <form.Field name="password">
+            {(field) => {
               return (
                 <Input
                   id={field.name}
@@ -107,7 +105,7 @@ export const LoginForm: FC = () => {
                 </Input>
               )
             }}
-          />
+          </form.Field>
         </fieldset>
         <Button
           type="submit"

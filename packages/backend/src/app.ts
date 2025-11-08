@@ -22,11 +22,11 @@ if (FRONTEND_URL) {
     cors({
       origin: FRONTEND_URL,
       allowHeaders: ["Content-Type", "Authorization"],
-      allowMethods: ["POST", "GET", "OPTIONS"],
+      allowMethods: ["POST", "GET", "PUT", "DELETE", "OPTIONS"],
       exposeHeaders: ["Content-Length"],
       maxAge: 600,
       credentials: true,
-    }),
+    })
   );
 }
 

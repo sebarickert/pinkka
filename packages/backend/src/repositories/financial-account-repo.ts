@@ -9,11 +9,12 @@ import type {
   FindTransactionsFinancialAccountRepoParameters,
   IncrementBalanceRepoParameters,
   DecrementBalanceRepoParameters,
+  GetTransactionCountFinancialAccountRepoParameters,
 } from "@/types/repo/financial-account.js";
 
 export const FinancialAccountRepo = {
   async create(
-    parameters: CreateFinancialAccountRepoParameters,
+    parameters: CreateFinancialAccountRepoParameters
   ): Promise<FinancialAccount> {
     return (parameters.trx ?? db)
       .insertInto("financial_account")
@@ -22,7 +23,7 @@ export const FinancialAccountRepo = {
       .executeTakeFirstOrThrow();
   },
   async findOne(
-    parameters: FindOneFinancialAccountRepoParameters,
+    parameters: FindOneFinancialAccountRepoParameters
   ): Promise<FinancialAccount | undefined> {
     return (parameters.trx ?? db)
       .selectFrom("financial_account")
@@ -32,7 +33,7 @@ export const FinancialAccountRepo = {
       .executeTakeFirst();
   },
   async getAll(
-    parameters: GetAllFinancialAccountRepoParameters,
+    parameters: GetAllFinancialAccountRepoParameters
   ): Promise<FinancialAccount[]> {
     return (parameters.trx ?? db)
       .selectFrom("financial_account")
@@ -42,7 +43,7 @@ export const FinancialAccountRepo = {
       .execute();
   },
   async update(
-    parameters: UpdateFinancialAccountRepoParameters,
+    parameters: UpdateFinancialAccountRepoParameters
   ): Promise<FinancialAccount> {
     return (parameters.trx ?? db)
       .updateTable("financial_account")
@@ -53,7 +54,7 @@ export const FinancialAccountRepo = {
       .executeTakeFirstOrThrow();
   },
   async delete(
-    parameters: DeleteFinancialAccountRepoParameters,
+    parameters: DeleteFinancialAccountRepoParameters
   ): Promise<FinancialAccount> {
     return (parameters.trx ?? db)
       .updateTable("financial_account")
@@ -63,8 +64,25 @@ export const FinancialAccountRepo = {
       .returningAll()
       .executeTakeFirstOrThrow();
   },
+  async getTransactionCount(
+    parameters: GetTransactionCountFinancialAccountRepoParameters
+  ): Promise<number> {
+    const result = await (parameters.trx ?? db)
+      .selectFrom("transaction")
+      .where(({ eb, or }) =>
+        or([
+          eb("from_account_id", "=", parameters.id),
+          eb("to_account_id", "=", parameters.id),
+        ])
+      )
+      .where("user_id", "=", parameters.userId)
+      .select((parameters.trx ?? db).fn.countAll().as("count"))
+      .executeTakeFirstOrThrow();
+
+    return Number(result.count);
+  },
   async findTransactionsForTransactionAccount(
-    parameters: FindTransactionsFinancialAccountRepoParameters,
+    parameters: FindTransactionsFinancialAccountRepoParameters
   ) {
     return (parameters.trx ?? db)
       .selectFrom("transaction")
@@ -72,7 +90,7 @@ export const FinancialAccountRepo = {
         or([
           eb("from_account_id", "=", parameters.id),
           eb("to_account_id", "=", parameters.id),
-        ]),
+        ])
       )
       .where("user_id", "=", parameters.userId)
       .selectAll()

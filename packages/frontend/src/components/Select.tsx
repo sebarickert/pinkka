@@ -1,15 +1,20 @@
 import type { FC, InputHTMLAttributes } from 'react'
 import { cn } from '@/lib/utils'
 
-type Props = InputHTMLAttributes<HTMLInputElement> & {
-  children: string
-  description?: string
+type Option = {
+  value: string
+  label: string
 }
 
-export const Input: FC<Props> = ({
+type Props = InputHTMLAttributes<HTMLSelectElement> & {
+  children: string
+  options: Array<Option>
+}
+
+export const Select: FC<Props> = ({
   className,
   children,
-  description,
+  options,
   ...rest
 }) => {
   return (
@@ -17,19 +22,16 @@ export const Input: FC<Props> = ({
       <label className="leading-none" htmlFor={rest.id}>
         {children}
       </label>
-      <input
+      <select
         {...rest}
         className="theme-field block w-full py-2 px-4 h-14 text-base/7"
-        aria-describedby={description && `${rest.id}-description`}
-      />
-      {description && (
-        <p
-          id={`${rest.id}-description`}
-          className="text-sm text-muted-foreground"
-        >
-          {description}
-        </p>
-      )}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
     </div>
   )
 }

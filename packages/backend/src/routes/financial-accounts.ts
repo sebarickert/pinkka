@@ -21,7 +21,7 @@ accounts.get("/accounts", async (c) => {
 
     return success(
       c,
-      accounts.map((account) => FinancialAccountMapper.fromDb(account)),
+      accounts.map((account) => FinancialAccountMapper.fromDb(account))
     );
   } catch {
     return error(c, "Failed to fetch accounts", { data: error });
@@ -43,6 +43,33 @@ accounts.get("/accounts/:id", validateIdParameter, async (c) => {
   return success(c, FinancialAccountMapper.fromDb(account));
 });
 
+// @TODO: Add tests for this endpoint
+accounts.get(
+  "/accounts/:id/has-transactions",
+  validateIdParameter,
+  async (c) => {
+    const userId = c.get("user").id;
+    const { id } = c.req.param();
+
+    const account = await FinancialAccountRepo.findOne({ id, userId });
+
+    if (!account || account.is_deleted) {
+      return error(c, `Financial account with id ${id} not found`, {
+        status: 404,
+      });
+    }
+
+    const transactions = await FinancialAccountRepo.getTransactionCount({
+      id,
+      userId,
+    });
+
+    const hasTransactions = transactions > 0;
+
+    return success(c, { hasTransactions });
+  }
+);
+
 accounts.post(
   "/accounts",
   validateBody(NewFinancialAccountDtoSchema),
@@ -60,7 +87,7 @@ accounts.post(
     } catch (error_) {
       return error(c, "Failed to create financial account", { data: error_ });
     }
-  },
+  }
 );
 
 accounts.put(
@@ -118,7 +145,7 @@ accounts.put(
         data: error_,
       });
     }
-  },
+  }
 );
 
 accounts.delete("/accounts/:id", validateIdParameter, async (c) => {

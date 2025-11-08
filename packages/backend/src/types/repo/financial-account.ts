@@ -28,6 +28,11 @@ export type DeleteFinancialAccountRepoParameters = {
   userId: string;
 } & BaseRepoOptions;
 
+export type GetTransactionCountFinancialAccountRepoParameters = {
+  id: string;
+  userId: string;
+} & BaseRepoOptions;
+
 export type FindTransactionsFinancialAccountRepoParameters = {
   id: string;
   userId: string;

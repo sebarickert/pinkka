@@ -26,10 +26,17 @@ type Props = {
   title: string
   trigger: React.ReactNode
   children: React.ReactNode
+  open: boolean
+  setOpen: (open: boolean) => void
 }
 
-export const ResponsiveDialog: FC<Props> = ({ trigger, children, title }) => {
-  const [open, setOpen] = useState(false)
+export const ResponsiveDialog: FC<Props> = ({
+  trigger,
+  children,
+  title,
+  open = false,
+  setOpen,
+}) => {
   const isDesktop = useMediaQuery('(min-width: 768px)')
 
   if (isDesktop) {
