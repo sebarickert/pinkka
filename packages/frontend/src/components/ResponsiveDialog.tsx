@@ -1,14 +1,10 @@
 import { useMediaQuery } from '@uidotdev/usehooks'
-import { useState } from 'react'
 import type { FC } from 'react'
-import type { Button } from '@/components/Button'
 
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
@@ -24,6 +20,7 @@ import {
 
 type Props = {
   title: string
+  description?: string
   trigger: React.ReactNode
   children: React.ReactNode
   open: boolean
@@ -34,6 +31,7 @@ export const ResponsiveDialog: FC<Props> = ({
   trigger,
   children,
   title,
+  description,
   open = false,
   setOpen,
 }) => {
@@ -46,10 +44,9 @@ export const ResponsiveDialog: FC<Props> = ({
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>
-              Make changes to your profile here. Click save when you&apos;re
-              done.
-            </DialogDescription>
+            {description && (
+              <DialogDescription>{description}</DialogDescription>
+            )}
           </DialogHeader>
           {children}
         </DialogContent>
@@ -61,18 +58,11 @@ export const ResponsiveDialog: FC<Props> = ({
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>{trigger}</DrawerTrigger>
       <DrawerContent>
-        <DrawerHeader className="text-left">
+        <DrawerHeader>
           <DrawerTitle>{title}</DrawerTitle>
-          <DrawerDescription>
-            Make changes to your profile here. Click save when you&apos;re done.
-          </DrawerDescription>
+          {description && <DrawerDescription>{description}</DrawerDescription>}
         </DrawerHeader>
-        {children}
-        {/* <DrawerFooter className="pt-2">
-          <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
-        </DrawerFooter> */}
+        <div className="pt-4 px-6 pb-12">{children}</div>
       </DrawerContent>
     </Drawer>
   )

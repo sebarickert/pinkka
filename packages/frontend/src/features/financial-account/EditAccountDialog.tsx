@@ -36,7 +36,8 @@ export const EditAccountDialog: FC<Props> = ({ account }) => {
     <ResponsiveDialog
       open={open}
       setOpen={setOpen}
-      title="Edit account"
+      title="Update Account Details"
+      description="Edit the details for this account. Some fields may be disabled if there are existing transactions."
       trigger={
         <Button
           type="button"
@@ -197,11 +198,6 @@ const EditAccountForm: FC<{
                 onChange={(event) => {
                   field.handleChange(Number(event.target.value))
                 }}
-                description={
-                  hasTransactions
-                    ? 'Balance cannot be edited because this account already has transactions.'
-                    : undefined
-                }
               >
                 Balance
               </Input>
