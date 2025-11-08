@@ -12,9 +12,6 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
-  Pen,
-  Pencil,
-  SquarePen,
 } from 'lucide-react'
 import * as z from 'zod'
 import { DateTime } from 'luxon'
@@ -34,6 +31,7 @@ import { formatCurrency } from '@/utils/format-currency'
 import { cn } from '@/lib/utils'
 import { ACCOUNT_TYPE_LABEL_MAPPING } from '@/utils/financial-account'
 import { Button } from '@/components/Button'
+import { ResponsiveDialog } from '@/components/ResponsiveDialog'
 
 export const Route = createFileRoute('/_authenticated/app/accounts/$accountId')(
   {
@@ -170,14 +168,21 @@ function RouteComponent() {
             <div className="grid gap-8">
               <DetailsList label="Account Details" items={accountDetails} />
               <div className="grid gap-4">
-                <Button
-                  type="button"
-                  accentColor="secondary"
-                  className="w-full"
-                  size="large"
+                <ResponsiveDialog
+                  title="Edit account"
+                  trigger={
+                    <Button
+                      type="button"
+                      accentColor="secondary"
+                      className="w-full"
+                      size="large"
+                    >
+                      Edit
+                    </Button>
+                  }
                 >
-                  Edit
-                </Button>
+                  <div>hola</div>
+                </ResponsiveDialog>
                 {account.type === 'investment' && (
                   <Button
                     type="button"
