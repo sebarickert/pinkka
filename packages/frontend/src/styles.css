@@ -3,8 +3,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-@custom-variant dark (&:is(.dark *));
-
 @theme {
   --font-*: initial;
   --font-display: 'Inter', 'sans-serif';
@@ -28,20 +26,48 @@
   --color-layer-dark: hsl(0 0% 11%);
   --color-accent-dark: hsl(0 0% 16%);
 
-  --color-foreground: var(--color-foreground-dark);
-  --color-muted-foreground: var(--color-muted-foreground-dark);
-  --color-background: var(--color-background-dark);
-  --color-layer: var(--color-layer-dark);
-  --color-accent: var(--color-accent-dark);
+  --color-foreground: var(--color-foreground-light);
+  --color-muted-foreground: var(--color-muted-foreground-light);
+  --color-background: var(--color-background-light);
+  --color-layer: var(--color-layer-light);
+  --color-accent: var(--color-accent-light);
 
-  /* --header-height: 48px; */
   --navigation-height: 56px;
-  /* --content-header-height: 56px; */
-  /* --gutter-top: var(--header-height); */
   --gutter-bottom: var(--navigation-height);
 
-  /* --z-header: 100; */
   --z-navigation: 99;
+}
+
+@layer theme {
+  :root.dark {
+    --color-foreground: var(--color-foreground-dark);
+    --color-muted-foreground: var(--color-muted-foreground-dark);
+    --color-background: var(--color-background-dark);
+    --color-layer: var(--color-layer-dark);
+    --color-accent: var(--color-accent-dark);
+    @apply scheme-dark;
+  }
+
+  :root.light {
+    @apply scheme-light;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not(.dark) {
+      @apply scheme-light;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not(.light) {
+      --color-foreground: var(--color-foreground-dark);
+      --color-muted-foreground: var(--color-muted-foreground-dark);
+      --color-background: var(--color-background-dark);
+      --color-layer: var(--color-layer-dark);
+      --color-accent: var(--color-accent-dark);
+      @apply scheme-dark;
+    }
+  }
 }
 
 *,
@@ -75,7 +101,7 @@ a {
 }
 
 @utility button-secondary {
-  @apply text-foreground! border bg-transparent hover:bg-accent active:bg-accent;
+  @apply bg-layer hover:bg-accent active:bg-accent text-foreground!;
 }
 
 @utility button-danger {

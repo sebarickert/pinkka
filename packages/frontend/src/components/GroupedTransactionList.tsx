@@ -20,19 +20,22 @@ export const GroupedTransactionList: FC<Props> = ({ transactions }) => {
         if (!trxs || trxs.length === 0) return null
 
         const isToday = DateTime.fromISO(date).hasSame(DateTime.local(), 'day')
+        const isUpcoming = DateTime.fromISO(date) > DateTime.local()
         const isYesterday = DateTime.fromISO(date).hasSame(
           DateTime.local().minus({ days: 1 }),
           'day',
         )
 
-        const label = isToday
-          ? 'Today'
-          : isYesterday
-            ? 'Yesterday'
-            : DateService.formatDate({
-                date,
-                format: 'MONTH_DAY_LONG',
-              })
+        const label = isUpcoming
+          ? 'Upcoming'
+          : isToday
+            ? 'Today'
+            : isYesterday
+              ? 'Yesterday'
+              : DateService.formatDate({
+                  date,
+                  format: 'MONTH_DAY_LONG',
+                })
 
         return <TransactionList key={label} label={label} transactions={trxs} />
       })}

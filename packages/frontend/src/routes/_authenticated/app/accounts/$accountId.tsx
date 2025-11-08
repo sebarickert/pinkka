@@ -190,7 +190,7 @@ function RouteComponent() {
                 )}
                 <Button
                   type="button"
-                  accentColor="danger"
+                  accentColor="secondary"
                   className="w-full"
                   size="large"
                 >
