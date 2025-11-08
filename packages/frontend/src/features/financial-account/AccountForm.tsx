@@ -3,6 +3,7 @@ import * as z from 'zod'
 import { useForm, useStore } from '@tanstack/react-form'
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
 import type { FinancialAccountDto } from '@pinkka/schemas/financial-account-dto'
 import type { FC } from 'react'
 import { Input } from '@/components/Input'
@@ -43,13 +44,15 @@ const BUTTON_LABEL_MAPPING = {
 type Props = {
   account?: FinancialAccountDto
   hasTransactions?: boolean
-  onSubmit: (payload: AccountFormSchema) => Promise<void>
+  onSuccess: (account: FinancialAccountDto) => void
+  mutationFn: (data: AccountFormSchema) => Promise<FinancialAccountDto>
 }
 
 export const AccountForm: FC<Props> = ({
   account,
   hasTransactions,
-  onSubmit,
+  onSuccess,
+  mutationFn,
 }) => {
   const MODE = account ? 'edit' : 'create'
   const [error, setError] = useState<string | null>(null)
@@ -60,6 +63,12 @@ export const AccountForm: FC<Props> = ({
     balance: account?.balance || 0,
   }
 
+  const mutation = useMutation({
+    mutationFn,
+    onSuccess,
+    onError: (err) => setError(err.message),
+  })
+
   const form = useForm({
     defaultValues,
     validators: {
@@ -67,13 +76,7 @@ export const AccountForm: FC<Props> = ({
       onChange: AccountFormSchema,
     },
     async onSubmit({ value }) {
-      setError(null)
-
-      try {
-        await onSubmit(value)
-      } catch (err) {
-        setError('Something went wrong. Please try again.')
-      }
+      await mutation.mutateAsync(value)
     },
   })
 
@@ -96,7 +99,13 @@ export const AccountForm: FC<Props> = ({
         await form.handleSubmit()
       }}
     >
-      {error && <div className="text-destructive text-sm mb-2">{error}</div>}
+      <div aria-live="polite">
+        {error && (
+          <div className="bg-layer mb-8 text-sm p-4 text-center border rounded-md">
+            <span>{error}</span>
+          </div>
+        )}
+      </div>
       <fieldset className="grid gap-6" disabled={isSubmitting}>
         <form.Field name="name">
           {(field) => {

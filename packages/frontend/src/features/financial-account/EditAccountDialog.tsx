@@ -1,14 +1,7 @@
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from '@tanstack/react-query'
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import type { FC } from 'react'
-import type {
-  FinancialAccountDto,
-  UpdateFinancialAccountDto,
-} from '@pinkka/schemas/financial-account-dto'
+import type { FinancialAccountDto } from '@pinkka/schemas/financial-account-dto'
 import type { AccountFormSchema } from '@/features/financial-account/AccountForm'
 import { Button } from '@/components/Button'
 import { ResponsiveDialog } from '@/components/ResponsiveDialog'
@@ -30,32 +23,26 @@ export const EditAccountDialog: FC<Props> = ({ account }) => {
     accountHasTransactionsQueryOptions(account.id),
   )
 
-  const mutation = useMutation({
-    mutationFn: async ({
-      id,
-      payload,
-    }: {
-      id: string
-      payload: UpdateFinancialAccountDto
-    }) => FinancialAccountService.update(id, payload),
-    onSuccess: (updatedAccount) => {
-      queryClient.setQueryData(
-        financialAccountKeys.byId(account.id),
-        updatedAccount,
-      )
+  const handleSuccess = (updatedAccount: FinancialAccountDto) => {
+    queryClient.setQueryData(
+      financialAccountKeys.byId(account.id),
+      updatedAccount,
+    )
 
-      setOpen(false)
-    },
-  })
+    setOpen(false)
+  }
 
-  const handleSubmit = async (payload: AccountFormSchema) => {
-    const data = {
-      name: payload.name,
-      type: payload.type,
-      ...(hasTransactions ? {} : { initialBalance: payload.balance }),
+  const handleMutation = (data: AccountFormSchema) => {
+    const updatedAccount = {
+      name: data.name,
+      type: data.type,
+      ...(hasTransactions ? {} : { initialBalance: data.balance }),
     }
 
-    await mutation.mutateAsync({ id: account.id, payload: data })
+    return FinancialAccountService.update({
+      id: account.id,
+      data: updatedAccount,
+    })
   }
 
   return (
@@ -77,8 +64,9 @@ export const EditAccountDialog: FC<Props> = ({ account }) => {
     >
       <AccountForm
         account={account}
-        onSubmit={handleSubmit}
         hasTransactions={Boolean(hasTransactions)}
+        onSuccess={handleSuccess}
+        mutationFn={handleMutation}
       />
     </ResponsiveDialog>
   )

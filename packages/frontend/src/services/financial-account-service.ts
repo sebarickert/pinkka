@@ -4,7 +4,6 @@ import type {
   UpdateFinancialAccountDto,
 } from '@pinkka/schemas/financial-account-dto'
 
-// @todo: Add try catches and proper error handling/logging
 export const FinancialAccountService = {
   async getAll(): Promise<Array<FinancialAccountDto>> {
     const response = await fetch('http://localhost:3000/api/accounts', {
@@ -50,74 +49,61 @@ export const FinancialAccountService = {
 
     return data.hasTransactions
   },
-  async create(
-    data: NewFinancialAccountDto,
-  ): Promise<FinancialAccountDto | null> {
-    try {
-      const response = await fetch(`http://localhost:3000/api/accounts`, {
-        body: JSON.stringify(data),
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      })
+  async create(data: NewFinancialAccountDto): Promise<FinancialAccountDto> {
+    const response = await fetch(`http://localhost:3000/api/accounts`, {
+      body: JSON.stringify(data),
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
 
-      if (!response.ok) {
-        return null
-      }
-
-      const { data: newAccount } = await response.json()
-
-      return newAccount
-    } catch (error) {
-      return null
+    if (!response.ok) {
+      throw new Error('Something went wrong. Please try again.')
     }
+
+    const { data: newAccount } = await response.json()
+    return newAccount
   },
-  async update(
-    id: string,
-    data: UpdateFinancialAccountDto,
-  ): Promise<FinancialAccountDto | null> {
-    try {
-      const response = await fetch(`http://localhost:3000/api/accounts/${id}`, {
-        body: JSON.stringify(data),
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      })
+  async update({
+    id,
+    data,
+  }: {
+    id: string
+    data: UpdateFinancialAccountDto
+  }): Promise<FinancialAccountDto> {
+    const response = await fetch(`http://localhost:3000/api/accounts/${id}`, {
+      body: JSON.stringify(data),
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
 
-      if (!response.ok) {
-        return null
-      }
-
-      const { data: updatedAccount } = await response.json()
-
-      return updatedAccount
-    } catch (error) {
-      return null
+    if (!response.ok) {
+      throw new Error('Something went wrong. Please try again.')
     }
+
+    const { data: updatedAccount } = await response.json()
+    return updatedAccount
   },
-  async delete(id: string): Promise<FinancialAccountDto | null> {
-    try {
-      const response = await fetch(`http://localhost:3000/api/accounts/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      })
+  async delete(id: string): Promise<FinancialAccountDto> {
+    const response = await fetch(`http://localhost:3000/api/accounts/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
 
-      if (!response.ok) {
-        return null
-      }
-
-      const { data: deletedAccount } = await response.json()
-
-      return deletedAccount
-    } catch (error) {
-      return null
+    if (!response.ok) {
+      throw new Error('Something went wrong. Please try again.')
     }
+
+    const { data: deletedAccount } = await response.json()
+
+    return deletedAccount
   },
 }

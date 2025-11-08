@@ -18,9 +18,11 @@ export const DeleteAccountDialog: FC<Props> = ({ account }) => {
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const [error, setError] = useState<string | null>(null)
 
   const mutation = useMutation({
-    mutationFn: async (id: string) => FinancialAccountService.delete(id),
+    mutationFn: FinancialAccountService.delete,
+    onError: (err) => setError(err.message),
     onSuccess: () => {
       queryClient.setQueryData(financialAccountKeys.all, (oldData) =>
         (oldData as Array<FinancialAccountDto> | undefined)?.filter(
@@ -54,6 +56,13 @@ export const DeleteAccountDialog: FC<Props> = ({ account }) => {
       }
     >
       <div className="flex flex-col gap-4 *:w-full mt-2">
+        <div aria-live="polite">
+          {error && (
+            <div className="bg-layer mb-4 text-sm p-4 text-center border rounded-md">
+              <span>{error}</span>
+            </div>
+          )}
+        </div>
         <Button
           type="button"
           accentColor="danger"

@@ -34,13 +34,14 @@ export const FinancialAccountMapper = {
     };
   },
   updateDtoToDb(
-    dto: Partial<UpdateFinancialAccountDto>,
+    dto: Partial<UpdateFinancialAccountDto>
   ): Partial<FinancialAccountUpdate> {
     return {
       ...(dto.type !== undefined && { type: dto.type }),
       ...(dto.name !== undefined && { name: dto.name }),
       ...(dto.initialBalance !== undefined && {
         initial_balance: dto.initialBalance,
+        balance: dto.initialBalance,
       }),
       ...(dto.isDeleted !== undefined && { is_deleted: dto.isDeleted }),
     };

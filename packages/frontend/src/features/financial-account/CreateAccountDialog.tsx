@@ -1,11 +1,8 @@
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import type { FC } from 'react'
-import type {
-  FinancialAccountDto,
-  NewFinancialAccountDto,
-} from '@pinkka/schemas/financial-account-dto'
+import type { FinancialAccountDto } from '@pinkka/schemas/financial-account-dto'
 import type { AccountFormSchema } from '@/features/financial-account/AccountForm'
 import { AccountForm } from '@/features/financial-account/AccountForm'
 import { Button } from '@/components/Button'
@@ -17,27 +14,22 @@ export const CreateAccountDialog: FC = () => {
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
 
-  const mutation = useMutation({
-    mutationFn: async (payload: NewFinancialAccountDto) =>
-      FinancialAccountService.create(payload),
-    onSuccess: (newAccount) => {
-      console.log(newAccount)
-      queryClient.setQueryData(
-        financialAccountKeys.lists(),
-        (old: Array<FinancialAccountDto> = []) => [...old, newAccount],
-      )
-      setOpen(false)
-    },
-  })
+  const handleSuccess = (newAccount: FinancialAccountDto) => {
+    queryClient.setQueryData(
+      financialAccountKeys.lists(),
+      (old: Array<FinancialAccountDto> = []) => [...old, newAccount],
+    )
+    setOpen(false)
+  }
 
-  const handleSubmit = async (payload: AccountFormSchema) => {
-    const data = {
-      name: payload.name,
-      type: payload.type,
-      initialBalance: payload.balance,
+  const handleMutation = async (data: AccountFormSchema) => {
+    const newAccount = {
+      name: data.name,
+      type: data.type,
+      initialBalance: data.balance,
     }
 
-    await mutation.mutateAsync(data)
+    return FinancialAccountService.create(newAccount)
   }
 
   return (
@@ -57,7 +49,7 @@ export const CreateAccountDialog: FC = () => {
         </Button>
       }
     >
-      <AccountForm onSubmit={handleSubmit} />
+      <AccountForm onSuccess={handleSuccess} mutationFn={handleMutation} />
     </ResponsiveDialog>
   )
 }
