@@ -1,5 +1,6 @@
 import type {
   FinancialAccountDto,
+  NewFinancialAccountDto,
   UpdateFinancialAccountDto,
 } from '@pinkka/schemas/financial-account-dto'
 
@@ -48,6 +49,30 @@ export const FinancialAccountService = {
     }
 
     return data.hasTransactions
+  },
+  async create(
+    data: NewFinancialAccountDto,
+  ): Promise<FinancialAccountDto | null> {
+    try {
+      const response = await fetch(`http://localhost:3000/api/accounts`, {
+        body: JSON.stringify(data),
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        return null
+      }
+
+      const { data: newAccount } = await response.json()
+
+      return newAccount
+    } catch (error) {
+      return null
+    }
   },
   async update(
     id: string,

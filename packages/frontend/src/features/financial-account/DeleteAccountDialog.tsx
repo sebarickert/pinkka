@@ -31,8 +31,8 @@ export const DeleteAccountDialog: FC<Props> = ({ account }) => {
     },
   })
 
-  const handleSubmit = () => {
-    mutation.mutate(account.id)
+  const handleSubmit = async () => {
+    await mutation.mutateAsync(account.id)
     setOpen(false)
   }
 
