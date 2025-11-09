@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { LogOut, TextAlignJustify } from 'lucide-react'
+import { LogOut, Tag, TextAlignJustify } from 'lucide-react'
 import { useId, useState } from 'react'
 import { useClickAway } from '@uidotdev/usehooks'
 import type { FC } from 'react'
@@ -59,13 +59,13 @@ export const UserMenu = () => {
           'absolute top-[calc(100%+var(--spacing))] right-0',
         )}
       >
-        {/* <div role="group">
-          <UserMenuItem href="/u/resumes" icon={File}>
-            Resumes
+        <div role="group">
+          <UserMenuItem href="/app/categories" icon={Tag}>
+            Categories
           </UserMenuItem>
         </div>
         <div role="separator" className="h-px my-1 -mx-1 bg-background" />
-        <div role="group">
+        {/* <div role="group">
           <UserMenuItem href="/u/settings" icon={Settings}>
             Settings
           </UserMenuItem>
