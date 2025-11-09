@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { Plus } from 'lucide-react'
 import type { FC } from 'react'
 import type { CategoryDto } from '@pinkka/schemas/category-dto'
 import type { CategoryFormSchema } from '@/features/category/CategoryForm'
@@ -37,12 +38,8 @@ export const CreateCategoryDialog: FC = () => {
       title="Create New Category"
       description="Fill in the details below to create a new category."
       trigger={
-        <Button
-          type="button"
-          accentColor="secondary"
-          className="w-full"
-          size="large"
-        >
+        <Button type="button" accentColor="ghost">
+          <Plus />
           Create
         </Button>
       }

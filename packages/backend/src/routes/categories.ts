@@ -20,7 +20,7 @@ categories.get("/categories", async (c) => {
 
     return success(
       c,
-      categories.map((category) => CategoryMapper.fromDb(category)),
+      categories.map((category) => CategoryMapper.fromDb(category))
     );
   } catch (error_) {
     return error(c, "Failed to fetch categories", { data: error_ });
@@ -42,6 +42,33 @@ categories.get("/categories/:id", validateIdParameter, async (c) => {
   return success(c, CategoryMapper.fromDb(category));
 });
 
+// @TODO: Add tests for this endpoint
+categories.get(
+  "/categories/:id/has-transactions",
+  validateIdParameter,
+  async (c) => {
+    const userId = c.get("user").id;
+    const { id } = c.req.param();
+
+    const category = await CategoryRepo.findOne({ id, userId });
+
+    if (!category || category.is_deleted) {
+      return error(c, `Category with id ${id} not found`, {
+        status: 404,
+      });
+    }
+
+    const transactions = await CategoryRepo.getTransactionLinksCount({
+      id,
+      userId,
+    });
+
+    const hasTransactions = transactions > 0;
+
+    return success(c, { hasTransactions });
+  }
+);
+
 categories.post(
   "/categories",
   validateBody(NewCategoryDtoSchema),
@@ -58,7 +85,7 @@ categories.post(
     } catch (error_) {
       return error(c, "Failed to create category", { data: error_ });
     }
-  },
+  }
 );
 
 categories.put(
@@ -104,7 +131,7 @@ categories.put(
         data: error_,
       });
     }
-  },
+  }
 );
 
 categories.delete("/categories/:id", validateIdParameter, async (c) => {

@@ -37,24 +37,24 @@ export const CategoryService = {
 
     return account
   },
-  // async hasTransactions(id: string) {
-  //   const response = await fetch(
-  //     `http://localhost:3000/api/categories/${id}/has-transactions`,
-  //     {
-  //       credentials: 'include',
-  //     },
-  //   )
+  async hasTransactions(id: string) {
+    const response = await fetch(
+      `http://localhost:3000/api/categories/${id}/has-transactions`,
+      {
+        credentials: 'include',
+      },
+    )
 
-  //   if (!response.ok) {
-  //     return null
-  //   }
+    if (!response.ok) {
+      return null
+    }
 
-  //   const { data } = (await response.json()) as {
-  //     data: { hasTransactions: boolean }
-  //   }
+    const { data } = (await response.json()) as {
+      data: { hasTransactions: boolean }
+    }
 
-  //   return data.hasTransactions
-  // },
+    return data.hasTransactions
+  },
   async create(data: NewCategoryDto): Promise<CategoryDto> {
     const response = await fetch(`http://localhost:3000/api/categories`, {
       body: JSON.stringify(data),

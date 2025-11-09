@@ -19,13 +19,13 @@ export const Button: FC<Props> = ({
 }) => {
   const buttonStyles = {
     base: cn(
-      'text-sm/6 text-center transition-colors',
+      'text-sm/6 text-center',
       'focus-visible:focus-highlight whitespace-nowrap cursor-pointer',
       'inline-flex items-center justify-center',
       '[&:has(svg)]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0',
       'disabled:pointer-events-none disabled:opacity-50',
     ),
-    default: cn('py-1 px-4 h-11'),
+    default: cn('py-2.5 px-4'),
     large: cn('py-2 px-4 h-14 text-base/7'),
     icon: cn('h-11 w-11'),
   }

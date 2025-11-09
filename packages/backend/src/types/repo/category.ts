@@ -25,6 +25,11 @@ export type DeleteCategoryParameters = {
   userId: string;
 } & BaseRepoOptions;
 
+export type GetTransactionLinkCountCategoryRepoParameters = {
+  id: string;
+  userId: string;
+} & BaseRepoOptions;
+
 export type FindTransactionLinksCategoryParameters = {
   id: string;
 } & BaseRepoOptions;

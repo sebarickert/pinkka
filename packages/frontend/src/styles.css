@@ -113,5 +113,5 @@ a {
 }
 
 @utility button-ghost {
-  @apply text-foreground! bg-transparent hover:bg-accent active:bg-accent;
+  @apply text-muted-foreground! bg-transparent hover:bg-accent hover:text-foreground! active:bg-accent active:text-foreground!;
 }

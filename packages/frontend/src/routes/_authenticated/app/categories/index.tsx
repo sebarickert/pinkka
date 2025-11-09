@@ -10,7 +10,6 @@ import { getAllCategoriesOptions } from '@/queries/categories'
 export const Route = createFileRoute('/_authenticated/app/categories/')({
   loader: async ({ context }) => {
     const queryClient = context.queryClient
-
     await queryClient.ensureQueryData(getAllCategoriesOptions)
   },
   component: RouteComponent,
@@ -25,14 +24,12 @@ function RouteComponent() {
         main={
           <section className="grid gap-8">
             <Breadcrumbs />
-            <Heading as="h1">Categories</Heading>
+            <div className="grid grid-cols-[1fr_auto] items-center">
+              <Heading as="h1">Categories</Heading>
+              <CreateCategoryDialog />
+            </div>
             <CategoryList categories={categories} />
           </section>
-        }
-        sidebar={
-          <aside>
-            <CreateCategoryDialog />
-          </aside>
         }
       />
     </div>

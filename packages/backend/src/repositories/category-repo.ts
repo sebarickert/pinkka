@@ -7,6 +7,7 @@ import type {
   FindOneCategoryParameters,
   FindTransactionLinksCategoryParameters,
   GetAllCategoryParameters,
+  GetTransactionLinkCountCategoryRepoParameters,
   UpdateCategoryParameters,
 } from "@/types/repo/category.js";
 
@@ -34,6 +35,7 @@ export const CategoryRepo = {
       .where("user_id", "=", parameters.userId)
       .where("is_deleted", "=", false)
       .selectAll()
+      .orderBy("name", "asc")
       .execute();
   },
   async update(parameters: UpdateCategoryParameters): Promise<Category> {
@@ -53,6 +55,17 @@ export const CategoryRepo = {
       .set({ is_deleted: true })
       .returningAll()
       .executeTakeFirstOrThrow();
+  },
+  async getTransactionLinksCount(
+    parameters: GetTransactionLinkCountCategoryRepoParameters
+  ): Promise<number> {
+    const result = await (parameters.trx ?? db)
+      .selectFrom("transaction_category")
+      .where("category_id", "=", parameters.id)
+      .select((parameters.trx ?? db).fn.countAll().as("count"))
+      .executeTakeFirstOrThrow();
+
+    return Number(result.count);
   },
   async findTransactionLinks(
     parameters: FindTransactionLinksCategoryParameters

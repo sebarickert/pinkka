@@ -39,12 +39,7 @@ export const CreateAccountDialog: FC = () => {
       title="Create New Account"
       description="Fill in the details below to create a new account."
       trigger={
-        <Button
-          type="button"
-          size="large"
-          accentColor="secondary"
-          className="w-full"
-        >
+        <Button type="button" accentColor="secondary">
           <Plus /> Create Account
         </Button>
       }

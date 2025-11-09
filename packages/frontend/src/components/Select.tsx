@@ -1,3 +1,4 @@
+import { Loader2 } from 'lucide-react'
 import type { FC, InputHTMLAttributes } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -9,18 +10,24 @@ type Option = {
 type Props = InputHTMLAttributes<HTMLSelectElement> & {
   children: string
   options: Array<Option>
+  isLoading?: boolean
 }
 
 export const Select: FC<Props> = ({
   className,
   children,
   options,
+  isLoading,
   ...rest
 }) => {
   return (
     <div className={cn(className, 'grid gap-3')}>
-      <label className="leading-none" htmlFor={rest.id}>
+      <label
+        className="leading-none inline-flex gap-2 items-center"
+        htmlFor={rest.id}
+      >
         {children}
+        {isLoading && <Loader2 className="animate-spin size-5" />}
       </label>
       <select
         {...rest}

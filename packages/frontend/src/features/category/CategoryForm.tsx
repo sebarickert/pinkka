@@ -45,6 +45,7 @@ type Props = {
   hasTransactions?: boolean
   onSuccess: (category: CategoryDto) => void
   mutationFn: (data: CategoryFormSchema) => Promise<CategoryDto>
+  isLoadingTransactionLinks?: boolean
 }
 
 export const CategoryForm: FC<Props> = ({
@@ -52,6 +53,7 @@ export const CategoryForm: FC<Props> = ({
   hasTransactions,
   onSuccess,
   mutationFn,
+  isLoadingTransactionLinks,
 }) => {
   const MODE = category ? 'edit' : 'create'
   const [error, setError] = useState<string | null>(null)
@@ -134,6 +136,8 @@ export const CategoryForm: FC<Props> = ({
                 onBlur={field.handleBlur}
                 required
                 options={CATEGORY_TYPE_OPTIONS}
+                disabled={isLoadingTransactionLinks || hasTransactions}
+                isLoading={isLoadingTransactionLinks}
                 onChange={(event) => {
                   field.handleChange(
                     event.target
