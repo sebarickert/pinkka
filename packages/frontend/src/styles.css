@@ -85,7 +85,7 @@ a {
 }
 
 @utility focus-highlight {
-  @apply outline-hidden ring-2 ring-blue dark:ring-white ring-inset;
+  @apply outline-hidden ring-2 ring-blue dark:ring-white;
 }
 
 @utility theme-field {

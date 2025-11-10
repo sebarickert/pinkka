@@ -25,16 +25,7 @@ export const ListTEst: FC<ListProps> = ({ label, children, className }) => {
         aria-labelledby={label ? headingId : undefined}
       >
         {Children.map(children, (child) => {
-          return (
-            child && (
-              <li
-                data-slot="list-item"
-                className={cn('[&>*:focus-visible]:ring-inset')}
-              >
-                {child}
-              </li>
-            )
-          )
+          return child && <li data-slot="list-item">{child}</li>
         })}
       </ul>
     </section>
