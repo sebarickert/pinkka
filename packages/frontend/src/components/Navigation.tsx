@@ -23,8 +23,7 @@ export const Navigation: FC = () => {
     <nav
       className={clsx(
         'bg-layer/85 backdrop-blur',
-        'fixed left-0 right-0 bottom-0',
-        // 'fixed left-0 right-0 bottom-0 z-(--z-navigation)',
+        'fixed left-0 right-0 bottom-0 z-(--z-navigation)',
         'h-14 grid grid-cols-3',
         '*:w-full *:h-full *:flex *:flex-col *:justify-center *:items-center',
       )}

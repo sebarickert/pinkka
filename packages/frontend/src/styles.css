@@ -35,6 +35,8 @@
   --navigation-height: 56px;
   --gutter-bottom: var(--navigation-height);
 
+  --z-drawer: 100;
+  --z-dialog: 100;
   --z-navigation: 99;
 }
 
