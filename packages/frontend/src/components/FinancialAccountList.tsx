@@ -7,7 +7,7 @@ import { financialAccountsQueryOptions } from '@/queries/financial-accounts'
 import { getFinancialAccountIcon } from '@/utils/financial-account'
 import { CreateAccountDialog } from '@/features/financial-account/CreateAccountDialog'
 import { cn } from '@/lib/utils'
-import { ListTEst } from '@/components/ListTEst'
+import { List } from '@/components/List'
 
 const ACCOUNT_TYPE_ORDER: Array<FinancialAccountDto['type']> = [
   'bank',
@@ -23,7 +23,7 @@ export const FinancialAccountList: FC = () => {
 
   return (
     <div className="grid gap-2">
-      <ListTEst label="Accounts">
+      <List label="Accounts">
         {ACCOUNT_TYPE_ORDER.map((type) =>
           accountsByType[type]
             ?.toSorted((a, b) => a.name.localeCompare(b.name))
@@ -31,7 +31,7 @@ export const FinancialAccountList: FC = () => {
               <FinancialAccountListItem key={account.id} account={account} />
             )),
         )}
-      </ListTEst>
+      </List>
       <CreateAccountDialog />
     </div>
   )

@@ -2,7 +2,7 @@ import { Tags } from 'lucide-react'
 import type { FC } from 'react'
 import type { CategoryDto } from '@pinkka/schemas/category-dto'
 import { cn } from '@/lib/utils'
-import { ListTEst } from '@/components/ListTEst'
+import { List } from '@/components/List'
 import { TRANSACTION_TYPE_LABEL_MAPPING } from '@/utils/transaction'
 import { EditCategoryDialog } from '@/features/category/EditCategoryDialog'
 import { DeleteCategoryDialog } from '@/features/category/DeleteCategoryDialog'
@@ -14,11 +14,11 @@ type Props = {
 
 export const CategoryList: FC<Props> = ({ label, categories }) => {
   return (
-    <ListTEst label={label}>
+    <List label={label}>
       {categories.map((category) => (
         <CategoryListItem category={category} />
       ))}
-    </ListTEst>
+    </List>
   )
 }
 

@@ -6,16 +6,10 @@ import { Heading } from '@/components/Heading'
 interface ListProps {
   children: React.ReactNode | Array<React.ReactNode>
   className?: string
-  itemRoundness?: boolean
   label?: string
 }
 
-export const List: FC<ListProps> = ({
-  label,
-  children,
-  className,
-  itemRoundness = true,
-}) => {
+export const List: FC<ListProps> = ({ label, children, className }) => {
   const headingId = useId()
 
   return (
@@ -27,24 +21,11 @@ export const List: FC<ListProps> = ({
       )}
       <ul
         data-slot="list"
-        className={cn('grid divide-y', {})}
+        className={cn('grid gap-2')}
         aria-labelledby={label ? headingId : undefined}
       >
         {Children.map(children, (child) => {
-          return (
-            child && (
-              <li
-                data-slot="list-item"
-                className={cn(
-                  '[&>*:focus-visible]:ring-inset',
-                  itemRoundness && 'first:[&>:not(style)]:rounded-t-md',
-                  itemRoundness && 'last:[&>:not(style)]:rounded-b-md',
-                )}
-              >
-                {child}
-              </li>
-            )
-          )
+          return child && <li data-slot="list-item">{child}</li>
         })}
       </ul>
     </section>
