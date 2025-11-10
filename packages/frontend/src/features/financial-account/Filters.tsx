@@ -1,8 +1,9 @@
-import { Link, useParams, useSearch } from '@tanstack/react-router'
+import { useParams, useSearch } from '@tanstack/react-router'
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 import { DateTime } from 'luxon'
 import { DateService } from '@/services/date-service'
 import { cn } from '@/lib/utils'
+import { ButtonLink } from '@/components/ButtonLink'
 
 export const Filters = () => {
   const params = useParams({ from: '/_authenticated/app/accounts/$accountId' })
@@ -21,9 +22,10 @@ export const Filters = () => {
       className={cn(
         'inline-flex items-center',
         '*:h-11 *:w-11 *:inline-flex *:items-center *:justify-center *:-mb-2',
+        '*:text-foreground!',
       )}
     >
-      <Link
+      <ButtonLink
         to="/app/accounts/$accountId"
         params={{ accountId: params.accountId }}
         search={{
@@ -31,11 +33,12 @@ export const Filters = () => {
           year: previous.year,
         }}
         resetScroll={false}
+        accentColor="ghost"
       >
         <span className="sr-only">Previous month</span>
         <ChevronLeft />
-      </Link>
-      <Link
+      </ButtonLink>
+      <ButtonLink
         to="/app/accounts/$accountId"
         params={{ accountId: params.accountId }}
         search={{
@@ -43,11 +46,12 @@ export const Filters = () => {
           year: DateService.now().year,
         }}
         resetScroll={false}
+        accentColor="ghost"
       >
         <span className="sr-only">Current month</span>
         <Calendar />
-      </Link>
-      <Link
+      </ButtonLink>
+      <ButtonLink
         to="/app/accounts/$accountId"
         params={{ accountId: params.accountId }}
         search={{
@@ -55,10 +59,11 @@ export const Filters = () => {
           year: next.year,
         }}
         resetScroll={false}
+        accentColor="ghost"
       >
         <span className="sr-only">Next month</span>
         <ChevronRight />
-      </Link>
+      </ButtonLink>
     </div>
   )
 }
