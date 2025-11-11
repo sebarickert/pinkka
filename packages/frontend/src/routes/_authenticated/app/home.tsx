@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
 import { FinancialAccountList } from '@/components/FinancialAccountList'
-import { TransactionList } from '@/components/TransactionList'
+import { TransactionList } from '@/features/transaction/TransactionList'
 import { BalanceSummary } from '@/components/BalanceSummary'
 import {
   currentMonthTransactionsQueryOptions,

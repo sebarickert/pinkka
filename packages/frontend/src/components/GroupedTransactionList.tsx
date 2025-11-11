@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import type { TransactionDto } from '@pinkka/schemas/transaction-dto'
 import type { FC } from 'react'
-import { TransactionList } from '@/components/TransactionList'
+import { TransactionList } from '@/features/transaction/TransactionList'
 import { DateService } from '@/services/date-service'
 
 type Props = {

@@ -1,11 +1,13 @@
 import type {
   NewTransactionDto,
+  TransactionDetailDto,
   TransactionDto,
   UpdateTransactionDto,
 } from "@pinkka/schemas/transaction-dto.js";
 import type {
   NewTransaction,
   Transaction,
+  TransactionDetail,
   TransactionUpdate,
 } from "@/types/db/transaction.js";
 
@@ -20,6 +22,22 @@ export const TransactionMapper = {
       date: db.date.toISOString(),
       fromAccountId: db.from_account_id ?? null,
       toAccountId: db.to_account_id ?? null,
+      createdAt: db.created_at.toISOString(),
+      updatedAt: db.updated_at.toISOString(),
+    };
+  },
+  fromDbDetail(db: TransactionDetail): TransactionDetailDto {
+    return {
+      id: db.id,
+      userId: db.user_id,
+      type: db.type,
+      amount: Number(Number(db.amount).toFixed(2)),
+      description: db.description,
+      date: db.date.toISOString(),
+      fromAccountId: db.from_account_id ?? null,
+      toAccountId: db.to_account_id ?? null,
+      fromAccountName: db.from_account_name ?? null,
+      toAccountName: db.to_account_name ?? null,
       createdAt: db.created_at.toISOString(),
       updatedAt: db.updated_at.toISOString(),
     };

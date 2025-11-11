@@ -13,6 +13,11 @@ export type FindOneTransactionRepoParameters = {
   userId: string;
 } & BaseRepoOptions;
 
+export type FindDetailsTransactionRepoParameters = {
+  id: string;
+  userId: string;
+} & BaseRepoOptions;
+
 export type GetAllTransactionRepoParameters = {
   userId: string;
   accountId?: string;

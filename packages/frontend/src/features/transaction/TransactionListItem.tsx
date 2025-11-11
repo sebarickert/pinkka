@@ -1,61 +1,29 @@
-import { ArrowDown, ArrowDownUp, ArrowUp } from 'lucide-react'
-import type { FC } from 'react'
 import type { TransactionDto } from '@pinkka/schemas/transaction-dto'
-import { formatCurrency } from '@/utils/format-currency'
-import { DateService } from '@/services/date-service'
+import type { FC } from 'react'
 import { cn } from '@/lib/utils'
-import { List } from '@/components/List'
+import { DateService } from '@/services/date-service'
+import { formatCurrency } from '@/utils/format-currency'
+import { getAmountAbbreviation, getTransactionIcon } from '@/utils/transaction'
 
 type Props = {
-  label?: string
-  transactions: Array<TransactionDto>
+  transaction: TransactionDto
 }
 
-export const TransactionList: FC<Props> = ({ label, transactions }) => {
-  return (
-    <List label={label}>
-      {transactions.map((transaction) => (
-        <TransactionListItem transaction={transaction} />
-      ))}
-    </List>
-  )
-}
-
-const getAmountAbbreviation = (type: TransactionDto['type']) => {
-  switch (type) {
-    case 'income':
-      return '+'
-    case 'expense':
-      return '-'
-    default:
-      return ''
-  }
-}
-
-const getTransactionIcon = (type: TransactionDto['type']) => {
-  switch (type) {
-    case 'income':
-      return <ArrowDown />
-    case 'expense':
-      return <ArrowUp />
-    case 'transfer':
-    default:
-      return <ArrowDownUp />
-  }
-}
-
-const TransactionListItem: FC<{ transaction: TransactionDto }> = ({
-  transaction,
-}) => {
+export const TransactionListItem: FC<Props> = ({ transaction, ...rest }) => {
   const abbreviation = getAmountAbbreviation(transaction.type)
 
   return (
-    <div
+    <button
+      // Pass in drawer/dialog props
+      {...rest}
+      type="button"
       className={cn(
-        'grid grid-cols-[auto_1fr_auto] items-center gap-4 pr-2',
-        'hover:bg-layer',
+        'grid grid-cols-[auto_1fr_auto] items-center gap-4',
+        'xl:pr-2 w-full text-left',
+        'focus-visible:focus-highlight hover:bg-layer hover:cursor-pointer',
         'group',
       )}
+      aria-label={`Open details for transaction ${transaction.description}`}
     >
       <div
         className={cn(
@@ -87,6 +55,6 @@ const TransactionListItem: FC<{ transaction: TransactionDto }> = ({
         <span className="sr-only">Transaction amount</span>
         <span>{`${abbreviation}${formatCurrency(transaction.amount)}`}</span>
       </span>
-    </div>
+    </button>
   )
 }

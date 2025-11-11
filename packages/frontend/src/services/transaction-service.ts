@@ -1,4 +1,7 @@
-import type { TransactionDto } from '@pinkka/schemas/transaction-dto'
+import type {
+  TransactionDetailDto,
+  TransactionDto,
+} from '@pinkka/schemas/transaction-dto'
 
 export type CommonQueryParams = {
   sort?: string
@@ -31,5 +34,35 @@ export const TransactionService = {
     const { data: transactions } = await response.json()
 
     return transactions
+  },
+  async getById(id: string): Promise<TransactionDto> {
+    const response = await fetch(
+      `http://localhost:3000/api/transactions/${id}`,
+      {
+        credentials: 'include',
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error('Something went wrong. Please try again.')
+    }
+
+    const { data: transaction } = await response.json()
+    return transaction
+  },
+  async getByIdDetails(id: string): Promise<TransactionDetailDto> {
+    const response = await fetch(
+      `http://localhost:3000/api/transactions/${id}/details`,
+      {
+        credentials: 'include',
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error('Something went wrong. Please try again.')
+    }
+
+    const { data: transaction } = await response.json()
+    return transaction
   },
 }

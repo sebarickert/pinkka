@@ -15,7 +15,21 @@ const transactionKeys = {
     [...transactionKeys.lists(), { accountId, year, month }] as const,
   byAccount: (accountId: string) =>
     [...transactionKeys.lists(), { accountId }] as const,
+  byId: (id: string) => [...transactionKeys.all, id] as const,
 }
+
+export const transactionByIdQueryOptions = (id: string) =>
+  queryOptions({
+    queryKey: transactionKeys.byId(id),
+    queryFn: async () => TransactionService.getById(id),
+  })
+
+export const transactionByIdDetailsQueryOptions = (id: string) =>
+  queryOptions({
+    queryKey: transactionKeys.byId(id),
+    queryFn: async () => TransactionService.getByIdDetails(id),
+    staleTime: Infinity,
+  })
 
 export const getAllTransactionsByAccountOptions = ({
   accountId,

@@ -34,8 +34,8 @@ export const TransactionDtoSchema = z
   .strictObject({
     id: z.uuid(),
     userId: z.uuid(),
-    toAccountId: z.uuid().nullable().optional(),
-    fromAccountId: z.uuid().nullable().optional(),
+    toAccountId: z.uuid().nullable(),
+    fromAccountId: z.uuid().nullable(),
     type: transactionTypeSchema,
     amount: z.coerce.number().min(0),
     description: z.string().max(255),
@@ -94,20 +94,26 @@ export const UpdateTransactionDtoSchema = TransactionDtoSchema.omit({
   .partial()
   .safeExtend({ categoryId: z.uuid().nullable().optional() });
 
-export const TransactionWithCategoryDtoSchema = TransactionDtoSchema.safeExtend(
-  {
-    category: z
-      .object({
-        id: z.uuid(),
-        name: z.string(),
-      })
-      .optional(),
-  },
-);
+export const TransactionDetailDtoSchema = TransactionDtoSchema.safeExtend({
+  fromAccountName: z.string().nullable(),
+  toAccountName: z.string().nullable(),
+});
+
+// export const TransactionWithCategoryDtoSchema = TransactionDtoSchema.safeExtend(
+//   {
+//     category: z
+//       .object({
+//         id: z.uuid(),
+//         name: z.string(),
+//       })
+//       .optional(),
+//   }
+// );
 
 export type TransactionDto = z.infer<typeof TransactionDtoSchema>;
 export type NewTransactionDto = z.infer<typeof NewTransactionDtoSchema>;
 export type UpdateTransactionDto = z.infer<typeof UpdateTransactionDtoSchema>;
-export type TransactionWithCategoryDto = z.infer<
-  typeof TransactionWithCategoryDtoSchema
->;
+export type TransactionDetailDto = z.infer<typeof TransactionDetailDtoSchema>;
+// export type TransactionWithCategoryDto = z.infer<
+//   typeof TransactionWithCategoryDtoSchema
+// >;

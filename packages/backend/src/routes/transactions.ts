@@ -29,6 +29,26 @@ transactions.get("/transactions/:id", validateIdParameter, async (c) => {
   return success(c, TransactionMapper.fromDb(transaction));
 });
 
+// @todo: Add tests
+transactions.get(
+  "/transactions/:id/details",
+  validateIdParameter,
+  async (c) => {
+    const userId = c.get("user").id;
+    const { id } = c.req.param();
+
+    const transaction = await TransactionRepo.findDetails({ id, userId });
+
+    if (!transaction) {
+      return error(c, `Transaction with id ${id} not found`, {
+        status: 404,
+      });
+    }
+
+    return success(c, TransactionMapper.fromDbDetail(transaction));
+  }
+);
+
 transactions.get("/transactions", async (c) => {
   const userId = c.get("user").id;
   const { limit, year, month, accountId } = c.req.query();

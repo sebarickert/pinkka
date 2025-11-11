@@ -23,3 +23,8 @@ export type TransactionTable = {
 export type Transaction = Selectable<TransactionTable>;
 export type NewTransaction = Insertable<TransactionTable>;
 export type TransactionUpdate = Updateable<TransactionTable>;
+
+export type TransactionDetail = Transaction & {
+  from_account_name: string | null;
+  to_account_name: string | null;
+};
