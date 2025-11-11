@@ -21,9 +21,9 @@ export const Select: FC<Props> = ({
   ...rest
 }) => {
   return (
-    <div className={cn(className, 'grid gap-3')}>
+    <div className={cn(className, 'grid')}>
       <label
-        className="leading-none inline-flex gap-2 items-center"
+        className="leading-none inline-flex gap-2 items-center pb-3"
         htmlFor={rest.id}
       >
         {children}

@@ -13,8 +13,8 @@ export const Input: FC<Props> = ({
   ...rest
 }) => {
   return (
-    <div className={cn(className, 'grid gap-3')}>
-      <label className="leading-none" htmlFor={rest.id}>
+    <div className={cn(className, 'grid')}>
+      <label className="leading-none pb-3" htmlFor={rest.id}>
         {children}
       </label>
       <input
@@ -25,7 +25,7 @@ export const Input: FC<Props> = ({
       {description && (
         <p
           id={`${rest.id}-description`}
-          className="text-sm text-muted-foreground"
+          className="text-sm text-muted-foreground mt-3"
         >
           {description}
         </p>
