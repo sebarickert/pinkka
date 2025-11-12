@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 import { TransactionService } from '@/services/transaction-service'
 import { DateService } from '@/services/date-service'
 
-const transactionKeys = {
+export const transactionKeys = {
   all: ['transactions'] as const,
   lists: () => [...transactionKeys.all, 'list'] as const,
   latest: (limit: number) =>

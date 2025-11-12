@@ -1,4 +1,7 @@
-import type { TransactionDto } from "@pinkka/schemas/transaction-dto.js";
+import type {
+  TransactionDetailDto,
+  TransactionDto,
+} from "@pinkka/schemas/transaction-dto.js";
 import { TransactionRepo } from "@/repositories/transaction-repo.js";
 import { TransactionCategoryRepo } from "@/repositories/transaction-category-repo.js";
 import { db } from "@/lib/db.js";
@@ -12,7 +15,7 @@ import { TransactionMapper } from "@/mappers/transaction-mapper.js";
 
 export const TransactionService = {
   async create(
-    parameters: CreateTransactionServiceParameters,
+    parameters: CreateTransactionServiceParameters
   ): Promise<TransactionDto> {
     const { categoryId, ...newTransaction } = parameters.data;
 
@@ -44,8 +47,8 @@ export const TransactionService = {
     return TransactionMapper.fromDb(transaction);
   },
   async update(
-    parameters: UpdateTransactionServiceParameters,
-  ): Promise<TransactionDto> {
+    parameters: UpdateTransactionServiceParameters
+  ): Promise<TransactionDetailDto> {
     const { categoryId, ...updatedTransactionFields } = parameters.data;
 
     const transaction = await db.transaction().execute(async (trx) => {
@@ -93,13 +96,25 @@ export const TransactionService = {
         });
       }
 
-      return updatedTransaction;
+      const detailedTransaction = await TransactionRepo.findDetails({
+        id: updatedTransaction.id,
+        userId: updatedTransaction.user_id,
+        trx,
+      });
+
+      if (!detailedTransaction) {
+        throw new Error(
+          `Transaction with id ${updatedTransaction.id} not found`
+        );
+      }
+
+      return detailedTransaction;
     });
 
-    return TransactionMapper.fromDb(transaction);
+    return TransactionMapper.fromDbDetail(transaction);
   },
   async delete(
-    parameters: DeleteTransactionServiceParameters,
+    parameters: DeleteTransactionServiceParameters
   ): Promise<boolean> {
     const { id, userId, transaction } = parameters;
 

@@ -1,6 +1,7 @@
 import type {
   TransactionDetailDto,
   TransactionDto,
+  UpdateTransactionDto,
 } from '@pinkka/schemas/transaction-dto'
 
 export type CommonQueryParams = {
@@ -64,5 +65,51 @@ export const TransactionService = {
 
     const { data: transaction } = await response.json()
     return transaction
+  },
+  async update({
+    id,
+    data,
+  }: {
+    id: string
+    data: UpdateTransactionDto
+  }): Promise<TransactionDetailDto> {
+    const response = await fetch(
+      `http://localhost:3000/api/transactions/${id}`,
+      {
+        body: JSON.stringify(data),
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error('Something went wrong. Please try again.')
+    }
+
+    const { data: updatedAccount } = await response.json()
+    return updatedAccount
+  },
+  async delete(id: string): Promise<TransactionDetailDto> {
+    const response = await fetch(
+      `http://localhost:3000/api/transactions/${id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error('Something went wrong. Please try again.')
+    }
+
+    const { data: deletedTransaction } = await response.json()
+
+    return deletedTransaction
   },
 }
