@@ -17,7 +17,7 @@ export const BUTTON_STYLES = {
     'disabled:pointer-events-none disabled:opacity-50',
   ),
   default: cn('py-2.5 px-4'),
-  large: cn('py-2 px-4 h-14 text-base/7'),
+  large: cn('py-2 px-4 h-14 text-base'),
   icon: cn('h-11 w-11'),
 }
 

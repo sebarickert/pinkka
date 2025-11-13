@@ -29,6 +29,17 @@ export const EditAccountDialog: FC<Props> = ({ account }) => {
       updatedAccount,
     )
 
+    queryClient.setQueryData(
+      financialAccountKeys.lists(),
+      (oldData?: Array<FinancialAccountDto>) => {
+        if (!oldData) return oldData
+
+        return oldData.map((acc) =>
+          acc.id === updatedAccount.id ? updatedAccount : acc,
+        )
+      },
+    )
+
     setOpen(false)
   }
 

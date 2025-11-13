@@ -1,32 +1,25 @@
 import { Link } from '@tanstack/react-router'
-import clsx from 'clsx'
-import { History, Home, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { FC } from 'react'
 import { cn } from '@/lib/utils'
+import { NAVIGATION_ITEMS } from '@/constants/navigation'
 
-const NAVIGATION_ITEMS = {
-  home: {
-    href: '/app/home',
-    title: 'Home',
-    icon: Home,
-  },
-  activity: {
-    href: '/app/activity',
-    title: 'Activity',
-    icon: History,
-  },
+type Props = {
+  className?: string
 }
 
-export const Navigation: FC = () => {
+export const MobileNavigation: FC<Props> = ({ className }) => {
   return (
     <nav
-      className={clsx(
+      className={cn(
         'bg-layer/85 backdrop-blur',
         'fixed left-0 right-0 bottom-0 z-(--z-navigation)',
         'h-14 grid grid-cols-3',
         '*:w-full *:h-full *:flex *:flex-col *:justify-center *:items-center',
+        className,
       )}
+      aria-label="Main navigation"
     >
       <NavigationItem {...NAVIGATION_ITEMS.home} />
       <button

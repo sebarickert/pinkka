@@ -34,12 +34,15 @@
   --color-layer: var(--color-layer-light);
   --color-accent: var(--color-accent-light);
 
-  --navigation-height: 56px;
-  --gutter-bottom: var(--navigation-height);
+  --header-height: 56px;
+  --mobile-navigation-height: 56px;
+  --gutter-top: var(--header-height);
+  --gutter-bottom: var(--mobile-navigation-height);
 
   --z-drawer: 100;
   --z-dialog: 100;
   --z-navigation: 99;
+  --z-header: 99;
 }
 
 @layer theme {
