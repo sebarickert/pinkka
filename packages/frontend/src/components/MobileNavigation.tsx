@@ -4,6 +4,7 @@ import type { LucideIcon } from 'lucide-react'
 import type { FC } from 'react'
 import { cn } from '@/lib/utils'
 import { NAVIGATION_ITEMS } from '@/constants/navigation'
+import { CreateTransactionDialog } from '@/features/transaction/CreateTransactionDialog'
 
 type Props = {
   className?: string
@@ -22,16 +23,19 @@ export const MobileNavigation: FC<Props> = ({ className }) => {
       aria-label="Main navigation"
     >
       <NavigationItem {...NAVIGATION_ITEMS.home} />
-      <button
-        type="button"
-        className={cn(
-          'focus-visible:focus-highlight text-muted-foreground',
-          'transition-colors',
-        )}
-      >
-        <Plus />
-        <span className="sr-only">Create</span>
-      </button>
+      <CreateTransactionDialog>
+        <button
+          type="button"
+          className={cn(
+            'focus-visible:focus-highlight text-muted-foreground',
+            'transition-colors',
+            'focus-visible:ring-inset',
+          )}
+        >
+          <Plus />
+          <span className="sr-only">Create</span>
+        </button>
+      </CreateTransactionDialog>
       <NavigationItem {...NAVIGATION_ITEMS.activity} />
     </nav>
   )
@@ -48,6 +52,7 @@ const NavigationItem: FC<{ href: string; title: string; icon: LucideIcon }> = ({
       className={cn(
         'text-muted-foreground',
         'aria-[current=page]:text-foreground transition-colors',
+        'focus-visible:ring-inset',
       )}
       title={title}
       activeOptions={{ exact: true }}

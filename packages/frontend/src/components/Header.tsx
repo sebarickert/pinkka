@@ -1,11 +1,12 @@
-import { Plus } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
+import { Plus } from 'lucide-react'
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { UserMenu } from '@/components/UserMenu'
 import { DesktopNavigation } from '@/components/DesktopNavigation'
 import { cn } from '@/lib/utils'
 import { Logo } from '@/components/Logo'
+import { CreateTransactionDialog } from '@/features/transaction/CreateTransactionDialog'
 
 export const Header = () => {
   return (
@@ -22,17 +23,18 @@ export const Header = () => {
         >
           <Logo className="size-9" />
         </Link>
-
         <DesktopNavigation className="max-lg:hidden" />
-        <Button
-          type="button"
-          accentColor="ghost"
-          size="large"
-          className="text-foreground! text-sm! focus-visible:ring-inset max-lg:hidden"
-        >
-          <Plus />
-          Create
-        </Button>
+        <CreateTransactionDialog>
+          <Button
+            type="button"
+            accentColor="ghost"
+            size="large"
+            className="text-foreground! text-sm! focus-visible:ring-inset max-lg:hidden"
+          >
+            <Plus />
+            Create
+          </Button>
+        </CreateTransactionDialog>
         <UserMenu />
       </Container>
     </header>

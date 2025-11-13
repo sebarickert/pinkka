@@ -1,4 +1,5 @@
 import type {
+  NewTransactionDto,
   TransactionDetailDto,
   TransactionDto,
   UpdateTransactionDto,
@@ -65,6 +66,24 @@ export const TransactionService = {
 
     const { data: transaction } = await response.json()
     return transaction
+  },
+  async create(data: NewTransactionDto): Promise<TransactionDto> {
+    const response = await fetch(`http://localhost:3000/api/transactions`, {
+      body: JSON.stringify(data),
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
+
+    if (!response.ok) {
+      console.log(await response.json())
+      throw new Error('Something went wrong. Please try again.')
+    }
+
+    const { data: newTransaction } = await response.json()
+    return newTransaction
   },
   async update({
     id,

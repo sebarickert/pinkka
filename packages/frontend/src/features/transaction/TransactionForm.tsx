@@ -6,6 +6,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import type { financialAccountTypesSchema } from '@pinkka/schemas/financial-account-dto'
 import type {
   TransactionDetailDto,
+  TransactionDto,
   transactionTypeSchema,
 } from '@pinkka/schemas/transaction-dto'
 import type { FC } from 'react'
@@ -118,8 +119,10 @@ const BUTTON_LABEL_MAPPING = {
 
 type Props = {
   transaction?: TransactionDetailDto
-  onSuccess: (transaction: TransactionDetailDto) => void
-  mutationFn: (data: TransactionFormSchema) => Promise<TransactionDetailDto>
+  onSuccess: (transaction: TransactionDto | TransactionDetailDto) => void
+  mutationFn: (
+    data: TransactionFormSchema,
+  ) => Promise<TransactionDto | TransactionDetailDto>
 }
 
 export const TransactionForm: FC<Props> = ({
@@ -357,7 +360,7 @@ export const TransactionForm: FC<Props> = ({
                   field.handleChange(event.target.value)
                 }}
               >
-                Name
+                Description
               </Input>
             )
           }}
