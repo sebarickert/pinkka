@@ -1,14 +1,15 @@
 import * as z from 'zod'
 import { useForm, useStore } from '@tanstack/react-form'
-import { Loader2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import type { financialAccountTypesSchema } from '@pinkka/schemas/financial-account-dto'
+import { transactionTypeSchema } from '@pinkka/schemas/transaction-dto'
 import type {
   TransactionDetailDto,
   TransactionDto,
-  transactionTypeSchema,
+  TransactionType,
 } from '@pinkka/schemas/transaction-dto'
+import type { financialAccountTypesSchema } from '@pinkka/schemas/financial-account-dto'
 import type { FC } from 'react'
 import { Input } from '@/components/Input'
 import { Select } from '@/components/Select'
@@ -16,9 +17,11 @@ import { Button } from '@/components/Button'
 import { cn } from '@/lib/utils'
 import { DateService } from '@/services/date-service'
 import { financialAccountsQueryOptions } from '@/queries/financial-accounts'
+import { TransactionTypeSwitcher } from '@/features/transaction/TransactionTypeSwitcher'
 
 const BaseTransactionFormSchema = z.object({
-  description: z.string(),
+  type: transactionTypeSchema,
+  description: z.string().min(1),
   amount: z.number().positive(),
   date: z.string(),
   // @todo: Implement when backend returns categories via transaction dto
@@ -38,9 +41,7 @@ const TransferTransactionFormSchema = BaseTransactionFormSchema.extend({
   toAccountId: z.string(),
 })
 
-function getTransactionFormSchemaByType(
-  type: z.infer<typeof transactionTypeSchema>,
-) {
+function getTransactionFormSchemaByType(type: TransactionType) {
   switch (type) {
     case 'income':
       return IncomeTransactionFormSchema
@@ -53,12 +54,14 @@ function getTransactionFormSchemaByType(
 }
 
 function getDefaultValuesByType(
-  type: z.infer<typeof transactionTypeSchema>,
+  type: TransactionType,
   transaction?: TransactionDetailDto,
 ) {
   const baseDefaultValues = {
+    type,
     description: transaction?.description || '',
-    amount: transaction?.amount || 0,
+    // NaN to make field empty if no amount is provided
+    amount: transaction?.amount || NaN,
     date: DateService.formatDate({ date: transaction?.date, format: 'INPUT' }),
     // @todo: Implement when backend returns categories via transaction dto
     // categoryId: '',
@@ -205,21 +208,40 @@ export const TransactionForm: FC<Props> = ({
         await form.handleSubmit()
       }}
     >
-      <div aria-live="polite">
+      <div aria-live="polite" aria-atomic>
         {error && (
           <div className="bg-layer mb-8 text-sm p-4 text-center border rounded-md">
             <span>{error}</span>
           </div>
         )}
       </div>
-      <fieldset className="grid gap-6" disabled={isSubmitting}>
+      <fieldset className="grid gap-4" disabled={isSubmitting}>
+        {MODE === 'create' && (
+          <form.Field name="type">
+            {(field) => {
+              return (
+                <TransactionTypeSwitcher
+                  transactionType={transactionType}
+                  name={field.name}
+                  id={field.name}
+                  onChange={(event) => {
+                    field.handleChange(event.target.value as TransactionType)
+                    setTransactionType(event.target.value as TransactionType)
+                  }}
+                />
+              )
+            }}
+          </form.Field>
+        )}
         <form.Field name="amount">
           {(field) => {
             return (
               <Input
+                hideLabel
                 id={field.name}
                 name={field.name}
                 type="number"
+                min={0.01}
                 step={0.01}
                 value={field.state.value}
                 onBlur={field.handleBlur}
@@ -257,13 +279,16 @@ export const TransactionForm: FC<Props> = ({
             {(field) => {
               return (
                 <Select
+                  hideLabel
                   id={field.name}
                   name={field.name}
                   type="number"
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   required
+                  placeholder="From Account"
                   options={ACCOUNT_OPTIONS}
+                  icon={ArrowUp}
                   onChange={(event) => {
                     field.handleChange(
                       event.target
@@ -302,12 +327,15 @@ export const TransactionForm: FC<Props> = ({
             {(field) => {
               return (
                 <Select
+                  hideLabel
                   id={field.name}
                   name={field.name}
                   type="number"
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   required
+                  icon={ArrowDown}
+                  placeholder="To Account"
                   options={ACCOUNT_OPTIONS}
                   onChange={(event) => {
                     field.handleChange(
@@ -350,6 +378,7 @@ export const TransactionForm: FC<Props> = ({
           {(field) => {
             return (
               <Input
+                hideLabel
                 id={field.name}
                 name={field.name}
                 type="text"
@@ -369,6 +398,7 @@ export const TransactionForm: FC<Props> = ({
           {(field) => {
             return (
               <Input
+                hideLabel
                 id={field.name}
                 name={field.name}
                 type="datetime-local"

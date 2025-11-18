@@ -28,11 +28,6 @@ export const CreateTransactionDialog: FC<Props> = ({ children }) => {
   }
 
   const handleMutation = (data: TransactionFormSchema) => {
-    const isIncome = 'toAccountId' in data && !('fromAccountId' in data)
-    const isExpense = 'fromAccountId' in data && !('toAccountId' in data)
-
-    const type = isExpense ? 'expense' : isIncome ? 'income' : 'transfer'
-
     const date = DateTime.fromISO(data.date).toISO()?.toString()
 
     if (!date) {
@@ -41,13 +36,13 @@ export const CreateTransactionDialog: FC<Props> = ({ children }) => {
 
     const newTransaction = {
       date,
-      type,
+      type: data.type,
       amount: data.amount,
       description: data.description,
-      ...('fromAccountId' in data
+      ...('fromAccountId' in data && data.fromAccountId
         ? { fromAccountId: data.fromAccountId }
         : { fromAccountId: null }),
-      ...('toAccountId' in data
+      ...('toAccountId' in data && data.toAccountId
         ? { toAccountId: data.toAccountId }
         : { toAccountId: null }),
       // @todo: Implement when backend returns categories via transaction dto

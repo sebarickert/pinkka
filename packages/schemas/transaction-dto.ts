@@ -29,6 +29,7 @@ const validateTransferTransaction = (data: any) => {
 };
 
 export const transactionTypeSchema = z.enum(["income", "expense", "transfer"]);
+export type TransactionType = z.infer<typeof transactionTypeSchema>;
 
 export const TransactionDtoSchema = z
   .strictObject({
