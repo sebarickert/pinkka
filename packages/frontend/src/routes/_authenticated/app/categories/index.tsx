@@ -5,18 +5,18 @@ import { TwoColumnLayout } from '@/components/TwoColumnLayout'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { CreateCategoryDialog } from '@/features/category/CreateCategoryDialog'
 import { CategoryList } from '@/features/category/CategoryList'
-import { getAllCategoriesOptions } from '@/queries/categories'
+import { categoriesQueryOptions } from '@/queries/categories'
 
 export const Route = createFileRoute('/_authenticated/app/categories/')({
   loader: async ({ context }) => {
     const queryClient = context.queryClient
-    await queryClient.ensureQueryData(getAllCategoriesOptions)
+    await queryClient.ensureQueryData(categoriesQueryOptions)
   },
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { data: categories } = useSuspenseQuery(getAllCategoriesOptions)
+  const { data: categories } = useSuspenseQuery(categoriesQueryOptions)
 
   return (
     <div>

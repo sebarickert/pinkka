@@ -152,6 +152,7 @@ transactions.put(
           id: categoryId,
           userId,
         });
+
         if (!category) {
           return error(c, `Category with id ${categoryId} not found`, {
             status: 404,

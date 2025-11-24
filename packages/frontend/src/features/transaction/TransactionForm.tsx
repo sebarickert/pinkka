@@ -1,6 +1,6 @@
 import * as z from 'zod'
 import { useForm, useStore } from '@tanstack/react-form'
-import { ArrowDown, ArrowUp, Loader2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, Loader2, Tags } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { transactionTypeSchema } from '@pinkka/schemas/transaction-dto'
@@ -18,27 +18,27 @@ import { cn } from '@/lib/utils'
 import { DateService } from '@/services/date-service'
 import { financialAccountsQueryOptions } from '@/queries/financial-accounts'
 import { TransactionTypeSwitcher } from '@/features/transaction/TransactionTypeSwitcher'
+import { categoriesQueryOptions } from '@/queries/categories'
 
 const BaseTransactionFormSchema = z.object({
   type: transactionTypeSchema,
   description: z.string().min(1),
   amount: z.number().positive(),
   date: z.string(),
-  // @todo: Implement when backend returns categories via transaction dto
-  // categoryId: z.string().optional(),
+  categoryId: z.string(),
 })
 
 const IncomeTransactionFormSchema = BaseTransactionFormSchema.extend({
-  toAccountId: z.string(),
+  toAccountId: z.string().min(1, 'To account is required'),
 })
 
 const ExpenseTransactionFormSchema = BaseTransactionFormSchema.extend({
-  fromAccountId: z.string(),
+  fromAccountId: z.string().min(1, 'From account is required'),
 })
 
 const TransferTransactionFormSchema = BaseTransactionFormSchema.extend({
-  fromAccountId: z.string(),
-  toAccountId: z.string(),
+  fromAccountId: z.string().min(1, 'From account is required'),
+  toAccountId: z.string().min(1, 'To account is required'),
 })
 
 function getTransactionFormSchemaByType(type: TransactionType) {
@@ -63,8 +63,7 @@ function getDefaultValuesByType(
     // NaN to make field empty if no amount is provided
     amount: transaction?.amount || NaN,
     date: DateService.formatDate({ date: transaction?.date, format: 'INPUT' }),
-    // @todo: Implement when backend returns categories via transaction dto
-    // categoryId: '',
+    categoryId: transaction?.categoryId || '',
   }
 
   switch (type) {
@@ -137,9 +136,13 @@ export const TransactionForm: FC<Props> = ({
   const [error, setError] = useState<string | null>(null)
   // @todo: add loaders to form, so before accounts are loaded, show a spinner
   const { data: accounts } = useQuery(financialAccountsQueryOptions)
+  // @todo: add loaders to form, so before categories are loaded, show a spinner
+  const { data: categories } = useQuery(categoriesQueryOptions)
   const [transactionType, setTransactionType] = useState(
     transaction?.type || 'expense',
   )
+
+  const hasCategories = categories?.some(({ type }) => type === transactionType)
 
   const TransactionFormSchema = getTransactionFormSchemaByType(transactionType)
   const defaultValues = getDefaultValuesByType(transactionType, transaction)
@@ -162,7 +165,6 @@ export const TransactionForm: FC<Props> = ({
   const form = useForm({
     defaultValues,
     validators: {
-      onMount: TransactionFormSchema,
       onChange: TransactionFormSchema,
     },
     async onSubmit({ value }) {
@@ -170,6 +172,7 @@ export const TransactionForm: FC<Props> = ({
     },
   })
 
+  const isTouched = useStore(form.store, (state) => state.isTouched)
   const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
   const canSubmit = useStore(form.store, (state) => state.canSubmit)
   const hasFormUpdatedValues = useStore(form.store, (state) => {
@@ -192,8 +195,8 @@ export const TransactionForm: FC<Props> = ({
       currentValues.amount !== defaultValues.amount ||
       currentValues.date !== defaultValues.date ||
       hasToAccountIdChanged ||
-      hasFromAccountIdChanged
-      // currentValues.categoryId !== defaultValues.categoryId || --- IGNORE ---
+      hasFromAccountIdChanged ||
+      currentValues.categoryId !== defaultValues.categoryId
     )
   })
 
@@ -225,8 +228,9 @@ export const TransactionForm: FC<Props> = ({
                   name={field.name}
                   id={field.name}
                   onChange={(event) => {
-                    field.handleChange(event.target.value as TransactionType)
-                    setTransactionType(event.target.value as TransactionType)
+                    const newType = event.target.value as TransactionType
+                    setTransactionType(newType)
+                    form.reset(getDefaultValuesByType(newType, transaction))
                   }}
                 />
               )
@@ -350,30 +354,6 @@ export const TransactionForm: FC<Props> = ({
             }}
           </form.Field>
         )}
-        {/* @todo: Implement when backend returns categories via transaction dto */}
-        {/* <form.Field name="categoryId">
-          {(field) => {
-            return (
-              <Select
-                id={field.name}
-                name={field.name}
-                type="number"
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                required
-                options={ACCOUNT_OPTIONS}
-                onChange={(event) => {
-                  field.handleChange(
-                    event.target
-                      .value as keyof typeof financialAccountTypesSchema.enum,
-                  )
-                }}
-              >
-                Category
-              </Select>
-            )
-          }}
-        </form.Field> */}
         <form.Field name="description">
           {(field) => {
             return (
@@ -394,6 +374,38 @@ export const TransactionForm: FC<Props> = ({
             )
           }}
         </form.Field>
+        {hasCategories && (
+          <form.Field name="categoryId">
+            {(field) => {
+              const categoryOptions = [
+                { value: '', label: 'No category' },
+                ...(categories
+                  ?.filter(({ type }) => type === transactionType)
+                  .map((category) => ({
+                    label: category.name,
+                    value: category.id,
+                  })) || []),
+              ]
+
+              return (
+                <Select
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  hideLabel
+                  icon={Tags}
+                  options={categoryOptions}
+                  onChange={(event) => {
+                    field.handleChange(event.target.value)
+                  }}
+                >
+                  Category
+                </Select>
+              )
+            }}
+          </form.Field>
+        )}
         <form.Field name="date">
           {(field) => {
             return (
@@ -420,6 +432,7 @@ export const TransactionForm: FC<Props> = ({
         size="large"
         className="w-full mt-10"
         disabled={
+          !isTouched ||
           isSubmitting ||
           !canSubmit ||
           (MODE === 'edit' && !hasFormUpdatedValues)

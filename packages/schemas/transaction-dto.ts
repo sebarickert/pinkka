@@ -98,6 +98,8 @@ export const UpdateTransactionDtoSchema = TransactionDtoSchema.omit({
 export const TransactionDetailDtoSchema = TransactionDtoSchema.safeExtend({
   fromAccountName: z.string().nullable(),
   toAccountName: z.string().nullable(),
+  categoryId: z.string().nullable(),
+  categoryName: z.string().nullable(),
 });
 
 // export const TransactionWithCategoryDtoSchema = TransactionDtoSchema.safeExtend(

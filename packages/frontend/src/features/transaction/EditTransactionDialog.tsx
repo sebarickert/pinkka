@@ -42,10 +42,15 @@ export const EditTransactionDialog: FC<Props> = ({ transaction }) => {
       date: DateTime.fromISO(data.date).toISO()?.toString(),
       amount: data.amount,
       description: data.description,
-      ...('fromAccountId' in data ? { fromAccountId: data.fromAccountId } : {}),
-      ...('toAccountId' in data ? { toAccountId: data.toAccountId } : {}),
-      // @todo: Implement when backend returns categories via transaction dto
-      // ...('categoryId' in data ? { fromAccountId: data.categoryId } : {}),
+      ...('fromAccountId' in data && data.fromAccountId
+        ? { fromAccountId: data.fromAccountId }
+        : { fromAccountId: null }),
+      ...('toAccountId' in data && data.toAccountId
+        ? { toAccountId: data.toAccountId }
+        : { toAccountId: null }),
+      ...('categoryId' in data && data.categoryId
+        ? { categoryId: data.categoryId }
+        : { categoryId: null }),
     } satisfies UpdateTransactionDto
 
     return TransactionService.update({

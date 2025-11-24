@@ -10,7 +10,7 @@ export const categoryKeys = {
     [...categoryKeys.all, 'has-transactions', id] as const,
 }
 
-export const getAllCategoriesOptions = queryOptions({
+export const categoriesQueryOptions = queryOptions({
   queryKey: categoryKeys.lists(),
   queryFn: CategoryService.getAll,
 })

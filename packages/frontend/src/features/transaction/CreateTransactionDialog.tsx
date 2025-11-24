@@ -45,8 +45,9 @@ export const CreateTransactionDialog: FC<Props> = ({ children }) => {
       ...('toAccountId' in data && data.toAccountId
         ? { toAccountId: data.toAccountId }
         : { toAccountId: null }),
-      // @todo: Implement when backend returns categories via transaction dto
-      // ...('categoryId' in data ? { fromAccountId: data.categoryId } : {}),
+      ...('categoryId' in data && data.categoryId
+        ? { categoryId: data.categoryId }
+        : {}),
     } satisfies NewTransactionDto
 
     return TransactionService.create(newTransaction)
