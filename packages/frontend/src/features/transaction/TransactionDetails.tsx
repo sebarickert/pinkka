@@ -51,6 +51,9 @@ export const TransactionDetails: FC<Props> = ({ transaction }) => {
     ...(data.toAccountName
       ? [{ label: 'To Account', description: data.toAccountName }]
       : []),
+    ...(data.categoryName
+      ? [{ label: 'Category', description: data.categoryName }]
+      : []),
     {
       label: 'Description',
       description: data.description,

@@ -38,6 +38,8 @@ export const TransactionMapper = {
       toAccountId: db.to_account_id ?? null,
       fromAccountName: db.from_account_name ?? null,
       toAccountName: db.to_account_name ?? null,
+      categoryName: db.category_name ?? null,
+      categoryId: db.category_id ?? null,
       createdAt: db.created_at.toISOString(),
       updatedAt: db.updated_at.toISOString(),
     };

@@ -41,8 +41,15 @@ export const TransactionRepo = {
         "transaction.from_account_id"
       )
       .leftJoin("financial_account as to", "to.id", "transaction.to_account_id")
+      .leftJoin(
+        "transaction_category",
+        "transaction_category.transaction_id",
+        "transaction.id"
+      )
+      .leftJoin("category", "category.id", "transaction_category.category_id")
       .selectAll("transaction")
       .select(["from.name as from_account_name", "to.name as to_account_name"])
+      .select(["category.name as category_name", "category.id as category_id"])
       .where("transaction.id", "=", parameters.id)
       .where("transaction.user_id", "=", parameters.userId)
       .executeTakeFirst();

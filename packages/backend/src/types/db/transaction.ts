@@ -27,4 +27,6 @@ export type TransactionUpdate = Updateable<TransactionTable>;
 export type TransactionDetail = Transaction & {
   from_account_name: string | null;
   to_account_name: string | null;
+  category_name: string | null;
+  category_id: string | null;
 };
