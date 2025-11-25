@@ -72,7 +72,6 @@ export const CategoryForm: FC<Props> = ({
   const form = useForm({
     defaultValues,
     validators: {
-      onMount: CategoryFormSchema,
       onChange: CategoryFormSchema,
     },
     async onSubmit({ value }) {
@@ -80,6 +79,7 @@ export const CategoryForm: FC<Props> = ({
     },
   })
 
+  const isTouched = useStore(form.store, (state) => state.isTouched)
   const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
   const canSubmit = useStore(form.store, (state) => state.canSubmit)
   const hasFormUpdatedValues = useStore(form.store, (state) => {
@@ -156,6 +156,7 @@ export const CategoryForm: FC<Props> = ({
         size="large"
         className="w-full mt-10"
         disabled={
+          !isTouched ||
           isSubmitting ||
           !canSubmit ||
           (MODE === 'edit' && !hasFormUpdatedValues)

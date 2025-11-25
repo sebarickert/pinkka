@@ -25,7 +25,7 @@ export const TransactionTypeSwitcher: FC<Props> = ({
   return (
     <div className={cn('grid items-center justify-center grid-cols-3')}>
       {FIELDS.map(({ value, label }) => (
-        <label>
+        <label key={label}>
           <input
             type="radio"
             name={name}
