@@ -1,27 +1,33 @@
 import { useState } from 'react'
 import { useForm, useStore } from '@tanstack/react-form'
 import * as z from 'zod'
-import { CircleX, Loader2 } from 'lucide-react'
+import { Check, CircleX, Loader2 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import type { FC } from 'react'
 import { Button } from '@/components/Button'
+import { cn } from '@/lib/utils'
 import { Input } from '@/components/Input'
 import { Separator } from '@/components/Separator'
-import { SocialLogins } from '@/components/SocialLogins'
-import { cn } from '@/lib/utils'
+import { SocialLogins } from '@/features/SocialLogins'
 import { authClient } from '@/lib/auth-client'
 
-const LoginFormSchema = z.object({
+const RegisterFormSchema = z.object({
+  name: z.string(),
   email: z.email(),
-  password: z.string(),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/\d/, 'Must include at least one number')
+    .regex(/[^A-Za-z\d]/, 'Must include at least one special character'),
 })
 
 const defaultValues = {
+  name: '',
   email: '',
   password: '',
 }
 
-export const LoginForm: FC = () => {
+export const RegisterForm: FC = () => {
   const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined,
@@ -30,10 +36,10 @@ export const LoginForm: FC = () => {
   const form = useForm({
     defaultValues,
     validators: {
-      onChange: LoginFormSchema,
+      onChange: RegisterFormSchema,
     },
     async onSubmit({ value }) {
-      const { error } = await authClient.signIn.email({
+      const { error } = await authClient.signUp.email({
         ...value,
       })
 
@@ -47,6 +53,23 @@ export const LoginForm: FC = () => {
   })
 
   const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
+  const passwordValue = useStore(form.store, (state) => state.values.password)
+
+  const passwordSchema = RegisterFormSchema.shape.password
+  const result = passwordSchema.safeParse(passwordValue)
+
+  const hasMinLength = !result.error?.issues.some(
+    (issue) => issue.code === 'too_small',
+  )
+  const hasNumber = !result.error?.issues.some(
+    (issue) =>
+      issue.code === 'invalid_format' && issue.message.includes('number'),
+  )
+  const hasSpecialChar = !result.error?.issues.some(
+    (issue) =>
+      issue.code === 'invalid_format' &&
+      issue.message.includes('special character'),
+  )
 
   return (
     <div className="grid gap-8">
@@ -68,8 +91,28 @@ export const LoginForm: FC = () => {
           )}
         </div>
         <fieldset className="grid gap-6" disabled={isSubmitting}>
-          <form.Field name="email">
-            {(field) => {
+          <form.Field
+            name="name"
+            children={(field) => {
+              return (
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  required
+                  onChange={(event) => {
+                    field.handleChange(event.target.value)
+                  }}
+                >
+                  Name
+                </Input>
+              )
+            }}
+          />
+          <form.Field
+            name="email"
+            children={(field) => {
               return (
                 <Input
                   id={field.name}
@@ -86,9 +129,10 @@ export const LoginForm: FC = () => {
                 </Input>
               )
             }}
-          </form.Field>
-          <form.Field name="password">
-            {(field) => {
+          />
+          <form.Field
+            name="password"
+            children={(field) => {
               return (
                 <Input
                   id={field.name}
@@ -105,7 +149,27 @@ export const LoginForm: FC = () => {
                 </Input>
               )
             }}
-          </form.Field>
+          />
+          <ul
+            className={cn(
+              'text-muted-foreground text-sm *:transition-colors grid gap-2',
+              '*:inline-flex *:items-center *:gap-2',
+              '*:data-[valid=true]:text-foreground *:data-[valid=true]:[&_svg]:text-green',
+            )}
+          >
+            <li data-valid={hasMinLength}>
+              <Check />
+              At least 8 characters
+            </li>
+            <li data-valid={hasNumber}>
+              <Check />
+              At least one number (0-9)
+            </li>
+            <li data-valid={hasSpecialChar}>
+              <Check />
+              At least one special character
+            </li>
+          </ul>
         </fieldset>
         <Button
           type="submit"
@@ -115,10 +179,14 @@ export const LoginForm: FC = () => {
         >
           {isSubmitting && <Loader2 className="animate-spin" />}
           <span className={cn(isSubmitting && 'sr-only')}>
-            {isSubmitting ? 'Logging in' : 'Log in'}
+            {isSubmitting ? 'Registering' : 'Continue'}
           </span>
         </Button>
       </form>
+      <p className="px-6 text-sm text-center text-muted-foreground">
+        By clicking continue, you agree to our <a href="#">Terms of Service</a>{' '}
+        and <a href="#">Privacy Policy</a>.
+      </p>
     </div>
   )
 }

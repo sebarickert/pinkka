@@ -13,7 +13,7 @@ import {
 } from '@/queries/financial-accounts'
 import { Heading } from '@/components/Heading'
 import { TwoColumnLayout } from '@/components/TwoColumnLayout'
-import { AccountBalanceHistoryChart } from '@/components/AccountBalanceHistoryChart'
+import { AccountBalanceHistoryChart } from '@/features/financial-account/AccountBalanceHistoryChart'
 import { FinancialAccountSidebar } from '@/features/financial-account/FinancialAccountSidebar'
 import { FinancialAccountTransactions } from '@/features/financial-account/FinancialAccountTransactions'
 import { pageTitle } from '@/utils/seo'

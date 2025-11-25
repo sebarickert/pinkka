@@ -1,6 +1,6 @@
 import { Link, createFileRoute, redirect } from '@tanstack/react-router'
 import * as z from 'zod'
-import { LoginForm } from '@/components/LoginForm'
+import { LoginForm } from '@/features/LoginForm'
 import { Heading } from '@/components/Heading'
 import { authClient } from '@/lib/auth-client'
 

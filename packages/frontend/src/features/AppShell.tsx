@@ -1,7 +1,7 @@
 import type { FC } from 'react'
-import { Header } from '@/components/Header'
+import { Header } from '@/features/Header'
 import { Container } from '@/components/Container'
-import { MobileNavigation } from '@/components/MobileNavigation'
+import { MobileNavigation } from '@/features/MobileNavigation'
 
 interface Props {
   children: React.ReactNode
