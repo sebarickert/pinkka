@@ -1,4 +1,4 @@
-import { createFileRoute, useParams } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useParams } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import * as z from 'zod'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
@@ -16,6 +16,7 @@ import { TwoColumnLayout } from '@/components/TwoColumnLayout'
 import { AccountBalanceHistoryChart } from '@/components/AccountBalanceHistoryChart'
 import { FinancialAccountSidebar } from '@/features/financial-account/FinancialAccountSidebar'
 import { FinancialAccountTransactions } from '@/features/financial-account/FinancialAccountTransactions'
+import { pageTitle } from '@/utils/seo'
 
 const validateSearchSchema = z.object({
   month: z.number().min(1).max(12).optional().catch(DateService.now().month),
@@ -57,19 +58,24 @@ export const Route = createFileRoute('/_authenticated/app/accounts/$accountId')(
 
       return { crumb: account?.name || 'Account Details' }
     },
+    head: ({ loaderData }) => ({
+      meta: [{ title: pageTitle(loaderData?.crumb || 'Account') }],
+    }),
     component: RouteComponent,
   },
 )
 
 function RouteComponent() {
   const params = useParams({ from: '/_authenticated/app/accounts/$accountId' })
+  const navigate = useNavigate()
 
   const { data: account } = useSuspenseQuery(
     financialAccountByIdQueryOptions(params.accountId),
   )
 
   if (!account) {
-    return <div>Account not found</div>
+    navigate({ to: '/app/home' })
+    return null
   }
 
   return (

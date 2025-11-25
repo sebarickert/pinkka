@@ -3,11 +3,15 @@ import { Heading } from '@/components/Heading'
 import { authClient } from '@/lib/auth-client'
 import { List } from '@/components/List'
 import { TwoColumnLayout } from '@/components/TwoColumnLayout'
+import { pageTitle } from '@/utils/seo'
 
 export const Route = createFileRoute('/_authenticated/app/admin/')({
   loader: async () => {
     return authClient.admin.listUsers({ query: {} })
   },
+  head: () => ({
+    meta: [{ title: pageTitle('Admin Dashboard') }],
+  }),
   component: RouteComponent,
 })
 

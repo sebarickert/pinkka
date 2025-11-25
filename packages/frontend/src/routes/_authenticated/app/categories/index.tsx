@@ -6,12 +6,16 @@ import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { CreateCategoryDialog } from '@/features/category/CreateCategoryDialog'
 import { CategoryList } from '@/features/category/CategoryList'
 import { categoriesQueryOptions } from '@/queries/categories'
+import { pageTitle } from '@/utils/seo'
 
 export const Route = createFileRoute('/_authenticated/app/categories/')({
   loader: async ({ context }) => {
     const queryClient = context.queryClient
     await queryClient.ensureQueryData(categoriesQueryOptions)
   },
+  head: () => ({
+    meta: [{ title: pageTitle('Categories') }],
+  }),
   component: RouteComponent,
 })
 

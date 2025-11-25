@@ -10,8 +10,12 @@ import {
 } from '@/queries/transactions'
 import { financialAccountsQueryOptions } from '@/queries/financial-accounts'
 import { TwoColumnLayout } from '@/components/TwoColumnLayout'
+import { pageTitle } from '@/utils/seo'
 
 export const Route = createFileRoute('/_authenticated/app/home')({
+  head: () => ({
+    meta: [{ title: pageTitle('Home') }],
+  }),
   loader: async ({ context }) => {
     const queryClient = context.queryClient
     await Promise.all([

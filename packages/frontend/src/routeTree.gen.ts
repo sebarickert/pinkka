@@ -14,7 +14,6 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedAppHomeRouteImport } from './routes/_authenticated/app/home'
-import { Route as AuthenticatedAppActivityRouteImport } from './routes/_authenticated/app/activity'
 import { Route as AuthenticatedAppCategoriesRouteRouteImport } from './routes/_authenticated/app/categories/route'
 import { Route as AuthenticatedAppAdminRouteRouteImport } from './routes/_authenticated/app/admin/route'
 import { Route as AuthenticatedAppAccountsRouteRouteImport } from './routes/_authenticated/app/accounts/route'
@@ -48,12 +47,6 @@ const AuthenticatedAppHomeRoute = AuthenticatedAppHomeRouteImport.update({
   path: '/app/home',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedAppActivityRoute =
-  AuthenticatedAppActivityRouteImport.update({
-    id: '/app/activity',
-    path: '/app/activity',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedAppCategoriesRouteRoute =
   AuthenticatedAppCategoriesRouteRouteImport.update({
     id: '/app/categories',
@@ -110,7 +103,6 @@ export interface FileRoutesByFullPath {
   '/app/accounts': typeof AuthenticatedAppAccountsRouteRouteWithChildren
   '/app/admin': typeof AuthenticatedAppAdminRouteRouteWithChildren
   '/app/categories': typeof AuthenticatedAppCategoriesRouteRouteWithChildren
-  '/app/activity': typeof AuthenticatedAppActivityRoute
   '/app/home': typeof AuthenticatedAppHomeRoute
   '/app/accounts/$accountId': typeof AuthenticatedAppAccountsAccountIdRoute
   '/app/admin/migration': typeof AuthenticatedAppAdminMigrationRoute
@@ -122,7 +114,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/app/activity': typeof AuthenticatedAppActivityRoute
   '/app/home': typeof AuthenticatedAppHomeRoute
   '/app/accounts/$accountId': typeof AuthenticatedAppAccountsAccountIdRoute
   '/app/admin/migration': typeof AuthenticatedAppAdminMigrationRoute
@@ -139,7 +130,6 @@ export interface FileRoutesById {
   '/_authenticated/app/accounts': typeof AuthenticatedAppAccountsRouteRouteWithChildren
   '/_authenticated/app/admin': typeof AuthenticatedAppAdminRouteRouteWithChildren
   '/_authenticated/app/categories': typeof AuthenticatedAppCategoriesRouteRouteWithChildren
-  '/_authenticated/app/activity': typeof AuthenticatedAppActivityRoute
   '/_authenticated/app/home': typeof AuthenticatedAppHomeRoute
   '/_authenticated/app/accounts/$accountId': typeof AuthenticatedAppAccountsAccountIdRoute
   '/_authenticated/app/admin/migration': typeof AuthenticatedAppAdminMigrationRoute
@@ -156,7 +146,6 @@ export interface FileRouteTypes {
     | '/app/accounts'
     | '/app/admin'
     | '/app/categories'
-    | '/app/activity'
     | '/app/home'
     | '/app/accounts/$accountId'
     | '/app/admin/migration'
@@ -168,7 +157,6 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/register'
-    | '/app/activity'
     | '/app/home'
     | '/app/accounts/$accountId'
     | '/app/admin/migration'
@@ -184,7 +172,6 @@ export interface FileRouteTypes {
     | '/_authenticated/app/accounts'
     | '/_authenticated/app/admin'
     | '/_authenticated/app/categories'
-    | '/_authenticated/app/activity'
     | '/_authenticated/app/home'
     | '/_authenticated/app/accounts/$accountId'
     | '/_authenticated/app/admin/migration'
@@ -235,13 +222,6 @@ declare module '@tanstack/react-router' {
       path: '/app/home'
       fullPath: '/app/home'
       preLoaderRoute: typeof AuthenticatedAppHomeRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/app/activity': {
-      id: '/_authenticated/app/activity'
-      path: '/app/activity'
-      fullPath: '/app/activity'
-      preLoaderRoute: typeof AuthenticatedAppActivityRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/app/categories': {
@@ -354,7 +334,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAppAccountsRouteRoute: typeof AuthenticatedAppAccountsRouteRouteWithChildren
   AuthenticatedAppAdminRouteRoute: typeof AuthenticatedAppAdminRouteRouteWithChildren
   AuthenticatedAppCategoriesRouteRoute: typeof AuthenticatedAppCategoriesRouteRouteWithChildren
-  AuthenticatedAppActivityRoute: typeof AuthenticatedAppActivityRoute
   AuthenticatedAppHomeRoute: typeof AuthenticatedAppHomeRoute
 }
 
@@ -364,7 +343,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAppAdminRouteRoute: AuthenticatedAppAdminRouteRouteWithChildren,
   AuthenticatedAppCategoriesRouteRoute:
     AuthenticatedAppCategoriesRouteRouteWithChildren,
-  AuthenticatedAppActivityRoute: AuthenticatedAppActivityRoute,
   AuthenticatedAppHomeRoute: AuthenticatedAppHomeRoute,
 }
 

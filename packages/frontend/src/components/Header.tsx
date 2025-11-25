@@ -14,7 +14,7 @@ export const Header = () => {
       <Container
         className={cn(
           'grid h-14 px-0',
-          'max-lg:grid-cols-[1fr_auto] lg:grid-cols-[auto_1fr_auto_auto]',
+          'max-lg:grid-cols-[1fr_auto] lg:grid-cols-[1fr_auto_auto_auto]',
         )}
       >
         <Link
