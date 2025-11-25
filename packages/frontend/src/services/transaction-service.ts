@@ -78,6 +78,7 @@ export const TransactionService = {
     })
 
     if (!response.ok) {
+      console.log('response', await response.json())
       throw new Error('Something went wrong. Please try again.')
     }
 

@@ -286,7 +286,6 @@ export const TransactionForm: FC<Props> = ({
                   hideLabel
                   id={field.name}
                   name={field.name}
-                  type="number"
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   required
@@ -334,7 +333,6 @@ export const TransactionForm: FC<Props> = ({
                   hideLabel
                   id={field.name}
                   name={field.name}
-                  type="number"
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   required

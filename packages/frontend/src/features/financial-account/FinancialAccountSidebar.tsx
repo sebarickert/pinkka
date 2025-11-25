@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
 import type { FC } from 'react'
 import type { FinancialAccountDto } from '@pinkka/schemas/financial-account-dto'
-import { Button } from '@/components/Button'
 import { ACCOUNT_TYPE_LABEL_MAPPING } from '@/utils/financial-account'
 import { formatCurrency } from '@/utils/format-currency'
 import { DetailsList } from '@/components/DetailsList'
 import { EditAccountDialog } from '@/features/financial-account/EditAccountDialog'
 import { DeleteAccountDialog } from '@/features/financial-account/DeleteAccountDialog'
+import { UpdateMarketValueDialog } from '@/features/financial-account/UpdateMarketValueDialog'
 
 type Props = {
   account: FinancialAccountDto
@@ -33,14 +33,7 @@ export const FinancialAccountSidebar: FC<Props> = ({ account }) => {
         <div className="grid gap-4">
           <EditAccountDialog account={account} />
           {account.type === 'investment' && (
-            <Button
-              type="button"
-              accentColor="secondary"
-              className="w-full"
-              size="large"
-            >
-              Update Market Value
-            </Button>
+            <UpdateMarketValueDialog account={account} />
           )}
           <DeleteAccountDialog account={account} />
         </div>
