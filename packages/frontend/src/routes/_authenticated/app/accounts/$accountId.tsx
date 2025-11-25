@@ -61,6 +61,7 @@ export const Route = createFileRoute('/_authenticated/app/accounts/$accountId')(
     head: ({ loaderData }) => ({
       meta: [{ title: pageTitle(loaderData?.crumb || 'Account') }],
     }),
+    wrapInSuspense: true,
     component: RouteComponent,
   },
 )

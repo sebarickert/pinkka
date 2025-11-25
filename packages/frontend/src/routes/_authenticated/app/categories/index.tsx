@@ -16,6 +16,7 @@ export const Route = createFileRoute('/_authenticated/app/categories/')({
   head: () => ({
     meta: [{ title: pageTitle('Categories') }],
   }),
+  wrapInSuspense: true,
   component: RouteComponent,
 })
 

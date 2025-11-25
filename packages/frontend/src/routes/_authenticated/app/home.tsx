@@ -27,7 +27,6 @@ export const Route = createFileRoute('/_authenticated/app/home')({
     return { crumb: 'Home' }
   },
   wrapInSuspense: true,
-  pendingComponent: () => <div>Loading...</div>,
   component: RouteComponent,
 })
 
