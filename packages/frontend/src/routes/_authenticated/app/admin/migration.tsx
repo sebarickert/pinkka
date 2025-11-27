@@ -52,7 +52,6 @@ function RouteComponent() {
       }
 
       const body = await response.json()
-      console.log(body)
 
       navigate({ to: '/app/home' })
     },
