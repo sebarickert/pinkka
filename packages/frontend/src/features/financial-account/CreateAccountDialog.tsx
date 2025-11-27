@@ -1,4 +1,3 @@
-import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import type { FC } from 'react'
@@ -8,9 +7,12 @@ import { AccountForm } from '@/features/financial-account/AccountForm'
 import { ResponsiveDialog } from '@/components/ResponsiveDialog'
 import { FinancialAccountService } from '@/services/financial-account-service'
 import { financialAccountKeys } from '@/queries/financial-accounts'
-import { cn } from '@/lib/utils'
 
-export const CreateAccountDialog: FC = () => {
+type Props = {
+  children: React.ReactNode
+}
+
+export const CreateAccountDialog: FC<Props> = ({ children }) => {
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
 
@@ -38,28 +40,7 @@ export const CreateAccountDialog: FC = () => {
       setOpen={setOpen}
       title="Create New Account"
       description="Fill in the details below to create a new account."
-      trigger={
-        <button
-          type="button"
-          className={cn(
-            'grid grid-cols-[auto_1fr] items-center gap-4 pr-2 text-left focus-visible:focus-highlight',
-            'hover:bg-layer hover:cursor-pointer',
-            'group',
-          )}
-        >
-          <div
-            className={cn(
-              'size-14 inline-flex items-center justify-center bg-layer',
-              'group-hover:bg-accent',
-            )}
-          >
-            <Plus />
-          </div>
-          <span className="text-muted-foreground group-hover:text-foreground">
-            Create Account
-          </span>
-        </button>
-      }
+      trigger={children}
     >
       <AccountForm onSuccess={handleSuccess} mutationFn={handleMutation} />
     </ResponsiveDialog>

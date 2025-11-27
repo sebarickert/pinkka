@@ -24,7 +24,7 @@ const LoaderIcon = () => (
 
 export const Loader: FC = () => {
   return (
-    <div className="flex items-center justify-center w-full pt-8">
+    <div className="flex items-center justify-center w-full pt-12">
       <LoaderIcon />
     </div>
   )

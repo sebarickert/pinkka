@@ -7,9 +7,10 @@ import { DateService } from '@/services/date-service'
 
 type Props = {
   data: Array<{ time: Time; value: number }>
+  isDummy?: boolean
 }
 
-export const AreaChart: FC<Props> = ({ data }) => {
+export const AreaChart: FC<Props> = ({ data, isDummy }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -38,10 +39,12 @@ export const AreaChart: FC<Props> = ({ data }) => {
         horzLine: {
           color: 'hsl(0 0% 65%)',
           labelVisible: false,
+          visible: !isDummy,
         },
         vertLine: {
           color: 'hsl(0 0% 65%)',
           labelVisible: false,
+          visible: !isDummy,
         },
       },
       rightPriceScale: {
@@ -135,8 +138,8 @@ export const AreaChart: FC<Props> = ({ data }) => {
       })
     }
 
-    chart.subscribeCrosshairMove(updateLegend)
-    updateLegend(undefined)
+    !isDummy && chart.subscribeCrosshairMove(updateLegend)
+    !isDummy && updateLegend(undefined)
     chart.timeScale().fitContent()
 
     // Use ResizeObserver for more reliable resizing

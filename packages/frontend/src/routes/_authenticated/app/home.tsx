@@ -11,6 +11,9 @@ import {
 import { financialAccountsQueryOptions } from '@/queries/financial-accounts'
 import { TwoColumnLayout } from '@/components/TwoColumnLayout'
 import { pageTitle } from '@/utils/seo'
+import { InfoMessageBlock } from '@/components/InfoMessageBlock'
+import { CreateTransactionDialog } from '@/features/transaction/CreateTransactionDialog'
+import { Button } from '@/components/Button'
 
 export const Route = createFileRoute('/_authenticated/app/home')({
   head: () => ({
@@ -31,9 +34,8 @@ export const Route = createFileRoute('/_authenticated/app/home')({
 })
 
 function RouteComponent() {
-  const { data: latestTransactions } = useSuspenseQuery(
-    latestTransactionsQueryOptions,
-  )
+  const transactions = useSuspenseQuery(latestTransactionsQueryOptions)
+  const { data: accounts } = useSuspenseQuery(financialAccountsQueryOptions)
 
   return (
     <TwoColumnLayout
@@ -41,10 +43,24 @@ function RouteComponent() {
         <div className="grid gap-8">
           <BalanceSummary />
           <FinancialAccountList />
-          <TransactionList
-            label="Latest activity"
-            transactions={latestTransactions}
-          />
+          {accounts.length > 0 && (
+            <div>
+              <TransactionList
+                label="Latest activity"
+                transactions={transactions.data}
+              />
+              {transactions.data.length === 0 && (
+                <InfoMessageBlock
+                  title="No recent transactions"
+                  description="Once you add transactions, your latest activity will appear here to help you track your finances at a glance."
+                >
+                  <CreateTransactionDialog>
+                    <Button type="button">Create Transaction</Button>
+                  </CreateTransactionDialog>
+                </InfoMessageBlock>
+              )}
+            </div>
+          )}
         </div>
       }
     />

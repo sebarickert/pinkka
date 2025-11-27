@@ -1,16 +1,20 @@
 import { Link } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import type { LucideIcon } from 'lucide-react'
 import type { FC } from 'react'
 import { cn } from '@/lib/utils'
 import { NAVIGATION_ITEMS } from '@/constants/navigation'
 import { CreateTransactionDialog } from '@/features/transaction/CreateTransactionDialog'
+import { financialAccountsQueryOptions } from '@/queries/financial-accounts'
 
 type Props = {
   className?: string
 }
 
 export const MobileNavigation: FC<Props> = ({ className }) => {
+  const accounts = useSuspenseQuery(financialAccountsQueryOptions)
+
   return (
     <nav
       className={cn(
@@ -26,10 +30,12 @@ export const MobileNavigation: FC<Props> = ({ className }) => {
       <CreateTransactionDialog>
         <button
           type="button"
+          disabled={accounts.data.length === 0}
           className={cn(
             'focus-visible:focus-highlight text-muted-foreground',
             'transition-colors',
             'focus-visible:ring-inset',
+            'disabled:opacity-50',
           )}
         >
           <Plus />

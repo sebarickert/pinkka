@@ -11,6 +11,7 @@ import { accountMonthTransactionsQueryOptions } from '@/queries/transactions'
 import { DATE_FORMAT, DateService } from '@/services/date-service'
 import { formatCurrency } from '@/utils/format-currency'
 import { Filters } from '@/features/financial-account/Filters'
+import { InfoMessageBlock } from '@/components/InfoMessageBlock'
 
 export const FinancialAccountTransactions: FC = () => {
   const params = useParams({ from: '/_authenticated/app/accounts/$accountId' })
@@ -69,7 +70,15 @@ export const FinancialAccountTransactions: FC = () => {
           label={label}
           items={transactionsDetails}
         />
-        <GroupedTransactionList transactions={transactions} />
+        {transactions.length === 0 && (
+          <InfoMessageBlock
+            title={`No transactions for ${label}`}
+            description="There are no transactions recorded for this account in this period."
+          />
+        )}
+        {transactions.length > 0 && (
+          <GroupedTransactionList transactions={transactions} />
+        )}
       </section>
     </section>
   )

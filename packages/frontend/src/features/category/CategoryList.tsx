@@ -6,6 +6,9 @@ import { List } from '@/components/List'
 import { TRANSACTION_TYPE_LABEL_MAPPING } from '@/utils/transaction'
 import { EditCategoryDialog } from '@/features/category/EditCategoryDialog'
 import { DeleteCategoryDialog } from '@/features/category/DeleteCategoryDialog'
+import { InfoMessageBlock } from '@/components/InfoMessageBlock'
+import { Button } from '@/components/Button'
+import { CreateCategoryDialog } from '@/features/category/CreateCategoryDialog'
 
 type Props = {
   label?: string
@@ -13,6 +16,19 @@ type Props = {
 }
 
 export const CategoryList: FC<Props> = ({ label, categories }) => {
+  if (categories.length === 0) {
+    return (
+      <InfoMessageBlock
+        title="No categories found"
+        description="You haven't created any categories yet. Add your first category to better organize and analyze your transactions."
+      >
+        <CreateCategoryDialog>
+          <Button type="button">Create Category</Button>
+        </CreateCategoryDialog>
+      </InfoMessageBlock>
+    )
+  }
+
   return (
     <List label={label}>
       {categories.map((category) => (

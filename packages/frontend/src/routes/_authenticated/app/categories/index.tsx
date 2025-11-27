@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { Plus } from 'lucide-react'
 import { Heading } from '@/components/Heading'
 import { TwoColumnLayout } from '@/components/TwoColumnLayout'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
@@ -7,6 +8,7 @@ import { CreateCategoryDialog } from '@/features/category/CreateCategoryDialog'
 import { CategoryList } from '@/features/category/CategoryList'
 import { categoriesQueryOptions } from '@/queries/categories'
 import { pageTitle } from '@/utils/seo'
+import { Button } from '@/components/Button'
 
 export const Route = createFileRoute('/_authenticated/app/categories/')({
   loader: async ({ context }) => {
@@ -31,7 +33,14 @@ function RouteComponent() {
             <Breadcrumbs />
             <div className="grid grid-cols-[1fr_auto] items-center">
               <Heading as="h1">Categories</Heading>
-              <CreateCategoryDialog />
+              {categories.length > 0 && (
+                <CreateCategoryDialog>
+                  <Button type="button" accentColor="ghost">
+                    <Plus />
+                    Create
+                  </Button>
+                </CreateCategoryDialog>
+              )}
             </div>
             <CategoryList categories={categories} />
           </section>
