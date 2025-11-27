@@ -4,6 +4,9 @@ import { authClient } from '@/lib/auth-client'
 import { List } from '@/components/List'
 import { TwoColumnLayout } from '@/components/TwoColumnLayout'
 import { pageTitle } from '@/utils/seo'
+import { UserListItem } from '@/features/admin/UserListItem'
+
+const USER_ROLE_ORDER: Array<'admin' | 'user'> = ['admin', 'user']
 
 export const Route = createFileRoute('/_authenticated/app/admin/')({
   loader: async () => {
@@ -18,26 +21,23 @@ export const Route = createFileRoute('/_authenticated/app/admin/')({
 function RouteComponent() {
   const { data } = Route.useLoaderData()
 
+  if (!data) {
+    return <div>No data available</div>
+  }
+
+  const usersByRole = Object.groupBy(data.users, (user) => user.role || 'user')
+
   return (
     <TwoColumnLayout
       main={
         <div className="grid gap-6">
           <Heading as="h1">Admin Dashboard</Heading>
           <List label="Registered Users">
-            {data &&
-              data.users.map((user) => (
-                <div
-                  key={user.id}
-                  className="p-4 gap-4 bg-layer flex items-center"
-                >
-                  <div className="flex flex-col">
-                    <span className="font-medium">{user.email}</span>
-                    <span className="text-sm text-muted-foreground">
-                      Role: {user.role}
-                    </span>
-                  </div>
-                </div>
-              ))}
+            {USER_ROLE_ORDER.map((role) =>
+              usersByRole[role]
+                ?.toSorted((a, b) => a.name.localeCompare(b.name))
+                .map((user) => <UserListItem {...user} key={user.id} />),
+            )}
           </List>
         </div>
       }

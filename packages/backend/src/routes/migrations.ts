@@ -11,6 +11,7 @@ import { FinancialAccountService } from "@/services/financial-account-service.js
 import { TransactionService } from "@/services/transaction-service.js";
 import { db } from "@/lib/db.js";
 import { requireAdminRole } from "@/middlewares/require-admin.js";
+import { validateIdParameter } from "@/lib/validator.js";
 
 function mapAccountType(type: AccountTypeEnum): FinancialAccountType {
   switch (type) {
@@ -39,8 +40,8 @@ function mapAccountType(type: AccountTypeEnum): FinancialAccountType {
 const migrations = createRouter();
 migrations.use("/migrations/*", requireAuth, requireAdminRole);
 
-migrations.post("/migrations/financer", async (c) => {
-  const userId = c.get("user").id;
+migrations.post("/migrations/financer/:id", validateIdParameter, async (c) => {
+  const { id } = c.req.param();
   const formData = await c.req.formData();
   const file = formData.get("document");
 
@@ -55,6 +56,8 @@ migrations.post("/migrations/financer", async (c) => {
   if (!validation.success) {
     return fail(c, { document: ["Invalid document format"] });
   }
+
+  const userId = id;
 
   try {
     const { accounts, transactions } = validation.data;

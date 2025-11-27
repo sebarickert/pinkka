@@ -62,7 +62,9 @@ export const ResponsiveDialog: FC<Props> = ({
           <DrawerTitle>{title}</DrawerTitle>
           {description && <DrawerDescription>{description}</DrawerDescription>}
         </DrawerHeader>
-        <div className="pt-4 px-6 pb-12 overflow-y-auto">{children}</div>
+        <div className="pt-4 px-6 pb-12 overflow-y-auto grid gap-4">
+          {children}
+        </div>
       </DrawerContent>
     </Drawer>
   )
