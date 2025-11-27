@@ -16,6 +16,7 @@
     "migrate:up": "npm -w @pinkka/backend run migrate:up",
     "migrate:up:test": "npm -w @pinkka/backend run migrate:up:test",
     "test:backend:integration": "npm -w @pinkka/backend run test:integration",
+    "docker:psql": "docker exec -it pinkka-database-1 psql -U admin pinkka_db",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix",
     "prettify": "npx prettier --write ."
