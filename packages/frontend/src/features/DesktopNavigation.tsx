@@ -15,6 +15,7 @@ export const DesktopNavigation: FC<Props> = ({ className }) => {
       aria-label="Main navigation"
     >
       <NavigationItem {...NAVIGATION_ITEMS.home} />
+      <NavigationItem {...NAVIGATION_ITEMS.activity} />
     </nav>
   )
 }

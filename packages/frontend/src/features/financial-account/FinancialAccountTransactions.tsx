@@ -77,7 +77,10 @@ export const FinancialAccountTransactions: FC = () => {
           />
         )}
         {transactions.length > 0 && (
-          <GroupedTransactionList transactions={transactions} />
+          <GroupedTransactionList
+            key={`${month}-${year}`}
+            transactions={transactions}
+          />
         )}
       </section>
     </section>

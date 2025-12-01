@@ -9,18 +9,19 @@ type Props = {
 }
 
 export const GroupedTransactionList: FC<Props> = ({ transactions }) => {
-  const groupedTransactions = Object.groupBy(
-    transactions,
-    ({ date }) => DateTime.fromISO(date).toISODate()!,
-  )
+  const groupedTransactions = Object.groupBy(transactions, ({ date }) => {
+    const isUpcoming = DateTime.fromISO(date) > DateTime.local()
+
+    return isUpcoming ? 'upcoming' : DateTime.fromISO(date).toISODate()!
+  })
 
   return (
     <div className="grid gap-4">
       {Object.entries(groupedTransactions).map(([date, trxs]) => {
         if (!trxs || trxs.length === 0) return null
 
+        const isUpcoming = date === 'upcoming'
         const isToday = DateTime.fromISO(date).hasSame(DateTime.local(), 'day')
-        const isUpcoming = DateTime.fromISO(date) > DateTime.local()
         const isYesterday = DateTime.fromISO(date).hasSame(
           DateTime.local().minus({ days: 1 }),
           'day',

@@ -46,6 +46,18 @@ export const latestTransactionsQueryOptions = queryOptions({
   queryFn: async () => TransactionService.getAll({ limit: 5 }),
 })
 
+export const transactionsByMonthYearQueryOptions = ({
+  month = DateService.now().month,
+  year = DateService.now().year,
+}: {
+  month?: number
+  year?: number
+} = {}) =>
+  queryOptions({
+    queryKey: transactionKeys.byMonthAndYear(year, month),
+    queryFn: async () => TransactionService.getAll({ year, month }),
+  })
+
 export const currentMonthTransactionsQueryOptions = () => {
   const { month, year } = DateService.now()
 

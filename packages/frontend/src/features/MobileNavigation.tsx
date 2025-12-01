@@ -20,7 +20,7 @@ export const MobileNavigation: FC<Props> = ({ className }) => {
       className={cn(
         'bg-layer/85 backdrop-blur',
         'fixed left-0 right-0 bottom-0 z-(--z-navigation)',
-        'h-14 grid grid-cols-2',
+        'h-14 grid grid-cols-3',
         '*:w-full *:h-full *:flex *:flex-col *:justify-center *:items-center',
         className,
       )}
@@ -42,6 +42,7 @@ export const MobileNavigation: FC<Props> = ({ className }) => {
           <span className="sr-only">Create</span>
         </button>
       </CreateTransactionDialog>
+      <NavigationItem {...NAVIGATION_ITEMS.activity} />
     </nav>
   )
 }

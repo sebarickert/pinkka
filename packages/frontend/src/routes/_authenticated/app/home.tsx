@@ -14,10 +14,12 @@ import { pageTitle } from '@/utils/seo'
 import { InfoMessageBlock } from '@/components/InfoMessageBlock'
 import { CreateTransactionDialog } from '@/features/transaction/CreateTransactionDialog'
 import { Button } from '@/components/Button'
+import { NAVIGATION_ITEMS } from '@/constants/navigation'
+import { Heading } from '@/components/Heading'
 
 export const Route = createFileRoute('/_authenticated/app/home')({
   head: () => ({
-    meta: [{ title: pageTitle('Home') }],
+    meta: [{ title: pageTitle(NAVIGATION_ITEMS.home.title) }],
   }),
   loader: async ({ context }) => {
     const queryClient = context.queryClient
@@ -27,7 +29,7 @@ export const Route = createFileRoute('/_authenticated/app/home')({
       queryClient.ensureQueryData(latestTransactionsQueryOptions),
     ])
 
-    return { crumb: 'Home' }
+    return { crumb: NAVIGATION_ITEMS.home.title }
   },
   wrapInSuspense: true,
   component: RouteComponent,
@@ -41,6 +43,9 @@ function RouteComponent() {
     <TwoColumnLayout
       main={
         <div className="grid gap-8">
+          <Heading as="h1" className="sr-only">
+            {NAVIGATION_ITEMS.home.title}
+          </Heading>
           <BalanceSummary />
           <FinancialAccountList />
           {accounts.length > 0 && (
