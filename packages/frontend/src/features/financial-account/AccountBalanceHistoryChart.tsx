@@ -42,34 +42,13 @@ export const AccountBalanceHistoryChart: FC<Props> = ({
     currentBalance,
   })
 
-  const hasEnoughYTD =
-    constructBalanceChartData({
-      data: YTD,
-      accountId,
-      currentBalance,
-    }).length > 2
-
-  const hasEnoughALL = ALL
-    ? constructBalanceChartData({
-        data: ALL,
-        accountId,
-        currentBalance,
-      }).length > 2
-    : false
-
   useEffect(() => {
-    if (timeframe === 'YTD' && !hasEnoughYTD && hasEnoughALL) {
-      setTimeframe('ALL')
-      setChartData(ALL || [])
-      return
-    }
-
     if (timeframe === 'YTD') {
       setChartData(YTD)
     } else if (ALL) {
       setChartData(ALL)
     }
-  }, [timeframe, hasEnoughYTD, hasEnoughALL, YTD, ALL])
+  }, [timeframe, YTD, ALL])
 
   return (
     <div className="grid gap-4">
@@ -81,15 +60,13 @@ export const AccountBalanceHistoryChart: FC<Props> = ({
       <div className="inline-flex items-center gap-2">
         <Button
           onClick={() => setTimeframe('YTD')}
-          accentColor="secondary"
-          disabled={!hasEnoughYTD || timeframe === 'YTD'}
+          accentColor={timeframe === 'YTD' ? 'secondary' : 'ghost'}
         >
           YTD
         </Button>
         <Button
           onClick={() => setTimeframe('ALL')}
-          accentColor="secondary"
-          disabled={!hasEnoughALL || timeframe === 'ALL'}
+          accentColor={timeframe === 'ALL' ? 'secondary' : 'ghost'}
         >
           ALL
         </Button>
