@@ -22,12 +22,12 @@ export const Route = createFileRoute('/login')({
 
 function RouteComponent() {
   return (
-    <div className="w-full max-w-md mx-auto grid gap-8 py-12">
+    <div className="max-w-md w-full grid gap-8 py-12 px-4 mx-auto">
       <Heading as="h1">Login</Heading>
       <div className="grid gap-8">
         <p className="text-muted-foreground">
           Don't have an account?{' '}
-          <Link to="/register" className="text-white underline">
+          <Link to="/register" className="underline">
             {' '}
             Create account{' '}
           </Link>

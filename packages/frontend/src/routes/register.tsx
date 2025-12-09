@@ -18,12 +18,12 @@ export const Route = createFileRoute('/register')({
 
 function RouteComponent() {
   return (
-    <div className="w-full max-w-md mx-auto grid gap-8 py-12">
+    <div className="max-w-md w-full grid gap-8 py-12 px-4 mx-auto">
       <Heading as="h1">Create account</Heading>
       <div className="grid gap-8">
         <p className="text-muted-foreground">
           Already have an account?{' '}
-          <Link to="/login" className="text-white underline">
+          <Link to="/login" className="underline">
             {' '}
             Log in{' '}
           </Link>

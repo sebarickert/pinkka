@@ -12,7 +12,10 @@ export const AppShell: FC<Props> = ({ children }) => {
     <div className="max-lg:pb-(--gutter-bottom)">
       <Header />
       <MobileNavigation className="lg:hidden" />
-      <Container as="main" className="py-12 mt-(--gutter-top)">
+      <Container
+        as="main"
+        className="pt-6 lg:pt-12 pb-safe-offset-12 mt-(--gutter-top)"
+      >
         {children}
       </Container>
     </div>

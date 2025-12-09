@@ -29,7 +29,7 @@ export const UserListItem: FC<Props> = ({ id, email, name, role }) => {
           data?.user.id === id && 'bg-blue',
         )}
       >
-        {role === 'admin' ? <UserStar /> : <User />}
+        {role === 'admin' ? <UserStar className="text-white" /> : <User />}
       </div>
       <div className="grid">
         <span className="truncate font-medium text-sm">{email}</span>
