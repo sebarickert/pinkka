@@ -21,7 +21,6 @@ import { Route as AuthenticatedAppAccountsRouteRouteImport } from './routes/_aut
 import { Route as AuthenticatedAppCategoriesIndexRouteImport } from './routes/_authenticated/app/categories/index'
 import { Route as AuthenticatedAppAdminIndexRouteImport } from './routes/_authenticated/app/admin/index'
 import { Route as AuthenticatedAppAccountsIndexRouteImport } from './routes/_authenticated/app/accounts/index'
-import { Route as AuthenticatedAppAdminMigrationRouteImport } from './routes/_authenticated/app/admin/migration'
 import { Route as AuthenticatedAppAccountsAccountIdRouteImport } from './routes/_authenticated/app/accounts/$accountId'
 
 const RegisterRoute = RegisterRouteImport.update({
@@ -90,12 +89,6 @@ const AuthenticatedAppAccountsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAppAccountsRouteRoute,
   } as any)
-const AuthenticatedAppAdminMigrationRoute =
-  AuthenticatedAppAdminMigrationRouteImport.update({
-    id: '/migration',
-    path: '/migration',
-    getParentRoute: () => AuthenticatedAppAdminRouteRoute,
-  } as any)
 const AuthenticatedAppAccountsAccountIdRoute =
   AuthenticatedAppAccountsAccountIdRouteImport.update({
     id: '/$accountId',
@@ -113,7 +106,6 @@ export interface FileRoutesByFullPath {
   '/app/activity': typeof AuthenticatedAppActivityRoute
   '/app/home': typeof AuthenticatedAppHomeRoute
   '/app/accounts/$accountId': typeof AuthenticatedAppAccountsAccountIdRoute
-  '/app/admin/migration': typeof AuthenticatedAppAdminMigrationRoute
   '/app/accounts/': typeof AuthenticatedAppAccountsIndexRoute
   '/app/admin/': typeof AuthenticatedAppAdminIndexRoute
   '/app/categories/': typeof AuthenticatedAppCategoriesIndexRoute
@@ -125,7 +117,6 @@ export interface FileRoutesByTo {
   '/app/activity': typeof AuthenticatedAppActivityRoute
   '/app/home': typeof AuthenticatedAppHomeRoute
   '/app/accounts/$accountId': typeof AuthenticatedAppAccountsAccountIdRoute
-  '/app/admin/migration': typeof AuthenticatedAppAdminMigrationRoute
   '/app/accounts': typeof AuthenticatedAppAccountsIndexRoute
   '/app/admin': typeof AuthenticatedAppAdminIndexRoute
   '/app/categories': typeof AuthenticatedAppCategoriesIndexRoute
@@ -142,7 +133,6 @@ export interface FileRoutesById {
   '/_authenticated/app/activity': typeof AuthenticatedAppActivityRoute
   '/_authenticated/app/home': typeof AuthenticatedAppHomeRoute
   '/_authenticated/app/accounts/$accountId': typeof AuthenticatedAppAccountsAccountIdRoute
-  '/_authenticated/app/admin/migration': typeof AuthenticatedAppAdminMigrationRoute
   '/_authenticated/app/accounts/': typeof AuthenticatedAppAccountsIndexRoute
   '/_authenticated/app/admin/': typeof AuthenticatedAppAdminIndexRoute
   '/_authenticated/app/categories/': typeof AuthenticatedAppCategoriesIndexRoute
@@ -159,7 +149,6 @@ export interface FileRouteTypes {
     | '/app/activity'
     | '/app/home'
     | '/app/accounts/$accountId'
-    | '/app/admin/migration'
     | '/app/accounts/'
     | '/app/admin/'
     | '/app/categories/'
@@ -171,7 +160,6 @@ export interface FileRouteTypes {
     | '/app/activity'
     | '/app/home'
     | '/app/accounts/$accountId'
-    | '/app/admin/migration'
     | '/app/accounts'
     | '/app/admin'
     | '/app/categories'
@@ -187,7 +175,6 @@ export interface FileRouteTypes {
     | '/_authenticated/app/activity'
     | '/_authenticated/app/home'
     | '/_authenticated/app/accounts/$accountId'
-    | '/_authenticated/app/admin/migration'
     | '/_authenticated/app/accounts/'
     | '/_authenticated/app/admin/'
     | '/_authenticated/app/categories/'
@@ -286,13 +273,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAccountsIndexRouteImport
       parentRoute: typeof AuthenticatedAppAccountsRouteRoute
     }
-    '/_authenticated/app/admin/migration': {
-      id: '/_authenticated/app/admin/migration'
-      path: '/migration'
-      fullPath: '/app/admin/migration'
-      preLoaderRoute: typeof AuthenticatedAppAdminMigrationRouteImport
-      parentRoute: typeof AuthenticatedAppAdminRouteRoute
-    }
     '/_authenticated/app/accounts/$accountId': {
       id: '/_authenticated/app/accounts/$accountId'
       path: '/$accountId'
@@ -321,13 +301,11 @@ const AuthenticatedAppAccountsRouteRouteWithChildren =
   )
 
 interface AuthenticatedAppAdminRouteRouteChildren {
-  AuthenticatedAppAdminMigrationRoute: typeof AuthenticatedAppAdminMigrationRoute
   AuthenticatedAppAdminIndexRoute: typeof AuthenticatedAppAdminIndexRoute
 }
 
 const AuthenticatedAppAdminRouteRouteChildren: AuthenticatedAppAdminRouteRouteChildren =
   {
-    AuthenticatedAppAdminMigrationRoute: AuthenticatedAppAdminMigrationRoute,
     AuthenticatedAppAdminIndexRoute: AuthenticatedAppAdminIndexRoute,
   }
 

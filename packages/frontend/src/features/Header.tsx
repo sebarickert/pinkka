@@ -6,7 +6,6 @@ import { Container } from '@/components/Container'
 import { UserMenu } from '@/features/UserMenu'
 import { DesktopNavigation } from '@/features/DesktopNavigation'
 import { cn } from '@/lib/utils'
-import { Logo } from '@/components/Logo'
 import { CreateTransactionDialog } from '@/features/transaction/CreateTransactionDialog'
 import { financialAccountsQueryOptions } from '@/queries/financial-accounts'
 
@@ -17,16 +16,11 @@ export const Header = () => {
     <header className="fixed top-0 left-0 right-0 bg-background/85 backdrop-blur z-(--z-header)">
       <Container
         className={cn(
-          'grid h-14 px-0',
-          'max-lg:grid-cols-[1fr_auto] lg:grid-cols-[1fr_auto_auto_auto]',
+          'h-14 px-0',
+          'max-lg:flex max-lg:justify-end',
+          'lg:grid lg:grid-cols-[1fr_auto_auto_auto]',
         )}
       >
-        <Link
-          to="/app/home"
-          className="size-14 inline-flex items-center justify-center focus-visible:ring-inset"
-        >
-          <Logo className="size-9" />
-        </Link>
         <DesktopNavigation className="max-lg:hidden" />
         <CreateTransactionDialog>
           <Button
