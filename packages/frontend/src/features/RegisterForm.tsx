@@ -10,6 +10,8 @@ import { Input } from '@/components/Input'
 import { Separator } from '@/components/Separator'
 import { SocialLogins } from '@/features/SocialLogins'
 import { authClient } from '@/lib/auth-client'
+import { TermsOfServiceDialog } from '@/features/TermsOfServiceDialog'
+import { PrivacyPolicyDialog } from '@/features/PrivacyPolicyDialog'
 
 const RegisterFormSchema = z.object({
   name: z.string(),
@@ -184,8 +186,8 @@ export const RegisterForm: FC = () => {
         </Button>
       </form>
       <p className="px-6 text-sm text-center text-muted-foreground">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{' '}
-        and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our <TermsOfServiceDialog /> and{' '}
+        <PrivacyPolicyDialog />.
       </p>
     </div>
   )
