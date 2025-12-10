@@ -3,12 +3,11 @@ import type {
   NewFinancialAccountDto,
   UpdateFinancialAccountDto,
 } from '@pinkka/schemas/financial-account-dto'
+import { fetcher } from '@/lib/fetcher'
 
 export const FinancialAccountService = {
   async getAll(): Promise<Array<FinancialAccountDto>> {
-    const response = await fetch('http://localhost:3000/api/accounts', {
-      credentials: 'include',
-    })
+    const response = await fetcher('/api/accounts')
 
     if (!response.ok) {
       return []
@@ -19,9 +18,7 @@ export const FinancialAccountService = {
     return accounts
   },
   async getById(id: string): Promise<FinancialAccountDto | null> {
-    const response = await fetch(`http://localhost:3000/api/accounts/${id}`, {
-      credentials: 'include',
-    })
+    const response = await fetcher(`/api/accounts/${id}`)
 
     if (!response.ok) {
       return null
@@ -32,12 +29,7 @@ export const FinancialAccountService = {
     return account
   },
   async hasTransactions(id: string) {
-    const response = await fetch(
-      `http://localhost:3000/api/accounts/${id}/has-transactions`,
-      {
-        credentials: 'include',
-      },
-    )
+    const response = await fetcher(`/api/accounts/${id}/has-transactions`)
 
     if (!response.ok) {
       return null
@@ -50,13 +42,12 @@ export const FinancialAccountService = {
     return data.hasTransactions
   },
   async create(data: NewFinancialAccountDto): Promise<FinancialAccountDto> {
-    const response = await fetch(`http://localhost:3000/api/accounts`, {
+    const response = await fetcher(`/api/accounts`, {
       body: JSON.stringify(data),
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -73,13 +64,12 @@ export const FinancialAccountService = {
     id: string
     data: UpdateFinancialAccountDto
   }): Promise<FinancialAccountDto> {
-    const response = await fetch(`http://localhost:3000/api/accounts/${id}`, {
+    const response = await fetcher(`/api/accounts/${id}`, {
       body: JSON.stringify(data),
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -90,12 +80,11 @@ export const FinancialAccountService = {
     return updatedAccount
   },
   async delete(id: string): Promise<FinancialAccountDto> {
-    const response = await fetch(`http://localhost:3000/api/accounts/${id}`, {
+    const response = await fetcher(`/api/accounts/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
     })
 
     if (!response.ok) {

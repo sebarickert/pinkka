@@ -4,6 +4,7 @@ import type {
   TransactionDto,
   UpdateTransactionDto,
 } from '@pinkka/schemas/transaction-dto'
+import { fetcher } from '@/lib/fetcher'
 
 export type CommonQueryParams = {
   sort?: string
@@ -22,11 +23,8 @@ export const TransactionService = {
     if (params?.month) searchParams.append('month', params.month.toString())
     if (params?.accountId) searchParams.append('accountId', params.accountId)
 
-    const response = await fetch(
-      `http://localhost:3000/api/transactions?${searchParams.toString()}`,
-      {
-        credentials: 'include',
-      },
+    const response = await fetcher(
+      `/api/transactions?${searchParams.toString()}`,
     )
 
     if (!response.ok) {
@@ -38,12 +36,7 @@ export const TransactionService = {
     return transactions
   },
   async getById(id: string): Promise<TransactionDto> {
-    const response = await fetch(
-      `http://localhost:3000/api/transactions/${id}`,
-      {
-        credentials: 'include',
-      },
-    )
+    const response = await fetcher(`/api/transactions/${id}`)
 
     if (!response.ok) {
       throw new Error('Something went wrong. Please try again.')
@@ -53,12 +46,7 @@ export const TransactionService = {
     return transaction
   },
   async getByIdDetails(id: string): Promise<TransactionDetailDto> {
-    const response = await fetch(
-      `http://localhost:3000/api/transactions/${id}/details`,
-      {
-        credentials: 'include',
-      },
-    )
+    const response = await fetcher(`/api/transactions/${id}/details`)
 
     if (!response.ok) {
       throw new Error('Something went wrong. Please try again.')
@@ -68,13 +56,12 @@ export const TransactionService = {
     return transaction
   },
   async create(data: NewTransactionDto): Promise<TransactionDto> {
-    const response = await fetch(`http://localhost:3000/api/transactions`, {
+    const response = await fetcher(`/api/transactions`, {
       body: JSON.stringify(data),
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -91,17 +78,13 @@ export const TransactionService = {
     id: string
     data: UpdateTransactionDto
   }): Promise<TransactionDetailDto> {
-    const response = await fetch(
-      `http://localhost:3000/api/transactions/${id}`,
-      {
-        body: JSON.stringify(data),
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
+    const response = await fetcher(`/api/transactions/${id}`, {
+      body: JSON.stringify(data),
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    )
+    })
 
     if (!response.ok) {
       throw new Error('Something went wrong. Please try again.')
@@ -111,16 +94,12 @@ export const TransactionService = {
     return updatedAccount
   },
   async delete(id: string): Promise<TransactionDetailDto> {
-    const response = await fetch(
-      `http://localhost:3000/api/transactions/${id}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
+    const response = await fetcher(`/api/transactions/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    )
+    })
 
     if (!response.ok) {
       throw new Error('Something went wrong. Please try again.')

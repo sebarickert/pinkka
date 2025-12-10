@@ -1,12 +1,12 @@
 import { Button } from '@/components/Button'
 import { authClient } from '@/lib/auth-client'
+import { FRONTEND_URL } from '@/lib/env'
 
 export const SocialLogins = () => {
   const google = async () =>
     authClient.signIn.social({
       provider: 'google',
-      // @todo make URL dynamic
-      callbackURL: 'http://localhost:5173/app/home',
+      callbackURL: `${FRONTEND_URL}/app/home`,
     })
 
   return (

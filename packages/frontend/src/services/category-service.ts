@@ -1,20 +1,13 @@
-// import type {
-//   CategoryDto,
-//   NewFinancialAccountDto,
-//   UpdateFinancialAccountDto,
-// } from '@pinkka/schemas/financial-account-dto'
-
 import type {
   CategoryDto,
   NewCategoryDto,
   UpdateCategoryDto,
 } from '@pinkka/schemas/category-dto'
+import { fetcher } from '@/lib/fetcher'
 
 export const CategoryService = {
   async getAll(): Promise<Array<CategoryDto>> {
-    const response = await fetch('http://localhost:3000/api/categories', {
-      credentials: 'include',
-    })
+    const response = await fetcher('/api/categories')
 
     if (!response.ok) {
       return []
@@ -25,9 +18,7 @@ export const CategoryService = {
     return accounts
   },
   async getById(id: string): Promise<CategoryDto | null> {
-    const response = await fetch(`http://localhost:3000/api/categories/${id}`, {
-      credentials: 'include',
-    })
+    const response = await fetcher(`/categories/${id}`)
 
     if (!response.ok) {
       return null
@@ -38,12 +29,7 @@ export const CategoryService = {
     return account
   },
   async hasTransactions(id: string) {
-    const response = await fetch(
-      `http://localhost:3000/api/categories/${id}/has-transactions`,
-      {
-        credentials: 'include',
-      },
-    )
+    const response = await fetcher(`/api/categories/${id}/has-transactions`)
 
     if (!response.ok) {
       return null
@@ -56,13 +42,12 @@ export const CategoryService = {
     return data.hasTransactions
   },
   async create(data: NewCategoryDto): Promise<CategoryDto> {
-    const response = await fetch(`http://localhost:3000/api/categories`, {
+    const response = await fetcher('/api/categories', {
       body: JSON.stringify(data),
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -79,13 +64,12 @@ export const CategoryService = {
     id: string
     data: UpdateCategoryDto
   }): Promise<CategoryDto> {
-    const response = await fetch(`http://localhost:3000/api/categories/${id}`, {
+    const response = await fetcher(`/api/categories/${id}`, {
       body: JSON.stringify(data),
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
     })
 
     if (!response.ok) {
@@ -96,12 +80,11 @@ export const CategoryService = {
     return updatedCategory
   },
   async delete(id: string): Promise<CategoryDto> {
-    const response = await fetch(`http://localhost:3000/api/categories/${id}`, {
+    const response = await fetcher(`/api/categories/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
     })
 
     if (!response.ok) {
