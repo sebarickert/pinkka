@@ -27,7 +27,7 @@ function RouteComponent() {
       <div className="grid gap-8">
         <p className="text-muted-foreground">
           Don't have an account?{' '}
-          <Link to="/register" className="underline">
+          <Link to="/register" className="underline text-foreground">
             {' '}
             Create account{' '}
           </Link>
