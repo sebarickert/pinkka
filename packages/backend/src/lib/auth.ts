@@ -2,7 +2,11 @@ import { betterAuth } from "better-auth";
 import { v4 as uuidv4 } from "uuid";
 import { admin } from "better-auth/plugins/admin";
 import { db } from "@/lib/db.js";
-import { FRONTEND_URL } from "@/lib/env.js";
+import {
+  FRONTEND_URL,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+} from "@/lib/env.js";
 
 export type AuthUser = typeof auth.$Infer.Session.user;
 export type AuthSession = typeof auth.$Infer.Session.session;
@@ -17,6 +21,14 @@ export type AuthType = {
 // https://github.com/better-auth/better-auth/issues/4789
 export const auth = betterAuth({
   database: { db, case: "snake", type: "postgres" },
+  socialProviders: {
+    google: {
+      clientId: GOOGLE_CLIENT_ID as string,
+      clientSecret: GOOGLE_CLIENT_SECRET as string,
+      accessType: "offline",
+      prompt: "select_account consent",
+    },
+  },
   plugins: [admin()],
   advanced: {
     database: {
@@ -24,7 +36,7 @@ export const auth = betterAuth({
     },
   },
   // Allow requests from the frontend development server
-  trustedOrigins: [FRONTEND_URL ?? ""],
+  trustedOrigins: [FRONTEND_URL as string],
   emailAndPassword: {
     enabled: true,
   },

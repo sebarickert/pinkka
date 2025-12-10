@@ -8,4 +8,6 @@ export const {
   BACKEND_URL,
   FRONTEND_URL,
   BACKEND_PORT,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
 } = process.env;
