@@ -7,9 +7,9 @@
     "start": "node dist/index.js",
     "migrate": "node-pg-migrate -j ts",
     "migrate:create": "npm run migrate create",
-    "migrate:up": "DATABASE_URL=postgresql://admin:admin@localhost:5432/pinkka_db npm run migrate up",
-    "migrate:up:test": "DATABASE_URL=postgresql://admin:admin@localhost:5432/pinkka_test_db npm run migrate up",
-    "kysely:codegen": "DATABASE_URL=postgresql://admin:admin@localhost:5432/pinkka_db kysely-codegen",
+    "migrate:up": "npm run migrate up",
+    "migrate:up:test": "npm run migrate up -- --database-url-var=DATABASE_URL_TEST",
+    "kysely:codegen": "kysely-codegen --dialect postgres --out-file ./src/types/db/db.d.ts",
     "test": "DATABASE_DB=pinkka_test_db vitest",
     "test:integration": "DATABASE_DB=pinkka_test_db vitest --project integration --no-file-parallelism"
   },
