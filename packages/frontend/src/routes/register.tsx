@@ -2,8 +2,12 @@ import { Link, createFileRoute, redirect } from '@tanstack/react-router'
 import { Heading } from '@/components/Heading'
 import { RegisterForm } from '@/features/RegisterForm'
 import { authClient } from '@/lib/auth-client'
+import { pageTitle } from '@/utils/seo'
 
 export const Route = createFileRoute('/register')({
+  head: () => ({
+    meta: [{ title: pageTitle('Register') }],
+  }),
   beforeLoad: async () => {
     const { data } = await authClient.getSession()
 

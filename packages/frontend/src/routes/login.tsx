@@ -3,8 +3,12 @@ import * as z from 'zod'
 import { LoginForm } from '@/features/LoginForm'
 import { Heading } from '@/components/Heading'
 import { authClient } from '@/lib/auth-client'
+import { pageTitle } from '@/utils/seo'
 
 export const Route = createFileRoute('/login')({
+  head: () => ({
+    meta: [{ title: pageTitle('Login') }],
+  }),
   validateSearch: z.object({
     redirect: z.string().optional().catch(''),
   }),
