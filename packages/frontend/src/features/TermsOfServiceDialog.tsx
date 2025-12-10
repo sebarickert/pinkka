@@ -26,9 +26,9 @@ export const TermsOfServiceDialog: FC = () => {
 
       <h2>2. Account Registration</h2>
       <p>
-        To use the App, you must create an account using your email, Google, or
-        Apple login. You are responsible for maintaining the confidentiality of
-        your login information and for all activities under your account.
+        To use the App, you must create an account using your email, or Google
+        login. You are responsible for maintaining the confidentiality of your
+        login information and for all activities under your account.
       </p>
 
       <h2>3. Use of the App</h2>
@@ -39,8 +39,8 @@ export const TermsOfServiceDialog: FC = () => {
       <ul className="list-disc list-inside">
         <li>Violate any applicable laws or regulations</li>
         <li>Infringe the rights of others</li>
-        <li>Disrupt or interfere with the App’s functionality</li>
-        <li>Attempt to access other users’ accounts or private information</li>
+        <li>Disrupt or interfere with the App's functionality</li>
+        <li>Attempt to access other users' accounts or private information</li>
       </ul>
 
       <h2>4. Privacy</h2>

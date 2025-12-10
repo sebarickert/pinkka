@@ -21,7 +21,7 @@ export const PrivacyPolicyDialog: FC = () => {
       <h2>1. Information We Collect</h2>
       <p>When you create an account, we may collect:</p>
       <ul className="list-disc list-inside">
-        <li>Your email or login provider info (Google/Apple)</li>
+        <li>Your email or login provider info (Google)</li>
         <li>Basic account usage information</li>
         <li>Any data you voluntarily provide within the App</li>
       </ul>
