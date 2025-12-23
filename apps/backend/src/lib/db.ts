@@ -3,6 +3,7 @@ import { Kysely, PostgresDialect } from "kysely";
 import type { Database } from "@/types/db/database.js";
 import {
   DATABASE_DB,
+  DATABASE_HOST,
   DATABASE_PASSWORD,
   DATABASE_PORT,
   DATABASE_USER,
@@ -14,6 +15,7 @@ const dialect = new PostgresDialect({
     password: DATABASE_PASSWORD,
     database: DATABASE_DB,
     port: Number(DATABASE_PORT),
+    host: DATABASE_HOST,
   }),
 });
 

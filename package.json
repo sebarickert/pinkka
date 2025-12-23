@@ -11,8 +11,13 @@
     "start": "npm run start:backend & npm run start:frontend",
     "start:test": "npm run start:backend:test & npm run start:frontend",
     "start:backend": "npm -w @pinkka/backend run dev",
+    "start:backend:prod": "npm -w @pinkka/backend run start",
     "start:backend:test": "DATABASE_DB=pinkka_test_db npm -w @pinkka/backend run dev",
     "start:frontend": "npm -w @pinkka/frontend run dev",
+    "start:frontend:prod": "npm -w @pinkka/frontend run serve",
+    "build:backend": "npm -w @pinkka/backend run build",
+    "build:frontend": "npm -w @pinkka/frontend run build",
+    "build:schemas": "npm -w @pinkka/schemas run build",
     "migrate:create": "npm -w @pinkka/backend run migrate:create",
     "migrate:up": "npm -w @pinkka/backend run migrate:up",
     "migrate:up:test": "npm -w @pinkka/backend run migrate:up:test",
@@ -20,7 +25,11 @@
     "docker:psql": "docker exec -it pinkka-database-1 psql -U admin pinkka_db",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix",
-    "prettify": "npx prettier --write ."
+    "prettify": "npx prettier --write .",
+    "docker:build:backend": "docker build -f apps/backend/Dockerfile -t pinkka-backend .",
+    "docker:run:backend": "docker run -p 3000:3000 --env-file apps/backend/.env pinkka-backend",
+    "docker:build:frontend": "docker build -f apps/frontend/Dockerfile -t pinkka-frontend .",
+    "docker:run:frontend": "docker run -p 4173:4173 --env-file apps/frontend/.env pinkka-frontend"
   },
   "type": "commonjs",
   "devDependencies": {

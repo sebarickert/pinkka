@@ -80,7 +80,7 @@ describe("Financial Account Integration Tests", () => {
       expect(body.status).toEqual("error");
       if ("message" in body) {
         expect(body.message).toEqual(
-          `Financial account with id ${id} not found`,
+          `Financial account with id ${id} not found`
         );
       }
     });
@@ -88,7 +88,7 @@ describe("Financial Account Integration Tests", () => {
     test("returns validation error if id is not a valid uuid", async () => {
       const { status, body } = await getFinancialAccount(
         "some-non-existing-id",
-        user,
+        user
       );
       expect(status).toEqual(400);
       expect(body.status).toEqual("error");
@@ -122,8 +122,8 @@ describe("Financial Account Integration Tests", () => {
 
       await Promise.all(
         newAccounts.map(async (payload) =>
-          createFinancialAccount(payload, user),
-        ),
+          createFinancialAccount(payload, user)
+        )
       );
 
       const { status, body, data } = await getFinancialAccounts(user);
@@ -157,7 +157,7 @@ describe("Financial Account Integration Tests", () => {
     test("creates financial account with valid data", async () => {
       const { status, body, data } = await createFinancialAccount(
         newAccountPayload,
-        user,
+        user
       );
       expect(status).toEqual(201);
       expect(body.status).toEqual("success");
@@ -168,6 +168,7 @@ describe("Financial Account Integration Tests", () => {
         .selectAll()
         .executeTakeFirst();
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(FinancialAccountMapper.fromDb(newAccount!)).toMatchObject({
         ...newAccountPayload,
         id: newAccount?.id,
@@ -188,7 +189,7 @@ describe("Financial Account Integration Tests", () => {
 
       const { status, body, data } = await createFinancialAccount(
         newAccountPayloadNegative,
-        user,
+        user
       );
 
       expect(status).toEqual(201);
@@ -200,6 +201,7 @@ describe("Financial Account Integration Tests", () => {
         .selectAll()
         .executeTakeFirst();
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(FinancialAccountMapper.fromDb(newAccount!)).toMatchObject({
         ...newAccountPayload,
         id: newAccount?.id,
@@ -241,7 +243,7 @@ describe("Financial Account Integration Tests", () => {
           type: "wallet",
           initialBalance: 5000,
         },
-        user,
+        user
       );
 
       expect(status).toEqual(200);
@@ -253,6 +255,7 @@ describe("Financial Account Integration Tests", () => {
         .selectAll()
         .executeTakeFirst();
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(accountAfter).not.toMatchObject(accountBefore!);
     });
 
@@ -266,7 +269,7 @@ describe("Financial Account Integration Tests", () => {
       const { status, body } = await updateFinancialAccount(
         account.id,
         {},
-        user,
+        user
       );
 
       expect(status).toEqual(200);
@@ -278,6 +281,7 @@ describe("Financial Account Integration Tests", () => {
         .selectAll()
         .executeTakeFirst();
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(accountAfter).toMatchObject(accountBefore!);
     });
 
@@ -289,7 +293,7 @@ describe("Financial Account Integration Tests", () => {
           type: "wallet",
           initialBalance: 5000,
         },
-        user,
+        user
       );
 
       expect(status).toEqual(400);
@@ -307,7 +311,7 @@ describe("Financial Account Integration Tests", () => {
           type: "wrong",
           initialBalance: 5000,
         } as unknown as UpdateFinancialAccountDto,
-        user,
+        user
       );
 
       expect(status).toEqual(400);
@@ -323,14 +327,14 @@ describe("Financial Account Integration Tests", () => {
         {
           name: "I do not exist",
         },
-        user,
+        user
       );
 
       expect(status).toEqual(404);
       expect(body.status).toEqual("error");
       if ("message" in body) {
         expect(body.message).toEqual(
-          `Financial account with id ${id} not found`,
+          `Financial account with id ${id} not found`
         );
       }
     });
@@ -340,6 +344,7 @@ describe("Financial Account Integration Tests", () => {
         description: "Grocery Shopping",
         amount: 50,
         fromAccountId: account.id,
+        toAccountId: null,
         type: "expense",
         date: new Date().toISOString(),
       } as const;
@@ -351,7 +356,7 @@ describe("Financial Account Integration Tests", () => {
         {
           initialBalance: 6000,
         },
-        user,
+        user
       );
 
       expect(status).toEqual(400);
@@ -365,7 +370,7 @@ describe("Financial Account Integration Tests", () => {
         {
           isDeleted: true,
         },
-        user,
+        user
       );
 
       const { status, body } = await updateFinancialAccount(
@@ -373,7 +378,7 @@ describe("Financial Account Integration Tests", () => {
         {
           name: "Trying to update deleted account",
         },
-        user,
+        user
       );
 
       expect(status).toEqual(404);
@@ -381,7 +386,7 @@ describe("Financial Account Integration Tests", () => {
 
       if ("message" in body) {
         expect(body.message).toEqual(
-          `Financial account with id ${account.id} not found`,
+          `Financial account with id ${account.id} not found`
         );
       }
     });
@@ -412,7 +417,7 @@ describe("Financial Account Integration Tests", () => {
 
       const { status, body, data } = await deleteFinancialAccount(
         account.id,
-        user,
+        user
       );
 
       expect(status).toEqual(200);
@@ -436,7 +441,7 @@ describe("Financial Account Integration Tests", () => {
       expect(body.status).toEqual("error");
       if ("message" in body) {
         expect(body.message).toEqual(
-          `Financial account with id ${id} not found`,
+          `Financial account with id ${id} not found`
         );
       }
     });
@@ -444,7 +449,7 @@ describe("Financial Account Integration Tests", () => {
     test("returns validation error if id is not a valid uuid", async () => {
       const { status, body } = await deleteFinancialAccount(
         "some-non-existing-id",
-        user,
+        user
       );
 
       expect(status).toEqual(400);

@@ -145,7 +145,7 @@ describe("Category Integration Tests", () => {
     test("creates category with valid data", async () => {
       const { status, body, data } = await createCategory(
         newCategoryPayload,
-        user,
+        user
       );
       expect(status).toEqual(201);
       expect(body.status).toEqual("success");
@@ -194,7 +194,7 @@ describe("Category Integration Tests", () => {
           name: "I was just updated!",
           type: "income",
         },
-        user,
+        user
       );
 
       expect(status).toEqual(200);
@@ -206,6 +206,7 @@ describe("Category Integration Tests", () => {
         .selectAll()
         .executeTakeFirst();
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(categoryAfter).not.toMatchObject(categoryBefore!);
     });
 
@@ -227,6 +228,7 @@ describe("Category Integration Tests", () => {
         .selectAll()
         .executeTakeFirst();
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(accountAfter).toMatchObject(categoryBefore!);
     });
 
@@ -234,7 +236,7 @@ describe("Category Integration Tests", () => {
       const { status, body } = await updateCategory(
         "some-non-existing-id",
         {},
-        user,
+        user
       );
 
       expect(status).toEqual(400);
@@ -248,7 +250,7 @@ describe("Category Integration Tests", () => {
       const { status, body } = await updateCategory(
         category.id,
         { asd: "I was just updated!" } as UpdateCategoryDto,
-        user,
+        user
       );
 
       expect(status).toEqual(400);
@@ -261,7 +263,7 @@ describe("Category Integration Tests", () => {
       const { status, body } = await updateCategory(
         id,
         { name: "I was just updated!" },
-        user,
+        user
       );
 
       expect(status).toEqual(404);
@@ -278,7 +280,7 @@ describe("Category Integration Tests", () => {
           initialBalance: 1000,
           type: "bank",
         },
-        user,
+        user
       );
       const account = accountResponse.body.data as FinancialAccountDto;
 
@@ -286,6 +288,7 @@ describe("Category Integration Tests", () => {
         description: "Grocery Shopping",
         amount: 50,
         fromAccountId: account.id,
+        toAccountId: null,
         type: "expense",
         date: new Date().toISOString(),
         categoryId: category.id,
@@ -298,7 +301,7 @@ describe("Category Integration Tests", () => {
         {
           type: "income",
         },
-        user,
+        user
       );
 
       expect(status).toEqual(400);
@@ -313,7 +316,7 @@ describe("Category Integration Tests", () => {
         {
           name: "Trying to update deleted category",
         },
-        user,
+        user
       );
       expect(status).toEqual(404);
       expect(body.status).toEqual("error");
@@ -373,7 +376,7 @@ describe("Category Integration Tests", () => {
     test("returns validation error if id is not a valid uuid", async () => {
       const { status, body } = await deleteCategory(
         "some-non-existing-id",
-        user,
+        user
       );
       expect(status).toEqual(400);
       expect(body.status).toEqual("error");

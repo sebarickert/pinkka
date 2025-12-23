@@ -13,12 +13,18 @@ export const Route = createFileRoute('/login')({
     redirect: z.string().optional().catch(''),
   }),
   beforeLoad: async ({ search }) => {
-    const { data } = await authClient.getSession()
+    try {
+      const { data } = await authClient.getSession()
 
-    if (data?.user) {
-      throw redirect({
-        to: search.redirect || '/app/home',
-      })
+      if (data?.user) {
+        throw redirect({
+          to: search.redirect || '/app/home',
+        })
+      }
+    } catch (error) {
+      // Backend not reachable → just let the page load
+      console.warn('Could not fetch session', error)
+      return
     }
   },
   component: RouteComponent,

@@ -10,11 +10,14 @@
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
     "baseUrl": ".",
+    "rootDir": "src",
+    "outDir": "dist",
     "paths": {
       "@/*": ["./src/*"],
       "@/fixtures/*": ["./tests/fixtures/*"],
       "@/test-utils/*": ["./tests/utils/*"]
     }
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "include": ["src/**/*.ts"]
 }

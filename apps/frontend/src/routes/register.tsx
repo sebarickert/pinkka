@@ -9,12 +9,18 @@ export const Route = createFileRoute('/register')({
     meta: [{ title: pageTitle('Register') }],
   }),
   beforeLoad: async () => {
-    const { data } = await authClient.getSession()
+    try {
+      const { data } = await authClient.getSession()
 
-    if (data?.user) {
-      throw redirect({
-        to: '/app/home',
-      })
+      if (data?.user) {
+        throw redirect({
+          to: '/app/home',
+        })
+      }
+    } catch (error) {
+      // Backend not reachable → just let the page load
+      console.warn('Could not fetch session', error)
+      return
     }
   },
   component: RouteComponent,

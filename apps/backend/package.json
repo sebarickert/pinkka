@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "start": "node dist/index.js",
     "migrate": "node-pg-migrate -j ts",
     "migrate:create": "npm run migrate create",
@@ -21,13 +21,14 @@
     "dotenv": "^17.2.3",
     "hono": "^4.9.9",
     "kysely": "^0.28.7",
+    "node-pg-migrate": "^8.0.4",
     "pg": "^8.16.3",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@types/pg": "^8.15.5",
     "kysely-codegen": "^0.19.0",
-    "node-pg-migrate": "^8.0.3",
+    "tsc-alias": "^1.8.16",
     "tsx": "^4.7.1",
     "vite-tsconfig-paths": "^5.1.4"
   }

@@ -4,10 +4,11 @@ import accounts from "@/routes/financial-accounts.js";
 import authRoute from "@/routes/auth.js";
 import categories from "@/routes/categories.js";
 import transactions from "@/routes/transactions.js";
-import { FRONTEND_URL } from "@/lib/env.js";
 import migrations from "@/routes/migrations.js";
+import { FRONTEND_URL } from "@/lib/env.js";
 
 const app = createRouter();
+
 const routes = [
   authRoute,
   accounts,
@@ -33,7 +34,5 @@ if (FRONTEND_URL) {
 for (const route of routes) {
   app.basePath("/api").route("/", route);
 }
-
-export type AppType = (typeof routes)[number];
 
 export default app;

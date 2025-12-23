@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Button } from '@/components/Button'

@@ -1,22 +1,26 @@
 import * as z from "zod";
 
-const validateIncomeTransaction = (data: any) => {
+type TransactionBase = {
+  type: TransactionType;
+  toAccountId?: string | null;
+  fromAccountId?: string | null;
+};
+
+const validateIncomeTransaction = (data: TransactionBase) => {
   if (data.type === "income") {
     return Boolean(data.toAccountId) && !data.fromAccountId;
   }
-
   return true;
 };
 
-const validateExpenseTransaction = (data: any) => {
+const validateExpenseTransaction = (data: TransactionBase) => {
   if (data.type === "expense") {
     return Boolean(data.fromAccountId) && !data.toAccountId;
   }
-
   return true;
 };
 
-const validateTransferTransaction = (data: any) => {
+const validateTransferTransaction = (data: TransactionBase) => {
   if (data.type === "transfer") {
     return (
       Boolean(data.toAccountId) &&
@@ -24,7 +28,6 @@ const validateTransferTransaction = (data: any) => {
       data.toAccountId !== data.fromAccountId
     );
   }
-
   return true;
 };
 
@@ -102,21 +105,7 @@ export const TransactionDetailDtoSchema = TransactionDtoSchema.safeExtend({
   categoryName: z.string().nullable(),
 });
 
-// export const TransactionWithCategoryDtoSchema = TransactionDtoSchema.safeExtend(
-//   {
-//     category: z
-//       .object({
-//         id: z.uuid(),
-//         name: z.string(),
-//       })
-//       .optional(),
-//   }
-// );
-
 export type TransactionDto = z.infer<typeof TransactionDtoSchema>;
 export type NewTransactionDto = z.infer<typeof NewTransactionDtoSchema>;
 export type UpdateTransactionDto = z.infer<typeof UpdateTransactionDtoSchema>;
 export type TransactionDetailDto = z.infer<typeof TransactionDetailDtoSchema>;
-// export type TransactionWithCategoryDto = z.infer<
-//   typeof TransactionWithCategoryDtoSchema
-// >;

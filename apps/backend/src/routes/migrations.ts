@@ -132,6 +132,7 @@ migrations.post("/migrations/financer/:id", validateIdParameter, async (c) => {
           transaction.fromAccount && !transaction.toAccount
         );
 
+        // eslint-disable-next-line unicorn/no-nested-ternary
         const type = isIncome ? "income" : isExpense ? "expense" : "transfer";
 
         const newTransaction = await TransactionService.create({
@@ -140,11 +141,11 @@ migrations.post("/migrations/financer/:id", validateIdParameter, async (c) => {
             type,
             date: transaction.date,
             fromAccountId: transaction.fromAccount
-              ? accountIdMapping.get(transaction.fromAccount)!
-              : undefined,
+              ? (accountIdMapping.get(transaction.fromAccount) ?? null)
+              : null,
             toAccountId: transaction.toAccount
-              ? accountIdMapping.get(transaction.toAccount)!
-              : undefined,
+              ? (accountIdMapping.get(transaction.toAccount) ?? null)
+              : null,
             description: transaction.description,
           },
           userId,
